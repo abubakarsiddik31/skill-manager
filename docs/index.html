@@ -47,185 +47,260 @@
 
 <style>
   :root {
-    --bg: #020617;
-    --bg-elevated: #0f172a;
-    --bg-panel: #1b2336;
-    --border: #334155;
-    --border-strong: #475569;
-    --text: #f8fafc;
-    --text-dim: #94a3b8;
-    --text-faint: #64748b;
-    --accent: #22c55e;
-    --accent-bright: #4ade80;
-    --accent-dim: #15803d;
-    --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface-2: #111111;
+    --border: rgba(255, 255, 255, 0.12);
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --text: #ffffff;
+    --text-dim: #a0a0a0;
+    --text-faint: #6a6a6a;
+    --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    font-family: var(--font-mono);
+    font-family: var(--sans);
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--accent-bright); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  a { color: var(--text); text-decoration: none; }
+  code { font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border-soft); padding: 1px 6px; border-radius: 4px; font-size: 0.85em; color: var(--text-dim); }
 
-  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- nav ---------- */
+
+  nav.pillnav {
+    position: sticky;
+    top: 16px;
+    z-index: 10;
+    max-width: 620px;
+    margin: 16px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 8px 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(10, 10, 10, 0.75);
+    backdrop-filter: blur(12px);
+    font-size: 13px;
+  }
+  .pillnav .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .pillnav .brand img { width: 18px; height: 18px; border-radius: 4px; }
+  .pillnav .links { display: flex; align-items: center; gap: 20px; color: var(--text-dim); }
+  .pillnav .links a:hover { color: var(--text); }
+  .pillnav .cta {
+    background: #fff;
+    color: #000;
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 12.5px;
+  }
+  .pillnav .cta:hover { background: #e5e5e5; }
+
+  /* ---------- hero ---------- */
 
   header.hero {
-    padding: 72px 0 48px;
+    padding: 96px 0 56px;
     text-align: center;
   }
-  .hero img { width: 84px; height: 84px; border-radius: 20px; }
-  .hero h1 {
-    font-size: 28px;
-    margin: 20px 0 8px;
-    letter-spacing: -0.01em;
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
   }
-  .hero h1 .accent { color: var(--accent-bright); }
+  .badge b {
+    background: #fff;
+    color: #000;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 24px;
+  }
   .hero p.tagline {
     color: var(--text-dim);
-    font-size: 15px;
-    max-width: 560px;
-    margin: 0 auto 32px;
+    font-size: 17px;
+    max-width: 600px;
+    margin: 0 auto 40px;
   }
-
-  .badges { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
-  .badges img { height: 20px; }
 
   .downloads {
     display: flex;
     justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
+    margin-bottom: 20px;
   }
   .dl-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--bg-elevated);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-family: inherit;
   }
-  .dl-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent-bright);
-    text-decoration: none;
-  }
-  .dl-btn.primary {
-    background: var(--accent-dim);
-    border-color: var(--accent);
-    color: #fff;
-  }
-  .dl-btn.primary:hover { background: var(--accent); color: #fff; }
+  .dl-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
+  .dl-btn.primary { background: #fff; color: #000; border-color: #fff; }
+  .dl-btn.primary:hover { background: #e5e5e5; }
+
   .dl-note {
-    text-align: center;
+    font-family: var(--mono);
     color: var(--text-faint);
-    font-size: 12px;
-    margin-top: 14px;
+    font-size: 11.5px;
   }
 
-  section { padding: 40px 0; border-top: 1px solid var(--border); }
+  /* ---------- sections ---------- */
+
+  section { padding: 56px 0; border-top: 1px solid var(--border-soft); }
+  section .kicker {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+  }
   section h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    max-width: 560px;
+  }
+  section > p.lead {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 560px;
+    margin: 0 0 32px;
   }
 
   .features {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 1px;
+    background: var(--border-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    overflow: hidden;
   }
-  .feature h3 { font-size: 14px; margin: 0 0 6px; color: var(--accent-bright); }
-  .feature p { color: var(--text-dim); font-size: 13px; margin: 0; }
+  .feature { background: var(--surface); padding: 22px; }
+  .feature h3 { font-size: 15px; margin: 0 0 8px; font-weight: 700; }
+  .feature p { color: var(--text-dim); font-size: 13.5px; margin: 0; }
 
+  /* mock UI */
   .mock {
     display: flex;
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    background: var(--bg-elevated);
+    background: var(--surface);
     font-size: 11px;
   }
   .mock-side {
-    width: 140px;
-    background: var(--bg-elevated);
-    border-right: 1px solid var(--border);
-    padding: 12px 0;
+    width: 150px;
+    border-right: 1px solid var(--border-soft);
+    padding: 14px 0;
+    flex-shrink: 0;
   }
-  .mock-brand { padding: 0 12px 12px; border-bottom: 1px solid var(--border); margin-bottom: 8px; font-weight: 600; }
-  .mock-item { padding: 6px 12px; color: var(--text-dim); }
-  .mock-item.active { color: var(--text); border-left: 2px solid var(--accent); background: var(--bg-panel); }
-  .mock-main { flex: 1; padding: 14px; }
+  .mock-brand { padding: 0 14px 12px; border-bottom: 1px solid var(--border-soft); margin-bottom: 8px; font-weight: 700; }
+  .mock-item { padding: 7px 14px; color: var(--text-faint); }
+  .mock-item.active { color: var(--text); border-left: 2px solid #fff; background: var(--surface-2); }
+  .mock-main { flex: 1; padding: 16px; min-width: 0; }
   .mock-card {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    padding: 11px 13px;
     margin-bottom: 8px;
   }
-  .mock-toggle { width: 24px; height: 14px; border-radius: 8px; background: var(--accent-dim); border: 1px solid var(--accent); position: relative; flex-shrink: 0; }
-  .mock-toggle::after { content: ""; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-bright); top: 1px; right: 1px; }
-  .mock-toggle.off { background: var(--bg-panel); border-color: var(--border); }
+  .mock-toggle { width: 26px; height: 15px; border-radius: 8px; background: #fff; border: 1px solid #fff; position: relative; flex-shrink: 0; }
+  .mock-toggle::after { content: ""; position: absolute; width: 11px; height: 11px; border-radius: 50%; background: #000; top: 1px; right: 1px; }
+  .mock-toggle.off { background: transparent; border-color: var(--border); }
   .mock-toggle.off::after { background: var(--text-faint); left: 1px; right: auto; }
-  .mock-name { font-weight: 600; }
-  .mock-desc { color: var(--text-faint); margin-top: 2px; }
+  .mock-name { font-weight: 700; }
+  .mock-desc { color: var(--text-faint); margin-top: 3px; }
 
-  table.tools { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table.tools th, table.tools td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
-  table.tools th { color: var(--text-faint); font-weight: 500; }
-  code { background: var(--bg-panel); padding: 1px 6px; border-radius: 4px; color: var(--accent-bright); font-size: 12px; }
+  table.tools { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.tools th, table.tools td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--border-soft); }
+  table.tools th { font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; font-size: 10.5px; color: var(--text-faint); font-weight: 500; }
 
   footer {
     text-align: center;
-    padding: 40px 0 60px;
+    padding: 56px 0 72px;
     color: var(--text-faint);
     font-size: 12px;
+    font-family: var(--mono);
   }
+  footer a { color: var(--text-dim); }
+  footer a:hover { color: var(--text); }
 </style>
 </head>
 <body>
 
+<nav class="pillnav">
+  <div class="brand">
+    <img src="./logo.svg" alt="" />
+    skillmanager
+  </div>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="#tools">Tools</a>
+    <a href="https://github.com/abubakarsiddik31/skill-manager">GitHub</a>
+  </div>
+  <a class="cta" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">Download</a>
+</nav>
+
 <div class="wrap">
   <header class="hero">
-    <img src="./logo.svg" alt="Skill Manager logo" width="84" height="84" />
-    <h1>skill<span class="accent">manager</span></h1>
+    <div class="badge"><b>OSS</b> Claude Code today · Codex, Cursor &amp; OpenCode best-effort</div>
+    <h1>One dashboard for<br />every agent skill.</h1>
     <p class="tagline">
-      One dashboard to discover, enable, disable, edit, and delete AI coding
-      agent skills across Claude Code, Codex, Cursor, and OpenCode.
+      Discover, enable, disable, edit, and delete AI coding agent skills
+      across Claude Code, Codex, Cursor, and OpenCode — instead of digging
+      through four different config folders by hand.
     </p>
-
-    <div class="badges">
-      <img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" />
-      <img src="https://img.shields.io/badge/built%20with-Tauri-22c55e.svg" alt="Built with Tauri" />
-      <img src="https://img.shields.io/badge/TypeScript-strict-22c55e.svg" alt="TypeScript" />
-    </div>
 
     <div class="downloads" id="downloads">
-      <a class="dl-btn" data-os="mac" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">⌘ macOS</a>
-      <a class="dl-btn" data-os="win" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">⊞ Windows</a>
-      <a class="dl-btn" data-os="linux" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">🐧 Linux</a>
+      <a class="dl-btn" data-os="mac" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">macOS</a>
+      <a class="dl-btn" data-os="win" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">Windows</a>
+      <a class="dl-btn" data-os="linux" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">Linux</a>
+      <a class="dl-btn" href="https://github.com/abubakarsiddik31/skill-manager">Star on GitHub</a>
     </div>
-    <p class="dl-note">
-      All builds are free and open source.
-      <a href="https://github.com/abubakarsiddik31/skill-manager/releases">See all releases</a>
-      or <a href="https://github.com/abubakarsiddik31/skill-manager">browse the source</a>.
-    </p>
+    <p class="dl-note">free · open source · mit licensed</p>
   </header>
 
   <section>
+    <div class="kicker">the app</div>
     <h2>What it looks like</h2>
     <div class="mock">
       <div class="mock-side">
-        <div class="mock-brand">skill<span style="color:#4ade80">manager</span></div>
+        <div class="mock-brand">skillmanager</div>
         <div class="mock-item active">all skills</div>
         <div class="mock-item">Claude</div>
         <div class="mock-item">Codex</div>
@@ -249,8 +324,9 @@
     </div>
   </section>
 
-  <section>
-    <h2>Features</h2>
+  <section id="features">
+    <div class="kicker">features</div>
+    <h2>Everything the four config folders won't show you.</h2>
     <div class="features">
       <div class="feature">
         <h3>Unified view</h3>
@@ -271,7 +347,8 @@
     </div>
   </section>
 
-  <section>
+  <section id="tools">
+    <div class="kicker">coverage</div>
     <h2>Supported tools</h2>
     <table class="tools">
       <thead><tr><th>Tool</th><th>Skills directory</th><th>Status</th></tr></thead>
@@ -285,8 +362,7 @@
   </section>
 
   <footer>
-    open source · MIT ·
-    <a href="https://github.com/abubakarsiddik31/skill-manager">github.com/abubakarsiddik31/skill-manager</a>
+    open source · mit · <a href="https://github.com/abubakarsiddik31/skill-manager">github.com/abubakarsiddik31/skill-manager</a>
   </footer>
 </div>
 
@@ -295,7 +371,7 @@
     var ua = navigator.userAgent;
     var os = /Mac/.test(ua) ? "mac" : /Win/.test(ua) ? "win" : /Linux/.test(ua) ? "linux" : null;
     if (!os) return;
-    document.querySelectorAll("#downloads .dl-btn").forEach(function (btn) {
+    document.querySelectorAll("#downloads .dl-btn[data-os]").forEach(function (btn) {
       if (btn.dataset.os === os) btn.classList.add("primary");
     });
   })();
