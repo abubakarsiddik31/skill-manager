@@ -5,7 +5,6 @@ description = "Manage AI coding agent skills (Claude, Codex, Cursor, OpenCode) f
 authors = ["Skill Manager contributors"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/skill-manager/skill-manager"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
