@@ -23,3 +23,6 @@ export interface ProjectInfo {
   path: string;
   name: string;
 }
+
+export type View = { kind: "global" } | { kind: "project"; project: ProjectInfo };
+
