@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "A dark-themed desktop dashboard to discover, enable, disable, edit, and delete AI coding agent skills across Claude, Codex, Cursor, and OpenCode.",
+  "description": "Discover, enable, disable, edit, and delete AI coding agent skills across Claude, Codex, Cursor, and OpenCode.",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

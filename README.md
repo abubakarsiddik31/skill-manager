@@ -4,7 +4,7 @@
 
 # Skill Manager
 
-**A dark-themed desktop dashboard for managing AI coding agent skills.**
+**One dashboard to manage every AI coding agent skill you've installed.**
 
 One place to discover, enable, disable, edit, and delete the skills installed for
 [Claude Code](https://claude.com/claude-code), Codex, Cursor, and OpenCode.
