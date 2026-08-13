@@ -1,7 +1,7 @@
 {
   "name": "skill-manager",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Discover, enable, disable, edit, and delete AI coding agent skills across Claude, Codex, Cursor, and OpenCode.",
   "scripts": {
