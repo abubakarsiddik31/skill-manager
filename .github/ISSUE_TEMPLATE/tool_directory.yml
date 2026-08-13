@@ -1,0 +1,45 @@
+name: Tool skill-directory correction
+description: A tool's skill directory convention changed, or our docs are wrong
+labels: ["adapter"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        All four tools' skill directories are currently verified against
+        their own docs (see the [README](../../README.md#supported-tools)).
+        If one has changed, or you've found a mistake, this unblocks the fix.
+
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Tool
+      options:
+        - Claude Code
+        - Codex
+        - Cursor
+        - OpenCode
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: input
+    id: user-dir
+    attributes:
+      label: Skills directory (user-level)
+      placeholder: e.g. ~/.agents/skills
+    validations:
+      required: true
+
+  - type: input
+    id: project-dir
+    attributes:
+      label: Skills directory (project-level, if different)
+      placeholder: e.g. .agents/skills
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: Docs link, changelog entry, or how you confirmed this.
+    validations:
+      required: true

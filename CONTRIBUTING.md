@@ -1,18 +1,22 @@
 ## Contributing
 
 Skill Manager is small on purpose — most useful contributions fall into one of
-these buckets.
+these buckets. Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before
+participating.
 
-### Pin down a tool's real skill directory
+### Keep a tool's skill directory in sync
 
-Codex, Cursor, and OpenCode's skill directory conventions are best-effort
-guesses right now (see the table in the [README](README.md#supported-tools)).
-If you actually use one of these tools and know its real convention:
+Claude Code, Codex, Cursor, and OpenCode's skill directories are all verified
+against each tool's own docs (see the [README](README.md#supported-tools)),
+but these tools evolve. If a tool changes its convention or you find it's
+wrong:
 
-1. Update the path in `src-tauri/src/skills/<tool>.rs` (both `skills_dir()`
-   and `project_subpath()`).
-2. Update the table in `README.md` and `docs/index.html`.
-3. Open a PR. One-line path fixes are very welcome.
+1. Open an issue using the [tool directory correction
+   template](https://github.com/abubakarsiddik31/skill-manager/issues/new?template=tool_directory.yml), with a source
+   (docs link or changelog entry).
+2. Or go straight to a PR: update the path in `src-tauri/src/skills/<tool>.rs`
+   (both `skills_dir()` and `project_subpath()`), and the tables in
+   `README.md` and `docs/index.html`.
 
 ### Add a new tool adapter
 
@@ -24,11 +28,31 @@ Every tool implements the same `SkillAdapter` trait
 2. Register it in `all_adapters()` and `adapter_for()` in
    `src-tauri/src/skills/mod.rs`.
 3. Add the tool to the `AgentTool` enum and its `label()`.
+4. Cite the source you verified the directory paths against, in a doc
+   comment — same as the existing adapters.
 
-### Bug fixes / small improvements
+### Report a bug
 
-Open an issue first for anything beyond a small fix, so we're aligned before
-you put in the work. For small fixes, a PR is fine on its own.
+Open an issue using the [bug report
+template](https://github.com/abubakarsiddik31/skill-manager/issues/new?template=bug_report.yml). Include steps to
+reproduce — issues without them are much slower to act on.
+
+### Propose a feature
+
+Open an issue using the [feature request
+template](https://github.com/abubakarsiddik31/skill-manager/issues/new?template=feature_request.yml) before writing code
+for anything beyond a small fix, so we're aligned on direction first.
+
+### Pull request process
+
+1. Fork the repo and create a branch off `main`.
+2. Make your change. Keep the diff scoped to one concern.
+3. Run the checks below - both must pass clean.
+4. Open a PR with a clear description of *why*, not just *what*. Link the
+   issue it resolves, if any.
+5. Commit messages: imperative mood, lowercase start (`fix ...`, `add ...`,
+   not `Fixed`/`Added`), explain the reasoning in the body when it's not
+   obvious from the diff alone.
 
 ### Development setup
 
@@ -42,4 +66,5 @@ Requires the [Rust toolchain](https://www.rust-lang.org/tools/install)
 [here](https://tauri.app/start/prerequisites/)).
 
 Run `npx tsc --noEmit` and `cargo check` (from `src-tauri/`) before opening a
-PR — both must pass clean.
+PR — both must pass clean. If you touched `src-tauri/src/skills/`, also run
+`cargo test` from `src-tauri/`.

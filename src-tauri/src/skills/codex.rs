@@ -1,10 +1,10 @@
 use super::{home_dir, AgentTool, SkillAdapter};
 use std::path::PathBuf;
 
-/// Codex CLI skills. Codex does not (yet) have a single documented skills
-/// directory the way Claude Code does, so this points at the most likely
-/// user-level location and follows Claude's `SKILL.md` shape. Update this
-/// path if/when Codex publishes an official convention.
+/// Codex CLI skills. Codex has no `.codex`-specific skills directory -
+/// per OpenAI's docs (developers.openai.com/codex/skills), it reads
+/// personal skills from `~/.agents/skills` and project skills by walking
+/// up from the working directory to `<repo-root>/.agents/skills`.
 pub struct CodexAdapter;
 
 impl SkillAdapter for CodexAdapter {
@@ -13,10 +13,10 @@ impl SkillAdapter for CodexAdapter {
     }
 
     fn skills_dir(&self) -> PathBuf {
-        home_dir().join(".codex").join("skills")
+        home_dir().join(".agents").join("skills")
     }
 
     fn project_subpath(&self) -> &'static str {
-        ".codex/skills"
+        ".agents/skills"
     }
 }

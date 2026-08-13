@@ -1,10 +1,12 @@
 use super::{home_dir, AgentTool, SkillAdapter};
 use std::path::PathBuf;
 
-/// Cursor skills. Cursor's own convention (rules vs. skills) is still
-/// evolving; this points at the most likely user-level location and
-/// follows Claude's `SKILL.md` shape. Update this path once Cursor's
-/// skills format is confirmed.
+/// Cursor skills. Verified against Cursor's docs (cursor.com/docs/skills):
+/// project skills in `.cursor/skills`, personal skills in
+/// `~/.cursor/skills`. Cursor also reads the shared `.agents/skills`
+/// convention and Claude/Codex's directories for compatibility, but those
+/// are already covered by their own adapters, so listing them again here
+/// would just duplicate the same skill under two tools.
 pub struct CursorAdapter;
 
 impl SkillAdapter for CursorAdapter {

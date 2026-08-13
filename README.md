@@ -20,7 +20,7 @@
 ## The problem
 
 If you use more than one AI coding agent, your skills are scattered across
-`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, and
+`~/.claude/skills`, `~/.agents/skills`, `~/.cursor/skills`, and
 `~/.config/opencode/skills` — four folders, four formats, zero shared view.
 
 - **You can't see what's installed.** Every tool hides its skills in its own
@@ -58,37 +58,32 @@ picked up across the ecosystem (Claude Code, Codex, Cursor, OpenCode, and others
 
 ## Supported tools
 
-| Tool | Skills directory | Status |
-| --- | --- | --- |
-| Claude Code | `~/.claude/skills` | ✅ fully supported |
-| Codex | `~/.codex/skills` | 🧪 best-effort (path unconfirmed) |
-| Cursor | `~/.cursor/skills` | 🧪 best-effort (path unconfirmed) |
-| OpenCode | `~/.config/opencode/skills` | 🧪 best-effort (path unconfirmed) |
+| Tool | User-level directory | Project-level directory | Status |
+| --- | --- | --- | --- |
+| Claude Code | `~/.claude/skills` | `.claude/skills` | ✅ fully supported |
+| Codex | `~/.agents/skills` | `.agents/skills` | ✅ fully supported |
+| Cursor | `~/.cursor/skills` | `.cursor/skills` | ✅ fully supported |
+| OpenCode | `~/.config/opencode/skills` | `.opencode/skills` | ✅ fully supported |
 
-Claude Code's `SKILL.md` convention is well documented and fully wired up. The
-other three tools' skill directories are evolving and not yet officially
-standardized — see the roadmap below.
+All four paths are verified against each tool's own docs — [Claude
+Code](https://code.claude.com/docs/en/skills),
+[Codex](https://developers.openai.com/codex/skills),
+[Cursor](https://cursor.com/docs/skills), and
+[OpenCode](https://opencode.ai/docs/skills/) — not guessed. If a tool changes
+its convention, [open an issue](.github/ISSUE_TEMPLATE/tool_directory.yml) and
+we'll update the adapter.
 
 ## Roadmap
 
-The near-term goal is **100% verified support for the four tools above** before
-expanding further:
-
-- [ ] Confirm and verify Codex's real skills directory convention
-- [ ] Confirm and verify Cursor's real skills directory convention
-- [ ] Confirm and verify OpenCode's real skills directory convention
-- [ ] Mark all four tools "fully supported" in the table above
-
-Once that's done:
+With all four tools verified, the focus moves to:
 
 - [ ] Add Gemini / Google AI support
 - [ ] Add support for other emerging coding agents as they adopt `SKILL.md`
 - [ ] Auto-update support (in-app update checks, no manual reinstall)
 - [ ] Code-signed builds (no more Gatekeeper/SmartScreen warnings)
 
-If you actually use one of the unconfirmed tools, [this is the single most
-useful thing you can contribute](CONTRIBUTING.md#pin-down-a-tools-real-skill-directory) —
-it's a one-line fix, and it directly unblocks the roadmap above.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to pick any of these up, or add
+support for a tool not listed above.
 
 ## Download
 

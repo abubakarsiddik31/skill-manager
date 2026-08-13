@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question / discuss an idea
+    url: https://github.com/abubakarsiddik31/skill-manager/discussions
+    about: For anything that isn't a bug report, feature request, or directory correction.
