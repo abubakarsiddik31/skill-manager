@@ -1,16 +1,17 @@
 :root {
-  --bg: #09090b;
-  --bg-elevated: #131316;
-  --bg-panel: #18181b;
-  --border: #27272a;
-  --border-strong: #3f3f46;
-  --text: #e8e6e3;
-  --text-dim: #9a9490;
-  --text-faint: #6b6560;
-  --accent: #6366f1;
-  --accent-bright: #818cf8;
-  --accent-dim: #3730a3;
-  --green: #3fb950;
+  --bg: #020617;
+  --bg-elevated: #0f172a;
+  --bg-panel: #1b2336;
+  --border: #334155;
+  --border-strong: #475569;
+  --text: #f8fafc;
+  --text-dim: #94a3b8;
+  --text-faint: #64748b;
+  --accent: #22c55e;
+  --accent-bright: #4ade80;
+  --accent-dim: #15803d;
+  --danger: #ef4444;
+  --danger-bright: #f87171;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace,
     Menlo, Consolas, monospace;
 
@@ -296,8 +297,8 @@ body,
 }
 
 .icon-btn.danger:hover {
-  color: var(--accent-bright);
-  border-color: var(--accent-dim);
+  color: var(--danger-bright);
+  border-color: var(--danger);
 }
 
 /* toggle switch */
