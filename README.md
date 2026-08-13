@@ -9,9 +9,9 @@
 One place to discover, enable, disable, edit, and delete the skills installed for
 [Claude Code](https://claude.com/claude-code), Codex, Cursor, and OpenCode.
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-8b0000.svg)](LICENSE)
-[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri-8b0000.svg)](https://tauri.app)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-8b0000.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-6366f1.svg)](LICENSE)
+[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri-6366f1.svg)](https://tauri.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-6366f1.svg)](https://www.typescriptlang.org/)
 
 </div>
 

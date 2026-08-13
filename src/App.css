@@ -1,15 +1,15 @@
 :root {
-  --bg: #0a0a0c;
-  --bg-elevated: #121215;
-  --bg-panel: #161313;
-  --border: #2a1416;
-  --border-strong: #4a1c1f;
+  --bg: #09090b;
+  --bg-elevated: #131316;
+  --bg-panel: #18181b;
+  --border: #27272a;
+  --border-strong: #3f3f46;
   --text: #e8e6e3;
   --text-dim: #9a9490;
   --text-faint: #6b6560;
-  --red: #ff3b3b;
-  --red-bright: #ff5c5c;
-  --red-dim: #8b0000;
+  --accent: #6366f1;
+  --accent-bright: #818cf8;
+  --accent-dim: #3730a3;
   --green: #3fb950;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace,
     Menlo, Consolas, monospace;
@@ -75,7 +75,7 @@ body,
 }
 
 .brand-name .accent {
-  color: var(--red-bright);
+  color: var(--accent-bright);
 }
 
 .nav-item {
@@ -98,7 +98,7 @@ body,
 
 .nav-item.active {
   color: var(--text);
-  border-left-color: var(--red);
+  border-left-color: var(--accent);
   background: var(--bg-panel);
 }
 
@@ -113,7 +113,7 @@ body,
 
 .nav-item.active .count {
   border-color: var(--border-strong);
-  color: var(--red-bright);
+  color: var(--accent-bright);
 }
 
 .nav-item .dir-missing {
@@ -197,7 +197,7 @@ body,
 }
 
 .empty-state code {
-  color: var(--red-bright);
+  color: var(--accent-bright);
   background: var(--bg-panel);
   padding: 2px 6px;
   border-radius: 4px;
@@ -243,7 +243,7 @@ body,
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--red-bright);
+  color: var(--accent-bright);
   border: 1px solid var(--border-strong);
   border-radius: 4px;
   padding: 1px 6px;
@@ -296,8 +296,8 @@ body,
 }
 
 .icon-btn.danger:hover {
-  color: var(--red-bright);
-  border-color: var(--red-dim);
+  color: var(--accent-bright);
+  border-color: var(--accent-dim);
 }
 
 /* toggle switch */
@@ -314,8 +314,8 @@ body,
 }
 
 .toggle.on {
-  background: var(--red-dim);
-  border-color: var(--red);
+  background: var(--accent-dim);
+  border-color: var(--accent);
 }
 
 .toggle .knob {
@@ -330,7 +330,7 @@ body,
 }
 
 .toggle.on .knob {
-  background: var(--red-bright);
+  background: var(--accent-bright);
   transform: translateX(16px);
 }
 
@@ -408,11 +408,11 @@ body,
 }
 
 .btn.primary {
-  background: var(--red-dim);
-  border-color: var(--red);
+  background: var(--accent-dim);
+  border-color: var(--accent);
   color: #fff;
 }
 
 .btn.primary:hover {
-  background: var(--red);
+  background: var(--accent);
 }
