@@ -36,6 +36,9 @@ place.
   own config).
 - **Edit** a skill's `SKILL.md` directly from the app.
 - **Delete** skills you no longer need.
+- **Per-project breakdown** — track individual project folders and see the
+  `.claude/skills`, `.codex/skills`, etc. installed inside each one, separate
+  from your global (user-level) skills.
 - **Search** across names and descriptions.
 - Dark, terminal-inspired UI — built for people who live in a monospace font.
 

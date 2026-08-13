@@ -76,16 +76,28 @@ pub trait SkillAdapter: Send + Sync {
     /// User-level skills directory for this tool, e.g. `~/.claude/skills`.
     fn skills_dir(&self) -> PathBuf;
 
+    /// Path to this tool's skills directory relative to a project root,
+    /// e.g. `.claude/skills`. Used to find project-level skills alongside
+    /// the user-level ones from `skills_dir()`.
+    fn project_subpath(&self) -> &'static str;
+
     fn discover(&self) -> Vec<Skill> {
-        let mut skills = scan_dir(self.tool(), &self.skills_dir(), SkillScope::User, true);
-        skills.extend(scan_dir(
-            self.tool(),
-            &self.skills_dir().join(".disabled"),
-            SkillScope::User,
-            false,
-        ));
-        skills
+        scan_scope(self.tool(), &self.skills_dir(), SkillScope::User)
     }
+
+    fn discover_at(&self, project_root: &Path) -> Vec<Skill> {
+        scan_scope(
+            self.tool(),
+            &project_root.join(self.project_subpath()),
+            SkillScope::Project,
+        )
+    }
+}
+
+fn scan_scope(tool: AgentTool, dir: &Path, scope: SkillScope) -> Vec<Skill> {
+    let mut skills = scan_dir(tool, dir, scope.clone(), true);
+    skills.extend(scan_dir(tool, &dir.join(DISABLED_DIR), scope, false));
+    skills
 }
 
 const MANIFEST_FILE: &str = "SKILL.md";
@@ -205,4 +217,11 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
 
 pub fn home_dir() -> PathBuf {
     dirs::home_dir().unwrap_or_else(|| PathBuf::from("."))
+}
+
+pub fn discover_project_skills(project_root: &Path) -> Vec<Skill> {
+    all_adapters()
+        .into_iter()
+        .flat_map(|adapter| adapter.discover_at(project_root))
+        .collect()
 }

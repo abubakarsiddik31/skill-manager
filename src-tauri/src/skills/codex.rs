@@ -15,4 +15,8 @@ impl SkillAdapter for CodexAdapter {
     fn skills_dir(&self) -> PathBuf {
         home_dir().join(".codex").join("skills")
     }
+
+    fn project_subpath(&self) -> &'static str {
+        ".codex/skills"
+    }
 }

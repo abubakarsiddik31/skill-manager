@@ -18,3 +18,8 @@ export interface ToolInfo {
   skillsDir: string;
   dirExists: boolean;
 }
+
+export interface ProjectInfo {
+  path: string;
+  name: string;
+}

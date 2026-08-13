@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { Skill, ToolInfo } from "../types";
+import { open } from "@tauri-apps/plugin-dialog";
+import type { ProjectInfo, Skill, ToolInfo } from "../types";
 
 /**
  * Thin client over the Rust-side adapters (src-tauri/src/skills).
@@ -25,5 +26,22 @@ export const api = {
   },
   writeSkillContent(id: string, content: string): Promise<void> {
     return invoke("write_skill_content", { id, content });
+  },
+
+  listProjects(): Promise<ProjectInfo[]> {
+    return invoke("list_projects");
+  },
+  addProject(path: string): Promise<ProjectInfo> {
+    return invoke("add_project", { path });
+  },
+  removeProject(path: string): Promise<void> {
+    return invoke("remove_project", { path });
+  },
+  listProjectSkills(path: string): Promise<Skill[]> {
+    return invoke("list_project_skills", { path });
+  },
+  async pickProjectFolder(): Promise<string | null> {
+    const selected = await open({ directory: true, multiple: false });
+    return typeof selected === "string" ? selected : null;
   },
 };

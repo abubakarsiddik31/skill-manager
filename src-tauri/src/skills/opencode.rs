@@ -14,4 +14,8 @@ impl SkillAdapter for OpenCodeAdapter {
     fn skills_dir(&self) -> PathBuf {
         home_dir().join(".config").join("opencode").join("skills")
     }
+
+    fn project_subpath(&self) -> &'static str {
+        ".opencode/skills"
+    }
 }

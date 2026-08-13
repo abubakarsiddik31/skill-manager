@@ -15,4 +15,8 @@ impl SkillAdapter for CursorAdapter {
     fn skills_dir(&self) -> PathBuf {
         home_dir().join(".cursor").join("skills")
     }
+
+    fn project_subpath(&self) -> &'static str {
+        ".cursor/skills"
+    }
 }

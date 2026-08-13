@@ -14,4 +14,8 @@ impl SkillAdapter for ClaudeAdapter {
     fn skills_dir(&self) -> PathBuf {
         home_dir().join(".claude").join("skills")
     }
+
+    fn project_subpath(&self) -> &'static str {
+        ".claude/skills"
+    }
 }
