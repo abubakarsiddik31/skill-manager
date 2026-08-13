@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Skill Manager — a desktop dashboard for AI coding agent skills</title>
+<meta name="description" content="Skill Manager is a free, open-source, dark-themed desktop app to discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, and OpenCode. Available for macOS, Windows, and Linux." />
+<meta name="keywords" content="skill manager, claude code skills, agent skills, claude skills manager, codex skills, cursor skills, opencode skills, ai coding agent, developer tools, tauri desktop app" />
+<meta name="author" content="Skill Manager contributors" />
+<link rel="canonical" href="https://abubakarsiddik31.github.io/skill-manager/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Skill Manager — a desktop dashboard for AI coding agent skills" />
+<meta property="og:description" content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, and OpenCode — from one dark-themed desktop app." />
+<meta property="og:url" content="https://abubakarsiddik31.github.io/skill-manager/" />
+<meta property="og:image" content="https://abubakarsiddik31.github.io/skill-manager/logo.svg" />
+<meta property="og:site_name" content="Skill Manager" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Skill Manager — a desktop dashboard for AI coding agent skills" />
+<meta name="twitter:description" content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, and OpenCode." />
+<meta name="twitter:image" content="https://abubakarsiddik31.github.io/skill-manager/logo.svg" />
+
+<link rel="icon" type="image/svg+xml" href="./logo.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Skill Manager",
+  "operatingSystem": "macOS, Windows, Linux",
+  "applicationCategory": "DeveloperApplication",
+  "description": "A dark-themed desktop dashboard to discover, enable, disable, edit, and delete AI coding agent skills across Claude Code, Codex, Cursor, and OpenCode.",
+  "url": "https://abubakarsiddik31.github.io/skill-manager/",
+  "image": "https://abubakarsiddik31.github.io/skill-manager/logo.svg",
+  "downloadUrl": "https://github.com/abubakarsiddik31/skill-manager/releases/latest",
+  "license": "https://github.com/abubakarsiddik31/skill-manager/blob/main/LICENSE",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+
+<style>
+  :root {
+    --bg: #020617;
+    --bg-elevated: #0f172a;
+    --bg-panel: #1b2336;
+    --border: #334155;
+    --border-strong: #475569;
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+    --text-faint: #64748b;
+    --accent: #22c55e;
+    --accent-bright: #4ade80;
+    --accent-dim: #15803d;
+    --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--font-mono);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: var(--accent-bright); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero {
+    padding: 72px 0 48px;
+    text-align: center;
+  }
+  .hero img { width: 84px; height: 84px; border-radius: 20px; }
+  .hero h1 {
+    font-size: 28px;
+    margin: 20px 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 .accent { color: var(--accent-bright); }
+  .hero p.tagline {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 560px;
+    margin: 0 auto 32px;
+  }
+
+  .badges { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
+  .badges img { height: 20px; }
+
+  .downloads {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .dl-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .dl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent-bright);
+    text-decoration: none;
+  }
+  .dl-btn.primary {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .dl-btn.primary:hover { background: var(--accent); color: #fff; }
+  .dl-note {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 12px;
+    margin-top: 14px;
+  }
+
+  section { padding: 40px 0; border-top: 1px solid var(--border); }
+  section h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .feature h3 { font-size: 14px; margin: 0 0 6px; color: var(--accent-bright); }
+  .feature p { color: var(--text-dim); font-size: 13px; margin: 0; }
+
+  .mock {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    font-size: 11px;
+  }
+  .mock-side {
+    width: 140px;
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border);
+    padding: 12px 0;
+  }
+  .mock-brand { padding: 0 12px 12px; border-bottom: 1px solid var(--border); margin-bottom: 8px; font-weight: 600; }
+  .mock-item { padding: 6px 12px; color: var(--text-dim); }
+  .mock-item.active { color: var(--text); border-left: 2px solid var(--accent); background: var(--bg-panel); }
+  .mock-main { flex: 1; padding: 14px; }
+  .mock-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .mock-toggle { width: 24px; height: 14px; border-radius: 8px; background: var(--accent-dim); border: 1px solid var(--accent); position: relative; flex-shrink: 0; }
+  .mock-toggle::after { content: ""; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-bright); top: 1px; right: 1px; }
+  .mock-toggle.off { background: var(--bg-panel); border-color: var(--border); }
+  .mock-toggle.off::after { background: var(--text-faint); left: 1px; right: auto; }
+  .mock-name { font-weight: 600; }
+  .mock-desc { color: var(--text-faint); margin-top: 2px; }
+
+  table.tools { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.tools th, table.tools td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  table.tools th { color: var(--text-faint); font-weight: 500; }
+  code { background: var(--bg-panel); padding: 1px 6px; border-radius: 4px; color: var(--accent-bright); font-size: 12px; }
+
+  footer {
+    text-align: center;
+    padding: 40px 0 60px;
+    color: var(--text-faint);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <img src="./logo.svg" alt="Skill Manager logo" width="84" height="84" />
+    <h1>skill<span class="accent">manager</span></h1>
+    <p class="tagline">
+      A dark-themed desktop dashboard to discover, enable, disable, edit, and
+      delete AI coding agent skills across Claude Code, Codex, Cursor, and OpenCode.
+    </p>
+
+    <div class="badges">
+      <img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" />
+      <img src="https://img.shields.io/badge/built%20with-Tauri-22c55e.svg" alt="Built with Tauri" />
+      <img src="https://img.shields.io/badge/TypeScript-strict-22c55e.svg" alt="TypeScript" />
+    </div>
+
+    <div class="downloads" id="downloads">
+      <a class="dl-btn" data-os="mac" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">⌘ macOS</a>
+      <a class="dl-btn" data-os="win" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">⊞ Windows</a>
+      <a class="dl-btn" data-os="linux" href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">🐧 Linux</a>
+    </div>
+    <p class="dl-note">
+      All builds are free and open source.
+      <a href="https://github.com/abubakarsiddik31/skill-manager/releases">See all releases</a>
+      or <a href="https://github.com/abubakarsiddik31/skill-manager">browse the source</a>.
+    </p>
+  </header>
+
+  <section>
+    <h2>What it looks like</h2>
+    <div class="mock">
+      <div class="mock-side">
+        <div class="mock-brand">skill<span style="color:#4ade80">manager</span></div>
+        <div class="mock-item active">all skills</div>
+        <div class="mock-item">Claude</div>
+        <div class="mock-item">Codex</div>
+        <div class="mock-item">Cursor</div>
+        <div class="mock-item">OpenCode</div>
+      </div>
+      <div class="mock-main">
+        <div class="mock-card">
+          <div class="mock-toggle"></div>
+          <div><div class="mock-name">pdf-tools</div><div class="mock-desc">Read, edit, merge, and split PDF files</div></div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-toggle"></div>
+          <div><div class="mock-name">code-review</div><div class="mock-desc">Review a diff against repo conventions</div></div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-toggle off"></div>
+          <div><div class="mock-name">banner-design</div><div class="mock-desc">Design banners for social and web</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Features</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>Unified view</h3>
+        <p>See every tool's skills directory in one dashboard instead of digging through <code>~/.claude</code>, <code>~/.codex</code>, and friends.</p>
+      </div>
+      <div class="feature">
+        <h3>Enable / disable</h3>
+        <p>Toggle a skill off without deleting it — fully reversible, never touches the tool's own config.</p>
+      </div>
+      <div class="feature">
+        <h3>Edit &amp; delete</h3>
+        <p>Open a skill's <code>SKILL.md</code> and edit it directly, or remove it entirely when it's no longer needed.</p>
+      </div>
+      <div class="feature">
+        <h3>Per-project breakdown</h3>
+        <p>Track individual project folders and see exactly which skills are installed inside each one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Supported tools</h2>
+    <table class="tools">
+      <thead><tr><th>Tool</th><th>Skills directory</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Claude Code</td><td><code>~/.claude/skills</code></td><td>fully supported</td></tr>
+        <tr><td>Codex</td><td><code>~/.codex/skills</code></td><td>best-effort</td></tr>
+        <tr><td>Cursor</td><td><code>~/.cursor/skills</code></td><td>best-effort</td></tr>
+        <tr><td>OpenCode</td><td><code>~/.config/opencode/skills</code></td><td>best-effort</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    open source · MIT ·
+    <a href="https://github.com/abubakarsiddik31/skill-manager">github.com/abubakarsiddik31/skill-manager</a>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var ua = navigator.userAgent;
+    var os = /Mac/.test(ua) ? "mac" : /Win/.test(ua) ? "win" : /Linux/.test(ua) ? "linux" : null;
+    if (!os) return;
+    document.querySelectorAll("#downloads .dl-btn").forEach(function (btn) {
+      if (btn.dataset.os === os) btn.classList.add("primary");
+    });
+  })();
+</script>
+</body>
+</html>

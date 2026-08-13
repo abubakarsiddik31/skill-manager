@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://abubakarsiddik31.github.io/skill-manager/sitemap.xml
