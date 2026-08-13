@@ -169,14 +169,20 @@ fn parse_frontmatter(raw: &str) -> (String, String) {
 }
 
 pub fn toggle_enabled(skill_path: &Path, enable: bool) -> std::io::Result<PathBuf> {
-    let skills_dir = skill_path
-        .parent()
-        .and_then(|p| p.parent())
-        .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "invalid skill path"))?;
-    let name = skill_path
-        .parent()
-        .and_then(|p| p.file_name())
-        .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "invalid skill path"))?;
+    let invalid = || std::io::Error::new(std::io::ErrorKind::NotFound, "invalid skill path");
+
+    let skill_dir = skill_path.parent().ok_or_else(invalid)?;
+    let name = skill_dir.file_name().ok_or_else(invalid)?;
+    let parent = skill_dir.parent().ok_or_else(invalid)?;
+
+    // A disabled skill's manifest lives one level deeper, under a
+    // `.disabled` folder inside the real skills directory - skip that
+    // extra segment so `skills_dir` is correct in both directions.
+    let skills_dir = if parent.file_name().and_then(|n| n.to_str()) == Some(DISABLED_DIR) {
+        parent.parent().ok_or_else(invalid)?
+    } else {
+        parent
+    };
 
     let (from, to) = if enable {
         (skills_dir.join(DISABLED_DIR).join(name), skills_dir.join(name))
@@ -224,4 +230,34 @@ pub fn discover_project_skills(project_root: &Path) -> Vec<Skill> {
         .into_iter()
         .flat_map(|adapter| adapter.discover_at(project_root))
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn temp_skills_dir(tag: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("skill-manager-test-{tag}-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(dir.join("demo")).unwrap();
+        fs::write(dir.join("demo").join(MANIFEST_FILE), "---\nname: demo\n---\n").unwrap();
+        dir
+    }
+
+    #[test]
+    fn disable_then_enable_round_trips() {
+        let skills_dir = temp_skills_dir("roundtrip");
+        let manifest = skills_dir.join("demo").join(MANIFEST_FILE);
+
+        let disabled_manifest = toggle_enabled(&manifest, false).expect("disable should succeed");
+        assert!(disabled_manifest.starts_with(skills_dir.join(DISABLED_DIR)));
+        assert!(disabled_manifest.is_file());
+
+        let re_enabled_manifest =
+            toggle_enabled(&disabled_manifest, true).expect("re-enable should succeed");
+        assert_eq!(re_enabled_manifest, skills_dir.join("demo").join(MANIFEST_FILE));
+        assert!(re_enabled_manifest.is_file());
+
+        fs::remove_dir_all(&skills_dir).unwrap();
+    }
 }
