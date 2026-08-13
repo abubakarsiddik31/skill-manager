@@ -6,12 +6,12 @@
 
 **One dashboard to manage every AI coding agent skill you've installed.**
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
-[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri-22c55e.svg)](https://tauri.app)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-22c55e.svg)](https://www.typescriptlang.org/)
-[![Latest release](https://img.shields.io/github/v/release/abubakarsiddik31/skill-manager?color=22c55e&label=release)](https://github.com/abubakarsiddik31/skill-manager/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-000000.svg)](LICENSE)
+[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri-000000.svg)](https://tauri.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-000000.svg)](https://www.typescriptlang.org/)
+[![Latest release](https://img.shields.io/github/v/release/abubakarsiddik31/skill-manager?color=000000&label=release)](https://github.com/abubakarsiddik31/skill-manager/releases/latest)
 
-[**Website**](https://abubakarsiddik31.github.io/skill-manager/) · [**Download**](https://github.com/abubakarsiddik31/skill-manager/releases/latest)
+[**Website**](https://abubakarsiddik31.github.io/skill-manager/) · [**Download**](https://github.com/abubakarsiddik31/skill-manager/releases/latest) · [**Contributing**](CONTRIBUTING.md)
 
 </div>
 
@@ -21,13 +21,18 @@
 
 If you use more than one AI coding agent, your skills are scattered across
 `~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, and
-`~/.config/opencode/skills` — with no shared way to see what's installed, what it
-does, or whether it's even active. Disabling one means deleting it or
-hand-editing config. There's no view across tools, and no per-project breakdown
-of what's actually wired into a given codebase.
+`~/.config/opencode/skills` — four folders, four formats, zero shared view.
 
-**Skill Manager fixes that.** One dashboard, every tool, full control: discover,
-enable, disable, edit, and delete skills for
+- **You can't see what's installed.** Every tool hides its skills in its own
+  config folder, so "what do I have?" means opening a terminal and grepping.
+- **You can't turn one off.** None of these tools ship a disable switch — your
+  only option is deleting the folder and hoping you don't need it back.
+- **You can't see what's wired into a project.** A skill installed globally and
+  one dropped into a repo's `.claude/skills` look identical until something
+  breaks.
+
+**Skill Manager fixes all three.** One dashboard, every tool: discover, enable,
+disable, edit, and delete skills for
 [Claude Code](https://claude.com/claude-code), Codex, Cursor, and OpenCode —
 without touching a config file by hand.
 
@@ -40,18 +45,16 @@ picked up across the ecosystem (Claude Code, Codex, Cursor, OpenCode, and others
 ## Features
 
 - **Unified view** across every tool's skills directory — no more digging through
-  `~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, and
-  `~/.config/opencode/skills` by hand.
+  four different config folders by hand.
 - **Enable / disable** any skill without deleting it (skills are moved to a
   sibling `.disabled/` folder — fully reversible, and it never touches the tool's
   own config).
-- **Edit** a skill's `SKILL.md` directly from the app.
+- **View & edit** — a skill's `SKILL.md` renders as formatted markdown by
+  default, with a one-click switch to raw edit.
 - **Delete** skills you no longer need.
-- **Per-project breakdown** — track individual project folders and see the
-  `.claude/skills`, `.codex/skills`, etc. installed inside each one, separate
-  from your global (user-level) skills.
+- **Per-project breakdown** — track individual project folders and see exactly
+  which skills are wired into each one, separate from your global skills.
 - **Search** across names and descriptions.
-- Dark, terminal-inspired UI — built for people who live in a monospace font.
 
 ## Supported tools
 
@@ -64,8 +67,28 @@ picked up across the ecosystem (Claude Code, Codex, Cursor, OpenCode, and others
 
 Claude Code's `SKILL.md` convention is well documented and fully wired up. The
 other three tools' skill directories are evolving and not yet officially
-standardized — if you know the real convention for one of them, a PR updating
-`src-tauri/src/skills/<tool>.rs` is very welcome.
+standardized — see the roadmap below.
+
+## Roadmap
+
+The near-term goal is **100% verified support for the four tools above** before
+expanding further:
+
+- [ ] Confirm and verify Codex's real skills directory convention
+- [ ] Confirm and verify Cursor's real skills directory convention
+- [ ] Confirm and verify OpenCode's real skills directory convention
+- [ ] Mark all four tools "fully supported" in the table above
+
+Once that's done:
+
+- [ ] Add Gemini / Google AI support
+- [ ] Add support for other emerging coding agents as they adopt `SKILL.md`
+- [ ] Auto-update support (in-app update checks, no manual reinstall)
+- [ ] Code-signed builds (no more Gatekeeper/SmartScreen warnings)
+
+If you actually use one of the unconfirmed tools, [this is the single most
+useful thing you can contribute](CONTRIBUTING.md#pin-down-a-tools-real-skill-directory) —
+it's a one-line fix, and it directly unblocks the roadmap above.
 
 ## Download
 
@@ -101,12 +124,16 @@ npm run tauri build
 ## Project structure
 
 ```
-src/                    react + typescript frontend
-  lib/api.ts            thin client over the tauri commands
+src/
+  components/           presentational react components (Sidebar, SkillCard, EditorModal, ...)
+  hooks/                data + mutations (useGlobalSkills, useProjects, useProjectSkills)
+  lib/                  api client, markdown rendering, filtering helpers
   types.ts              shared frontend types
 src-tauri/src/
   skills/               one adapter per tool, all implementing SkillAdapter
+  projects.rs           persisted list of tracked project folders
   commands.rs           tauri commands exposed to the frontend
+docs/                   the landing page (GitHub Pages)
 ```
 
 Each tool implements the same `SkillAdapter` trait
@@ -115,8 +142,15 @@ module pointing at its skills directory.
 
 ## Contributing
 
-Issues and PRs welcome — especially ones that pin down the real skills-directory
-convention for Codex, Cursor, or OpenCode, or that add a new adapter entirely.
+This project gets meaningfully better with a handful of small, specific
+contributions — see [CONTRIBUTING.md](CONTRIBUTING.md) for exactly how to:
+
+- Pin down a tool's real skills directory (the single biggest gap right now)
+- Add support for an entirely new coding agent
+- Report a bug or open a fix
+
+Every one of these is scoped to be doable in one sitting. Issues and PRs
+welcome.
 
 ## License
 
