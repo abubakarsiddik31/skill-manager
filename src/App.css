@@ -1,15 +1,15 @@
 :root {
-  --bg: #020617;
-  --bg-elevated: #0f172a;
-  --bg-panel: #1b2336;
-  --border: #334155;
-  --border-strong: #475569;
-  --text: #f8fafc;
-  --text-dim: #94a3b8;
-  --text-faint: #64748b;
-  --accent: #22c55e;
-  --accent-bright: #4ade80;
-  --accent-dim: #15803d;
+  --bg: #000000;
+  --bg-elevated: #0a0a0a;
+  --bg-panel: #111111;
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.28);
+  --text: #ffffff;
+  --text-dim: #a0a0a0;
+  --text-faint: #6a6a6a;
+  --accent: #ffffff;
+  --accent-bright: #ffffff;
+  --accent-dim: rgba(255, 255, 255, 0.16);
   --danger: #ef4444;
   --danger-bright: #f87171;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace,
@@ -331,8 +331,8 @@ body,
 }
 
 .toggle.on {
-  background: var(--accent-dim);
-  border-color: var(--accent);
+  background: #fff;
+  border-color: #fff;
 }
 
 .toggle .knob {
@@ -347,7 +347,7 @@ body,
 }
 
 .toggle.on .knob {
-  background: var(--accent-bright);
+  background: #000;
   transform: translateX(16px);
 }
 
@@ -425,11 +425,11 @@ body,
 }
 
 .btn.primary {
-  background: var(--accent-dim);
-  border-color: var(--accent);
-  color: #fff;
+  background: #fff;
+  border-color: #fff;
+  color: #000;
 }
 
 .btn.primary:hover {
-  background: var(--accent);
+  background: #e5e5e5;
 }
