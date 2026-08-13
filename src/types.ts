@@ -1,0 +1,20 @@
+export type AgentTool = "claude" | "codex" | "cursor" | "opencode";
+
+export type SkillScope = "user" | "project";
+
+export interface Skill {
+  id: string;
+  tool: AgentTool;
+  name: string;
+  description: string;
+  path: string;
+  scope: SkillScope;
+  enabled: boolean;
+}
+
+export interface ToolInfo {
+  tool: AgentTool;
+  label: string;
+  skillsDir: string;
+  dirExists: boolean;
+}
