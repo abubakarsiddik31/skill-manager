@@ -24,11 +24,7 @@ config file ever again.
 
 <br />
 
-<!--
-  Add a real screenshot or GIF of the app here before shipping this README —
-  e.g. `docs/screenshot.png`, embedded as:
-  <img src="docs/screenshot.png" width="720" alt="Skill Manager screenshot" />
--->
+<img src="docs/assets/demo.gif" width="760" alt="Skill Manager demo: browsing, filtering, searching, and viewing a skill across Claude Code, Codex, Cursor, and OpenCode" />
 
 </div>
 
