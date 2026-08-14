@@ -11,8 +11,10 @@ across Claude Code, Codex, Cursor, and OpenCode — without hand-editing a
 config file ever again.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-000000.svg)](LICENSE)
-[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri-000000.svg)](https://tauri.app)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-000000.svg)](https://www.typescriptlang.org/)
+[![Built with Tauri](https://img.shields.io/badge/Tauri-000000.svg?logo=tauri&logoColor=FFC131)](https://tauri.app)
+[![Rust](https://img.shields.io/badge/Rust-000000.svg?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-000000.svg?logo=typescript&logoColor=3178C6)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-000000.svg?logo=react&logoColor=61DAFB)](https://react.dev/)
 [![Latest release](https://img.shields.io/github/v/release/abubakarsiddik31/skill-manager?color=000000&label=release)](https://github.com/abubakarsiddik31/skill-manager/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-000000.svg)](#download)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-000000.svg)](CONTRIBUTING.md)
