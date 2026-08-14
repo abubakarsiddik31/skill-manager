@@ -32,7 +32,7 @@ export function Sidebar({
       <div className="brand">
         <img src="/logo.svg" alt="Skill Manager" />
         <span className="brand-name">
-          skill<span className="accent">manager</span>
+          Skill <span className="accent">Manager</span>
         </span>
       </div>
 

@@ -1,24 +1,13 @@
 <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skill Manager logo">
-  <defs>
-    <linearGradient id="sm-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#020617"/>
-    </linearGradient>
-    <linearGradient id="sm-accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#4ade80"/>
-      <stop offset="100%" stop-color="#16a34a"/>
-    </linearGradient>
-  </defs>
-
-  <rect x="2" y="2" width="124" height="124" rx="28" fill="url(#sm-bg)" stroke="#334155" stroke-width="2"/>
+  <rect x="2" y="2" width="124" height="124" rx="28" fill="#000000" stroke="#ffffff" stroke-opacity="0.16" stroke-width="2"/>
 
   <!-- hexagonal skill badge -->
   <path d="M64 20 L100 40 L100 80 L64 100 L28 80 L28 40 Z"
-        fill="none" stroke="url(#sm-accent)" stroke-width="4" stroke-linejoin="round"/>
+        fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
 
   <!-- terminal prompt chevron -->
-  <path d="M48 50 L64 63 L48 76" fill="none" stroke="#4ade80" stroke-width="6"
+  <path d="M48 50 L64 63 L48 76" fill="none" stroke="#ffffff" stroke-width="6"
         stroke-linecap="round" stroke-linejoin="round"/>
   <!-- cursor underscore -->
-  <rect x="70" y="70" width="16" height="6" rx="1.5" fill="#4ade80"/>
+  <rect x="70" y="70" width="16" height="6" rx="1.5" fill="#ffffff"/>
 </svg>
