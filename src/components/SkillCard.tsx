@@ -3,16 +3,18 @@ import type { Skill } from "../types";
 interface SkillCardProps {
   skill: Skill;
   onToggle: (skill: Skill) => void;
-  onEdit: (skill: Skill) => void;
-  onDelete: (skill: Skill) => void;
+  onOpen: (skill: Skill) => void;
 }
 
-export function SkillCard({ skill, onToggle, onEdit, onDelete }: SkillCardProps) {
+export function SkillCard({ skill, onToggle, onOpen }: SkillCardProps) {
   return (
-    <div className={`skill-card ${skill.enabled ? "" : "disabled"}`}>
+    <div className={`skill-card ${skill.enabled ? "" : "disabled"}`} onClick={() => onOpen(skill)}>
       <div
         className={`toggle ${skill.enabled ? "on" : ""}`}
-        onClick={() => onToggle(skill)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle(skill);
+        }}
         title={skill.enabled ? "disable" : "enable"}
       >
         <div className="knob" />
@@ -26,15 +28,6 @@ export function SkillCard({ skill, onToggle, onEdit, onDelete }: SkillCardProps)
         </div>
         {skill.description && <div className="skill-desc">{skill.description}</div>}
         <div className="skill-path">{skill.path}</div>
-      </div>
-
-      <div className="skill-actions">
-        <button className="icon-btn" onClick={() => onEdit(skill)}>
-          edit
-        </button>
-        <button className="icon-btn danger" onClick={() => onDelete(skill)}>
-          delete
-        </button>
       </div>
     </div>
   );

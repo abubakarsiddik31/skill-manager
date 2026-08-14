@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorModal } from "./components/EditorModal";
 import { Sidebar } from "./components/Sidebar";
 import { SkillList } from "./components/SkillList";
@@ -17,11 +17,16 @@ function App() {
   const [activeTool, setActiveTool] = useState<AgentTool | "all">(ALL);
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Skill | null>(null);
+  const skillListRef = useRef<HTMLDivElement>(null);
 
   const global = useGlobalSkills();
   const projects = useProjects();
   const activeProject = view.kind === "project" ? view.project : null;
   const projectView = useProjectSkills(activeProject);
+
+  useEffect(() => {
+    skillListRef.current?.scrollTo(0, 0);
+  }, [view, activeTool]);
 
   function selectAll() {
     setView({ kind: "global" });
@@ -93,14 +98,13 @@ function App() {
           onForgetProject={view.kind === "project" ? () => forgetProject(view.project) : undefined}
         />
 
-        <div className="skill-list">
+        <div className="skill-list" ref={skillListRef}>
           {view.kind === "global" ? (
             <SkillList
               skills={filteredGlobal}
               emptyHint="No skills found."
               onToggle={global.toggle}
-              onEdit={setEditing}
-              onDelete={global.remove}
+              onOpen={setEditing}
             />
           ) : projectView.loading ? (
             <div className="empty-state">loading...</div>
@@ -109,14 +113,19 @@ function App() {
               skills={filteredProjectSkills}
               emptyHint="No skills found in this project."
               onToggle={projectView.toggle}
-              onEdit={setEditing}
-              onDelete={projectView.remove}
+              onOpen={setEditing}
             />
           )}
         </div>
       </main>
 
-      {editing && <EditorModal skill={editing} onClose={() => setEditing(null)} />}
+      {editing && (
+        <EditorModal
+          skill={editing}
+          onClose={() => setEditing(null)}
+          onDelete={view.kind === "global" ? global.remove : projectView.remove}
+        />
+      )}
     </div>
   );
 }

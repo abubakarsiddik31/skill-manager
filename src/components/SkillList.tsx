@@ -5,11 +5,10 @@ interface SkillListProps {
   skills: Skill[];
   emptyHint: string;
   onToggle: (skill: Skill) => void;
-  onEdit: (skill: Skill) => void;
-  onDelete: (skill: Skill) => void;
+  onOpen: (skill: Skill) => void;
 }
 
-export function SkillList({ skills, emptyHint, onToggle, onEdit, onDelete }: SkillListProps) {
+export function SkillList({ skills, emptyHint, onToggle, onOpen }: SkillListProps) {
   if (skills.length === 0) {
     return (
       <div className="empty-state">
@@ -22,7 +21,7 @@ export function SkillList({ skills, emptyHint, onToggle, onEdit, onDelete }: Ski
   return (
     <>
       {skills.map((skill) => (
-        <SkillCard key={skill.id} skill={skill} onToggle={onToggle} onEdit={onEdit} onDelete={onDelete} />
+        <SkillCard key={skill.id} skill={skill} onToggle={onToggle} onOpen={onOpen} />
       ))}
     </>
   );

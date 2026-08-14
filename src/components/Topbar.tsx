@@ -9,21 +9,23 @@ interface TopbarProps {
 export function Topbar({ title, subtitle, query, onQueryChange, onForgetProject }: TopbarProps) {
   return (
     <div className="topbar">
-      <div>
+      <div className="topbar-title">
         <h1>{title}</h1>
         <span className="subtitle">{subtitle}</span>
       </div>
-      <input
-        className="search"
-        placeholder="search skills..."
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-      />
-      {onForgetProject && (
-        <button className="icon-btn danger" onClick={onForgetProject}>
-          forget project
-        </button>
-      )}
+      <div className="topbar-actions">
+        <input
+          className="search"
+          placeholder="search skills..."
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+        />
+        {onForgetProject && (
+          <button className="icon-btn danger" onClick={onForgetProject}>
+            forget project
+          </button>
+        )}
+      </div>
     </div>
   );
 }

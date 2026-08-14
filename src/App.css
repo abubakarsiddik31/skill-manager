@@ -161,9 +161,16 @@ body,
 .topbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px 12px;
   padding: 14px 24px;
   border-bottom: 1px solid var(--border);
+}
+
+.topbar-title {
+  min-width: 0;
+  flex: 1 1 160px;
+  overflow: hidden;
 }
 
 .topbar h1 {
@@ -171,15 +178,29 @@ body,
   font-weight: 600;
   margin: 0;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar .subtitle {
+  display: block;
   color: var(--text-faint);
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 auto;
+  margin-left: auto;
 }
 
 .search {
-  margin-left: auto;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   color: var(--text);
@@ -187,7 +208,9 @@ body,
   border-radius: 6px;
   font-family: inherit;
   font-size: 12px;
-  width: 220px;
+  flex: 1 1 160px;
+  min-width: 120px;
+  max-width: 220px;
   outline: none;
 }
 
@@ -233,6 +256,7 @@ body,
 
 .skill-card:hover {
   border-color: var(--border-strong);
+  cursor: pointer;
 }
 
 .skill-card.disabled {
@@ -289,13 +313,6 @@ body,
   word-break: break-all;
 }
 
-.skill-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
 .icon-btn {
   background: var(--bg-panel);
   border: 1px solid var(--border);
@@ -304,6 +321,7 @@ body,
   padding: 5px 9px;
   font-size: 11px;
   font-family: inherit;
+  flex-shrink: 0;
   cursor: pointer;
 }
 
@@ -315,6 +333,21 @@ body,
 .icon-btn.danger:hover {
   color: var(--danger-bright);
   border-color: var(--danger);
+}
+
+.icon-btn.square {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+}
+
+.icon-btn.square.active {
+  color: var(--text);
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
 }
 
 /* toggle switch */
@@ -390,32 +423,6 @@ body,
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.mode-tabs {
-  display: flex;
-  gap: 2px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px;
-  flex-shrink: 0;
-}
-
-.mode-tab {
-  font-family: inherit;
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 5px;
-  border: none;
-  background: transparent;
-  color: var(--text-faint);
-  cursor: pointer;
-}
-
-.mode-tab.active {
-  background: var(--bg-elevated);
-  color: var(--text);
 }
 
 .modal textarea {

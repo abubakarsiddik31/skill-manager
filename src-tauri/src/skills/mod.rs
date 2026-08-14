@@ -192,8 +192,40 @@ pub fn toggle_enabled(skill_path: &Path, enable: bool) -> std::io::Result<PathBu
         (skills_dir.join(name), disabled_root.join(name))
     };
 
-    fs::rename(&from, &to)?;
+    move_skill_entry(&from, &to)?;
     Ok(to.join(MANIFEST_FILE))
+}
+
+/// Moves a skill folder from `from` to `to`. Plain directories are renamed
+/// as usual, but a symlinked skill (common for tools like Cursor that share
+/// skills with other tools via a link) needs special care: naively renaming
+/// the link node would leave a relative target - e.g. `../../.claude/skills/x`
+/// - resolving from the wrong depth once it's nested one level into/out of
+/// `.disabled`, silently turning it into a dangling link. Resolve the link's
+/// real target first and recreate an absolute symlink at the destination
+/// instead.
+fn move_skill_entry(from: &Path, to: &Path) -> std::io::Result<()> {
+    if from.is_symlink() {
+        let target = fs::canonicalize(from)?;
+        create_symlink(&target, to)?;
+        fs::remove_file(from)
+    } else {
+        fs::rename(from, to)
+    }
+}
+
+#[cfg(unix)]
+fn create_symlink(target: &Path, link: &Path) -> std::io::Result<()> {
+    std::os::unix::fs::symlink(target, link)
+}
+
+#[cfg(windows)]
+fn create_symlink(target: &Path, link: &Path) -> std::io::Result<()> {
+    if target.is_dir() {
+        std::os::windows::fs::symlink_dir(target, link)
+    } else {
+        std::os::windows::fs::symlink_file(target, link)
+    }
 }
 
 pub fn delete_skill_dir(skill_path: &Path) -> std::io::Result<()> {
@@ -259,5 +291,34 @@ mod tests {
         assert!(re_enabled_manifest.is_file());
 
         fs::remove_dir_all(&skills_dir).unwrap();
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn disabling_a_relative_symlinked_skill_keeps_it_resolvable() {
+        // Mirrors a real setup: a skill directory that lives elsewhere,
+        // linked into a tool's skills dir with a relative target (e.g.
+        // Cursor sharing a skill from `~/.claude/skills` via
+        // `../../.claude/skills/<name>`).
+        let real_dir = std::env::temp_dir()
+            .join(format!("skill-manager-test-real-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&real_dir);
+        fs::create_dir_all(&real_dir).unwrap();
+        fs::write(real_dir.join(MANIFEST_FILE), "---\nname: linked\n---\n").unwrap();
+
+        let skills_dir = temp_skills_dir("symlink");
+        let link = skills_dir.join("linked");
+        std::os::unix::fs::symlink(&real_dir, &link).unwrap();
+        let manifest = link.join(MANIFEST_FILE);
+
+        let disabled_manifest = toggle_enabled(&manifest, false).expect("disable should succeed");
+        assert!(disabled_manifest.is_file(), "symlink must still resolve once disabled");
+
+        let re_enabled_manifest =
+            toggle_enabled(&disabled_manifest, true).expect("re-enable should succeed");
+        assert!(re_enabled_manifest.is_file(), "symlink must still resolve once re-enabled");
+
+        fs::remove_dir_all(&skills_dir).unwrap();
+        fs::remove_dir_all(&real_dir).unwrap();
     }
 }
