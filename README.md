@@ -114,9 +114,23 @@ Grab a build from the [latest release](https://github.com/abubakarsiddik31/skill
 | Windows | `.exe` or `.msi` |
 | Linux | `.deb`, `.rpm`, or `.AppImage` |
 
-Builds are unsigned — macOS Gatekeeper and Windows SmartScreen will warn on
-first launch (right-click → Open on macOS, "More info" → "Run anyway" on
-Windows). [Code-signed builds](#roadmap) are on the roadmap.
+> [!NOTE]
+> **Builds are currently unsigned.** We're working on code-signed releases
+> (see [Roadmap](#roadmap)) so this warning goes away — until then, here's
+> how to open the app anyway:
+>
+> **macOS** — Gatekeeper will say *"Skill Manager" Not Opened* / *Apple could
+> not verify "Skill Manager" is free of malware*. Click **Done**, then either:
+> - Right-click (Control-click) the app in Finder → **Open** → **Open** in
+>   the dialog that appears, or
+> - Go to **System Settings → Privacy & Security**, scroll down to the
+>   blocked-app notice, and click **Open Anyway** → **Open Anyway** again to
+>   confirm.
+>
+> You only need to do this once — it launches normally after that.
+>
+> **Windows** — SmartScreen will show *Windows protected your PC*. Click
+> **More info**, then **Run anyway**.
 
 ## Development
 
