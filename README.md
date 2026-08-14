@@ -50,10 +50,18 @@ If you use more than one AI coding agent, your skills are scattered across
 `~/.claude/skills`, `~/.agents/skills`, `~/.cursor/skills`, and
 `~/.config/opencode/skills` — four folders, four formats, zero shared view.
 
+Left unchecked, this turns into **skill hell**: every skill you've ever
+installed sits there active, and your agent has to disambiguate against all
+of them just to pick the right one for what you're doing right now. A
+crowded skills directory doesn't just look messy — the more skills compete
+for a match, the worse an agent gets at triggering the right one. Disabling
+what you don't need for the current project is how you climb back out.
+
 | | Without Skill Manager | With Skill Manager |
 | --- | --- | --- |
 | **See what's installed** | Open a terminal, `ls` four different folders | One dashboard, every tool |
 | **Turn a skill off** | Delete the folder and hope you don't need it back | Toggle it — fully reversible |
+| **Keep triggering accurate** | Every installed skill competes for a match, even ones irrelevant to this project | Disable the noise, leave only what's relevant enabled |
 | **Know what's wired into a project** | Global and project-level skills look identical until something breaks | Per-project breakdown, separate from global |
 | **Edit a `SKILL.md`** | Open a text editor, hunt down the path | Rendered markdown with one-click raw edit |
 
