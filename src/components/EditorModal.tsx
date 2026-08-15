@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
-import type { Skill } from "../types";
+import type { Skill, ToolEntry } from "../types";
 
 type EditorMode = "view" | "edit";
 
 interface EditorModalProps {
   skill: Skill;
+  toolEntries: ToolEntry[];
   onClose: () => void;
   onDelete: (skill: Skill) => void;
 }
 
-export function EditorModal({ skill, onClose, onDelete }: EditorModalProps) {
+export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorModalProps) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -46,6 +47,10 @@ export function EditorModal({ skill, onClose, onDelete }: EditorModalProps) {
 
   const html = useMemo(() => renderMarkdown(content), [content]);
 
+  // Tools that read this skill's folder — toggling or deleting affects
+  // all of them, since the folder holds one copy on disk.
+  const seers = toolEntries.filter((t) => t.folders.some((f) => f.tool === skill.tool));
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -66,6 +71,32 @@ export function EditorModal({ skill, onClose, onDelete }: EditorModalProps) {
             </svg>
           </button>
         </div>
+
+        {mode === "view" && (
+          <div className="readers-box">
+            <div className="readers-head">
+              read by {seers.length} tool{seers.length === 1 ? "" : "s"}
+            </div>
+            {seers.map((t) => {
+              const via = t.folders.find((f) => f.tool === skill.tool);
+              return (
+                <div key={t.id} className="reader-row">
+                  <span className={`dot ${skill.enabled ? "on" : ""}`} />
+                  <span>{t.label}</span>
+                  <span className="reader-via">
+                    {via?.role === "own" ? "primary" : `via ${skill.tool}`}
+                  </span>
+                </div>
+              );
+            })}
+            {seers.length > 1 && (
+              <div className="readers-warn">
+                disabling or deleting this skill affects all {seers.length} tools
+                above — the folder holds one copy on disk.
+              </div>
+            )}
+          </div>
+        )}
 
         {mode === "edit" ? (
           <textarea

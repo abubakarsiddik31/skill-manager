@@ -29,13 +29,6 @@ export interface Skill {
   enabled: boolean;
 }
 
-export interface ToolInfo {
-  tool: AgentTool;
-  label: string;
-  skillsDir: string;
-  dirExists: boolean;
-}
-
 export interface ProjectInfo {
   path: string;
   name: string;

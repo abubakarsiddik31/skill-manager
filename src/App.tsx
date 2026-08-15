@@ -7,14 +7,14 @@ import { useGlobalSkills } from "./hooks/useGlobalSkills";
 import { useProjects } from "./hooks/useProjects";
 import { useProjectSkills } from "./hooks/useProjectSkills";
 import { filterSkills } from "./lib/filterSkills";
-import type { AgentTool, ProjectInfo, Skill, View } from "./types";
+import type { ProjectInfo, Skill, ToolEntry, View } from "./types";
 import "./App.css";
 
-const ALL: AgentTool | "all" = "all";
+const ALL = "all" as const;
 
 function App() {
   const [view, setView] = useState<View>({ kind: "global" });
-  const [activeTool, setActiveTool] = useState<AgentTool | "all">(ALL);
+  const [activeToolId, setActiveToolId] = useState<string | typeof ALL>(ALL);
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Skill | null>(null);
   const skillListRef = useRef<HTMLDivElement>(null);
@@ -24,18 +24,23 @@ function App() {
   const activeProject = view.kind === "project" ? view.project : null;
   const projectView = useProjectSkills(activeProject);
 
+  const activeTool =
+    activeToolId === ALL
+      ? null
+      : global.toolEntries.find((t) => t.id === activeToolId) ?? null;
+
   useEffect(() => {
     skillListRef.current?.scrollTo(0, 0);
-  }, [view, activeTool]);
+  }, [view, activeToolId]);
 
   function selectAll() {
     setView({ kind: "global" });
-    setActiveTool(ALL);
+    setActiveToolId(ALL);
   }
 
-  function selectTool(tool: AgentTool) {
+  function selectTool(toolId: string) {
     setView({ kind: "global" });
-    setActiveTool(tool);
+    setActiveToolId(toolId);
   }
 
   function openProject(project: ProjectInfo) {
@@ -52,9 +57,17 @@ function App() {
     if (activeProject?.path === project.path) setView({ kind: "global" });
   }
 
+  // A tool's view is the union of every skills folder it reads — a skill
+  // in the shared ~/.agents folder correctly shows under Codex, Goose,
+  // Amp, and every tool that scans it.
+  const folderFilter = useMemo(
+    () => (activeTool ? new Set(activeTool.folders.map((f) => f.tool)) : undefined),
+    [activeTool],
+  );
+
   const filteredGlobal = useMemo(
-    () => filterSkills(global.skills, query, activeTool),
-    [global.skills, query, activeTool],
+    () => filterSkills(global.skills, query, folderFilter),
+    [global.skills, query, folderFilter],
   );
 
   const filteredProjectSkills = useMemo(
@@ -62,27 +75,28 @@ function App() {
     [projectView.skills, query],
   );
 
-  const countForTool = (tool: AgentTool) => global.skills.filter((s) => s.tool === tool).length;
+  const countForEntry = (entry: ToolEntry) =>
+    global.skills.filter((s) => entry.folders.some((f) => f.tool === s.tool)).length;
 
   const title =
-    view.kind === "global"
-      ? activeTool === ALL
-        ? "all skills"
-        : global.tools.find((t) => t.tool === activeTool)?.label ?? ""
-      : view.project.name;
+    view.kind === "global" ? (activeTool ? activeTool.label : "all skills") : view.project.name;
 
   const subtitle =
-    view.kind === "global" ? `${filteredGlobal.length} shown` : view.project.path;
+    view.kind === "global"
+      ? activeTool
+        ? `${filteredGlobal.length} shown · ${activeTool.folders.length} folder${activeTool.folders.length === 1 ? "" : "s"} read`
+        : `${filteredGlobal.length} shown`
+      : view.project.path;
 
   return (
     <div className="app">
       <Sidebar
-        tools={global.tools}
+        toolEntries={global.toolEntries}
         totalSkillCount={global.skills.length}
-        countForTool={countForTool}
+        countForEntry={countForEntry}
         projects={projects.projects}
         view={view}
-        activeTool={activeTool}
+        activeToolId={activeToolId}
         onSelectAll={selectAll}
         onSelectTool={selectTool}
         onOpenProject={openProject}
@@ -102,6 +116,7 @@ function App() {
           {view.kind === "global" ? (
             <SkillList
               skills={filteredGlobal}
+              toolEntries={global.toolEntries}
               emptyHint="No skills found."
               onToggle={global.toggle}
               onOpen={setEditing}
@@ -111,6 +126,7 @@ function App() {
           ) : (
             <SkillList
               skills={filteredProjectSkills}
+              toolEntries={global.toolEntries}
               emptyHint="No skills found in this project."
               onToggle={projectView.toggle}
               onOpen={setEditing}
@@ -122,6 +138,7 @@ function App() {
       {editing && (
         <EditorModal
           skill={editing}
+          toolEntries={global.toolEntries}
           onClose={() => setEditing(null)}
           onDelete={view.kind === "global" ? global.remove : projectView.remove}
         />

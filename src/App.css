@@ -12,6 +12,7 @@
   --accent-dim: rgba(255, 255, 255, 0.16);
   --danger: #ef4444;
   --danger-bright: #f87171;
+  --ok: #4ade80;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace,
     Menlo, Consolas, monospace;
 
@@ -550,4 +551,106 @@ body,
 
 .btn.primary:hover {
   background: #e5e5e5;
+}
+
+/* ---------- tool-level sidebar entries ---------- */
+
+.nav-label-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nav-sub {
+  font-size: 10px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* ---------- "seen by" chips on skill cards ---------- */
+
+.seen-by {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.seen-by-label {
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.chip {
+  font-size: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1px 6px;
+  color: var(--text-dim);
+  background: var(--bg);
+}
+
+.chip.compat {
+  color: var(--text-faint);
+  border-style: dashed;
+}
+
+.chip.more {
+  border-style: dashed;
+}
+
+/* ---------- editor modal: read-by box ---------- */
+
+.readers-box {
+  margin: 12px 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.readers-head {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+.reader-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 2px 0;
+}
+
+.reader-row .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+
+.reader-row .dot.on {
+  background: var(--ok, #4ade80);
+}
+
+.reader-via {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.readers-warn {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-left: 2px solid var(--danger);
+  padding: 2px 10px;
+  line-height: 1.5;
 }

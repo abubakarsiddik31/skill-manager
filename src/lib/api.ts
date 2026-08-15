@@ -1,16 +1,17 @@
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import type { ProjectInfo, Skill, ToolInfo } from "../types";
+import type { ProjectInfo, Skill, ToolEntry } from "../types";
 
 /**
  * Thin client over the Rust-side adapters (src-tauri/src/skills).
- * Each supported tool (Claude, Codex, Cursor, Gemini, OpenCode) implements the
- * same SkillAdapter trait on the backend; this module is the single
- * place the frontend talks to that layer.
+ * Each skills folder implements the same SkillAdapter trait on the
+ * backend, and tools are modeled as readers of folders
+ * (list_tool_entries); this module is the single place the frontend
+ * talks to that layer.
  */
 export const api = {
-  listTools(): Promise<ToolInfo[]> {
-    return invoke("list_tools");
+  listToolEntries(): Promise<ToolEntry[]> {
+    return invoke("list_tool_entries");
   },
   listSkills(): Promise<Skill[]> {
     return invoke("list_skills");

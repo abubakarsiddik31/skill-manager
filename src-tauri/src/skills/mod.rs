@@ -63,15 +63,6 @@ pub struct Skill {
     pub enabled: bool,
 }
 
-#[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolInfo {
-    pub tool: AgentTool,
-    pub label: String,
-    pub skills_dir: String,
-    pub dir_exists: bool,
-}
-
 /// Every supported coding agent implements this the same way: a directory
 /// of `<skill-name>/SKILL.md` folders. None of these tools ship a native
 /// enable/disable switch, so Skill Manager introduces its own convention:

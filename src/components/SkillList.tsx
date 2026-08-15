@@ -1,14 +1,15 @@
-import type { Skill } from "../types";
+import type { Skill, ToolEntry } from "../types";
 import { SkillCard } from "./SkillCard";
 
 interface SkillListProps {
   skills: Skill[];
+  toolEntries: ToolEntry[];
   emptyHint: string;
   onToggle: (skill: Skill) => void;
   onOpen: (skill: Skill) => void;
 }
 
-export function SkillList({ skills, emptyHint, onToggle, onOpen }: SkillListProps) {
+export function SkillList({ skills, toolEntries, emptyHint, onToggle, onOpen }: SkillListProps) {
   if (skills.length === 0) {
     return (
       <div className="empty-state">
@@ -21,7 +22,13 @@ export function SkillList({ skills, emptyHint, onToggle, onOpen }: SkillListProp
   return (
     <>
       {skills.map((skill) => (
-        <SkillCard key={skill.id} skill={skill} onToggle={onToggle} onOpen={onOpen} />
+        <SkillCard
+          key={skill.id}
+          skill={skill}
+          toolEntries={toolEntries}
+          onToggle={onToggle}
+          onOpen={onOpen}
+        />
       ))}
     </>
   );

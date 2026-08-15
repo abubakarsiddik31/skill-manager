@@ -1,28 +1,11 @@
 use crate::projects::{self, ProjectInfo};
-use crate::skills::{self, tools::ToolEntry, Skill, ToolInfo};
+use crate::skills::{self, tools::ToolEntry, Skill};
 use std::fs;
 use std::path::Path;
 use tauri::AppHandle;
 
-#[tauri::command]
-pub fn list_tools() -> Vec<ToolInfo> {
-    skills::all_adapters()
-        .into_iter()
-        .map(|adapter| {
-            let dir = adapter.skills_dir();
-            ToolInfo {
-                tool: adapter.tool(),
-                label: adapter.tool().label().to_string(),
-                skills_dir: dir.to_string_lossy().to_string(),
-                dir_exists: dir.is_dir(),
-            }
-        })
-        .collect()
-}
-
 /// Tool-level registry entries (see `skills::tools`): one per coding
-/// agent, listing every skills folder it reads. Coexists with
-/// `list_tools` (folder-level) until the frontend migrates.
+/// agent, listing every skills folder it reads.
 #[tauri::command]
 pub fn list_tool_entries() -> Vec<ToolEntry> {
     skills::tools::tool_entries()
