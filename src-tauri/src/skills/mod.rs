@@ -5,6 +5,7 @@ mod crush;
 mod cursor;
 mod gemini;
 mod opencode;
+mod roo;
 pub mod tools;
 
 use serde::{Deserialize, Serialize};
@@ -18,6 +19,7 @@ pub use crush::CrushAdapter;
 pub use cursor::CursorAdapter;
 pub use gemini::GeminiAdapter;
 pub use opencode::OpenCodeAdapter;
+pub use roo::RooAdapter;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -32,6 +34,7 @@ pub enum AgentTool {
     Cursor,
     Gemini,
     Opencode,
+    Roo,
 }
 
 impl AgentTool {
@@ -44,6 +47,7 @@ impl AgentTool {
             AgentTool::Cursor => "Cursor",
             AgentTool::Gemini => "Gemini",
             AgentTool::Opencode => "OpenCode",
+            AgentTool::Roo => "Roo Code",
         }
     }
 }
@@ -251,6 +255,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
         Box::new(CursorAdapter),
         Box::new(GeminiAdapter),
         Box::new(OpenCodeAdapter),
+        Box::new(RooAdapter),
     ]
 }
 
@@ -263,6 +268,7 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
         AgentTool::Cursor => Box::new(CursorAdapter),
         AgentTool::Gemini => Box::new(GeminiAdapter),
         AgentTool::Opencode => Box::new(OpenCodeAdapter),
+        AgentTool::Roo => Box::new(RooAdapter),
     }
 }
 

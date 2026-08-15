@@ -5,7 +5,8 @@ export type AgentTool =
   | "crush"
   | "cursor"
   | "gemini"
-  | "opencode";
+  | "opencode"
+  | "roo";
 
 /** How a tool relates to a skills folder it reads. */
 export type FolderRole = "own" | "compat";
