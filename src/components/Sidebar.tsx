@@ -53,12 +53,7 @@ export function Sidebar({
             onClick={() => onSelectTool(entry.id)}
             title={entry.folders.map((f) => f.dir).join("\n")}
           >
-            <span className={`nav-label-col ${anyDirExists ? "" : "dir-missing"}`}>
-              <span>{entry.label}</span>
-              <span className="nav-sub">
-                {entry.folders.map((f) => f.dir.replace(/^.*(\/|\\)/, "~…/")).join(" + ")}
-              </span>
-            </span>
+            <span className={anyDirExists ? "" : "dir-missing"}>{entry.label}</span>
             <span className="count">{countForEntry(entry)}</span>
           </div>
         );

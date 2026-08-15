@@ -82,11 +82,7 @@ function App() {
     view.kind === "global" ? (activeTool ? activeTool.label : "all skills") : view.project.name;
 
   const subtitle =
-    view.kind === "global"
-      ? activeTool
-        ? `${filteredGlobal.length} shown · ${activeTool.folders.length} folder${activeTool.folders.length === 1 ? "" : "s"} read`
-        : `${filteredGlobal.length} shown`
-      : view.project.path;
+    view.kind === "global" ? `${filteredGlobal.length} shown` : view.project.path;
 
   return (
     <div className="app">
@@ -107,6 +103,7 @@ function App() {
         <Topbar
           title={title}
           subtitle={subtitle}
+          folders={view.kind === "global" ? activeTool?.folders : undefined}
           query={query}
           onQueryChange={setQuery}
           onForgetProject={view.kind === "project" ? () => forgetProject(view.project) : undefined}
