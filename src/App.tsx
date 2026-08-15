@@ -73,6 +73,11 @@ function App() {
     if (project) openProject(project);
   }
 
+  async function removeProjectSkill(skill: Skill) {
+    await projectView.remove(skill);
+    await projects.refresh(); // keep sidebar skill-count badges honest
+  }
+
   async function forgetProject(project: ProjectInfo) {
     await projects.forget(project);
     if (activeProject?.path === project.path) setView({ kind: "global" });
@@ -114,6 +119,7 @@ function App() {
         pinnedTools={pinnedTools.pinned}
         onTogglePinTool={pinnedTools.toggle}
         projects={projects.projects}
+        skillCounts={projects.skillCounts}
         onTogglePinProject={projects.togglePin}
         onShowAllProjects={() => setShowingAllProjects(true)}
         suggested={detected ?? []}
@@ -164,7 +170,7 @@ function App() {
           skill={editing}
           toolEntries={global.toolEntries}
           onClose={() => setEditing(null)}
-          onDelete={view.kind === "global" ? global.remove : projectView.remove}
+          onDelete={view.kind === "global" ? global.remove : removeProjectSkill}
         />
       )}
 
@@ -180,6 +186,7 @@ function App() {
       {showingAllProjects && (
         <ProjectsModal
           projects={projects.projects}
+          skillCounts={projects.skillCounts}
           activePath={activeProject?.path}
           onClose={() => setShowingAllProjects(false)}
           onOpen={openProject}

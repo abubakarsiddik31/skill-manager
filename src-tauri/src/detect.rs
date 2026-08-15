@@ -17,6 +17,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
+use crate::skills;
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DetectedProject {
@@ -24,6 +26,8 @@ pub struct DetectedProject {
     pub name: String,
     /// Unix seconds of the strongest activity signal found; 0 = unknown.
     pub last_active: u64,
+    /// Agent skills found in the project folder (any tool's subdir).
+    pub skill_count: usize,
     pub sources: Vec<&'static str>,
 }
 
@@ -225,6 +229,7 @@ pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
                 path: path.to_string_lossy().into_owned(),
                 name,
                 last_active: candidate.last_active,
+                skill_count: skills::discover_project_skills(&path).len(),
                 sources: candidate.sources.into_iter().collect(),
             }
         })

@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import type { ProjectInfo } from "../types";
 
-/** Tracks which project folders the user has added - not their skills. */
+/**
+ * Tracks which project folders the user has added — not their skills —
+ * plus a skill count per project so the sidebar can badge rows.
+ */
 export function useProjects() {
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
+  const [skillCounts, setSkillCounts] = useState<Record<string, number>>({});
 
   async function refresh() {
     setProjects(await api.listProjects());
+    setSkillCounts(await api.listProjectSkillCounts());
   }
 
   useEffect(() => {
@@ -46,5 +51,5 @@ export function useProjects() {
     await refresh();
   }
 
-  return { projects, add, pickAndAdd, forget, togglePin, touch };
+  return { projects, skillCounts, add, pickAndAdd, forget, togglePin, touch, refresh };
 }

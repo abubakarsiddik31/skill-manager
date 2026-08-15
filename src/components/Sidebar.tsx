@@ -36,6 +36,8 @@ interface SidebarProps {
   pinnedTools: Set<string>;
   onTogglePinTool: (toolId: string) => void;
   projects: ProjectInfo[];
+  /** tracked path → skill count, for row badges */
+  skillCounts: Record<string, number>;
   onTogglePinProject: (project: ProjectInfo) => void;
   onShowAllProjects: () => void;
   /** Detected but untracked folders, most recently active first. */
@@ -56,6 +58,7 @@ export function Sidebar({
   pinnedTools,
   onTogglePinTool,
   projects,
+  skillCounts,
   onTogglePinProject,
   onShowAllProjects,
   suggested,
@@ -162,6 +165,7 @@ export function Sidebar({
         >
           <span>{p.name}</span>
           <span className="nav-right">
+            <span className="count">{skillCounts[p.path] ?? 0}</span>
             <button
               className={`pin-btn ${p.pinned ? "pinned" : ""}`}
               onClick={(e) => {
@@ -193,7 +197,10 @@ export function Sidebar({
               title={`${d.path} — from ${d.sources.join(", ")}`}
             >
               <span>+ {d.name}</span>
-              <span className="suggested-time">{relativeTime(d.lastActive)}</span>
+              <span className="nav-right">
+                <span className="count">{d.skillCount}</span>
+                <span className="suggested-time">{relativeTime(d.lastActive)}</span>
+              </span>
             </div>
           ))}
         </>

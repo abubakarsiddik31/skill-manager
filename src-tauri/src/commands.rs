@@ -1,6 +1,7 @@
 use crate::detect::{self, DetectedProject};
 use crate::projects::{self, ProjectInfo};
 use crate::skills::{self, tools::ToolEntry, Skill};
+use serde::Serialize;
 use std::fs;
 use std::path::Path;
 use tauri::AppHandle;
@@ -55,6 +56,27 @@ pub fn list_projects(app: AppHandle) -> Result<Vec<ProjectInfo>, String> {
 #[tauri::command]
 pub fn detect_projects(exclude: Vec<String>) -> Vec<DetectedProject> {
     detect::detect(&exclude)
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProjectSkillCount {
+    pub path: String,
+    pub count: usize,
+}
+
+/// Skill counts for every tracked project, so the sidebar can badge
+/// rows without the frontend issuing one scan per project.
+#[tauri::command]
+pub fn list_project_skill_counts(app: AppHandle) -> Vec<ProjectSkillCount> {
+    projects::list(&app)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|p| ProjectSkillCount {
+            count: skills::discover_project_skills(Path::new(&p.path)).len(),
+            path: p.path,
+        })
+        .collect()
 }
 
 #[tauri::command]

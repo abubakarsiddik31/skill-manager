@@ -96,7 +96,10 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
                 >
                   <div className="row-main">
                     <span className="row-name">{d.name}</span>
-                    <span className="row-time">{relativeTime(d.lastActive)}</span>
+                    <span className="row-time">
+                      {d.skillCount} skill{d.skillCount === 1 ? "" : "s"} ·{" "}
+                      {relativeTime(d.lastActive)}
+                    </span>
                   </div>
                   <div className="row-sub">
                     <span className="row-path">{d.path}</span>

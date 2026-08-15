@@ -47,6 +47,13 @@ export const api = {
   touchProject(path: string): Promise<void> {
     return invoke("touch_project", { path });
   },
+  listProjectSkillCounts(): Promise<Record<string, number>> {
+    return invoke("list_project_skill_counts").then((rows) =>
+      Object.fromEntries(
+        (rows as { path: string; count: number }[]).map((r) => [r.path, r.count]),
+      ),
+    );
+  },
   listProjectSkills(path: string): Promise<Skill[]> {
     return invoke("list_project_skills", { path });
   },

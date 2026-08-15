@@ -5,13 +5,14 @@ import type { ProjectInfo } from "../types";
 
 interface ProjectsModalProps {
   projects: ProjectInfo[];
+  skillCounts: Record<string, number>;
   activePath?: string;
   onClose: () => void;
   onOpen: (project: ProjectInfo) => void;
 }
 
 /** The full tracked-project list behind the sidebar's short default. */
-export function ProjectsModal({ projects, activePath, onClose, onOpen }: ProjectsModalProps) {
+export function ProjectsModal({ projects, skillCounts, activePath, onClose, onOpen }: ProjectsModalProps) {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -84,7 +85,8 @@ export function ProjectsModal({ projects, activePath, onClose, onOpen }: Project
                     <div className="row-main">
                       <span className="row-name">{p.name}</span>
                       <span className="row-time">
-                        {uses > 0 ? `${uses} open${uses === 1 ? "" : "s"} · ` : ""}
+                        {skillCounts[p.path] ?? 0} skills
+                        {uses > 0 ? ` · ${uses} open${uses === 1 ? "" : "s"}` : ""} ·{" "}
                         {relativeTime(lastUsed(p))}
                       </span>
                     </div>

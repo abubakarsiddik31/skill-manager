@@ -16,6 +16,7 @@ pub fn run() {
             commands::read_skill_content,
             commands::write_skill_content,
             commands::detect_projects,
+            commands::list_project_skill_counts,
             commands::list_projects,
             commands::add_project,
             commands::remove_project,
