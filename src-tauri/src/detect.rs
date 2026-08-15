@@ -132,7 +132,9 @@ fn collect_editor(home: &Path, app_dir: &str, source: &'static str, out: &mut Ca
     let mut uris = Vec::new();
     collect_file_uris(&value, &mut uris);
     for uri in uris {
-        let path = file_uri_to_path(&uri);
+        let Some(path) = file_uri_to_path(&uri) else {
+            continue;
+        };
         record(out, path, source, 0);
     }
 }
@@ -146,8 +148,16 @@ fn collect_file_uris(value: &Value, out: &mut Vec<String>) {
     }
 }
 
-fn file_uri_to_path(uri: &str) -> PathBuf {
+/// A `file://` URI is only a local path when its host is empty or
+/// `localhost` — anything else names a network share, which we don't
+/// want to suggest as a project folder.
+fn file_uri_to_path(uri: &str) -> Option<PathBuf> {
     let rest = &uri["file://".len()..];
+    let rest = match rest.find('/') {
+        Some(0) => rest,
+        Some(at) if rest[..at].eq_ignore_ascii_case("localhost") => &rest[at..],
+        _ => return None,
+    };
     // percent-decode into raw bytes, then interpret as utf-8
     let bytes = rest.as_bytes();
     let mut decoded: Vec<u8> = Vec::with_capacity(bytes.len());
@@ -172,7 +182,7 @@ fn file_uri_to_path(uri: &str) -> PathBuf {
     while path.ends_with('/') {
         path.pop();
     }
-    PathBuf::from(path)
+    Some(PathBuf::from(path))
 }
 
 fn collect_git(out: &mut Candidates) {
@@ -288,16 +298,23 @@ mod tests {
     fn decodes_file_uris() {
         assert_eq!(
             file_uri_to_path("file:///Users/foo/My%20Project"),
-            PathBuf::from("/Users/foo/My Project")
+            Some(PathBuf::from("/Users/foo/My Project"))
         );
         assert_eq!(
             file_uri_to_path("file:///C%3A/Users/foo/app"),
-            PathBuf::from("C:/Users/foo/app")
+            Some(PathBuf::from("C:/Users/foo/app"))
         );
         assert_eq!(
             file_uri_to_path("file:///home/foo/app/"),
-            PathBuf::from("/home/foo/app")
+            Some(PathBuf::from("/home/foo/app"))
         );
+        assert_eq!(
+            file_uri_to_path("file://localhost/home/foo"),
+            Some(PathBuf::from("/home/foo"))
+        );
+        // network shares are not local paths
+        assert_eq!(file_uri_to_path("file://server/share/doc"), None);
+        assert_eq!(file_uri_to_path("file://example.com/a"), None);
     }
 
     #[test]
