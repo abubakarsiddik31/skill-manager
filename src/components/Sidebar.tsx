@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { lastUsed, usageCount } from "../lib/projectUsage";
+import { orderToolsByPin, selectVisibleProjects } from "../lib/sidebarLists";
 import { relativeTime } from "../lib/relativeTime";
 import type { DetectedProject, ProjectInfo, ToolEntry, View } from "../types";
 
@@ -77,27 +77,15 @@ export function Sidebar({
     getVersion().then(setVersion).catch(console.error);
   }, []);
 
-  // Pinned tools float to the top; the rest keep registry order.
-  const sortedTools = [...toolEntries].sort(
-    (a, b) => Number(pinnedTools.has(b.id)) - Number(pinnedTools.has(a.id)),
-  );
+  const sortedTools = orderToolsByPin(toolEntries, pinnedTools);
   const visibleTools = toolsExpanded ? sortedTools : sortedTools.slice(0, PREVIEW_COUNT);
   const hiddenTools = sortedTools.length - visibleTools.length;
 
-  // The sidebar only shows pins plus the most-used projects of the last
-  // 30 days (topped up to MIN_PROJECT_ROWS); everything else lives in
-  // the all-projects dialog.
-  const pinnedProjects = projects.filter((p) => p.pinned);
-  const mostUsed = projects
-    .filter((p) => !p.pinned)
-    .sort((a, b) => usageCount(b) - usageCount(a) || lastUsed(b) - lastUsed(a))
-    .slice(0, MOST_USED_COUNT);
-  const visibleProjects = [...pinnedProjects, ...mostUsed];
-  for (const p of projects) {
-    if (visibleProjects.length >= Math.max(pinnedProjects.length, MIN_PROJECT_ROWS)) break;
-    if (!visibleProjects.some((v) => v.path === p.path)) visibleProjects.push(p);
-  }
-  const hiddenProjects = projects.length - visibleProjects.length;
+  const { visible: visibleProjects, hiddenCount: hiddenProjects } = selectVisibleProjects(
+    projects,
+    MOST_USED_COUNT,
+    MIN_PROJECT_ROWS,
+  );
 
   return (
     <aside className="sidebar">
