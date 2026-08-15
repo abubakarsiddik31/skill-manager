@@ -546,10 +546,16 @@ body,
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   gap: 8px;
   padding: 12px 16px;
   border-top: 1px solid var(--border);
+}
+
+.modal-footer .footer-spacer {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
 }
 
 .btn {
@@ -564,6 +570,15 @@ body,
 }
 
 .btn:hover {
+  border-color: var(--border-strong);
+}
+
+.btn.danger {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: var(--danger-bright);
+}
+
+.btn.danger:hover {
   border-color: var(--border-strong);
 }
 

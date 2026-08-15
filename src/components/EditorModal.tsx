@@ -56,18 +56,9 @@ export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorMod
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <span className="title">{skill.name} / SKILL.md</span>
-          <button
-            className={`icon-btn square ${mode === "edit" ? "active" : ""}`}
-            onClick={() => setMode(mode === "edit" ? "view" : "edit")}
-            title={mode === "edit" ? "view" : "edit"}
-          >
+          <button className="icon-btn square" onClick={onClose} title="close">
             <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M13.5 3.5 16.5 6.5 6.5 16.5 3 17 3.5 13.5Z" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <button className="icon-btn square danger" onClick={remove} title="delete">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M4 5.5h12M8 5.5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M14.5 5.5 14 16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5.5 5.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
             </svg>
           </button>
         </div>
@@ -113,16 +104,27 @@ export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorMod
           />
         )}
 
-        {mode === "edit" && (
-          <div className="modal-footer">
-            <button className="btn" onClick={() => setMode("view")}>
-              cancel
-            </button>
-            <button className="btn primary" onClick={save} disabled={loading || saving}>
-              {saving ? "saving..." : "save"}
-            </button>
-          </div>
-        )}
+        <div className="modal-footer">
+          <button
+            className={`btn ${mode === "edit" ? "active" : ""}`}
+            onClick={() => setMode(mode === "edit" ? "view" : "edit")}
+          >
+            {mode === "edit" ? "view" : "edit"}
+          </button>
+          <button className="btn danger" onClick={remove}>
+            delete
+          </button>
+          {mode === "edit" && (
+            <div className="footer-spacer">
+              <button className="btn" onClick={() => setMode("view")}>
+                cancel
+              </button>
+              <button className="btn primary" onClick={save} disabled={loading || saving}>
+                {saving ? "saving..." : "save"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
