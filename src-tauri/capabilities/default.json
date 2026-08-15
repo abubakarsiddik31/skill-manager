@@ -5,7 +5,13 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "opener:default",
-    "dialog:default"
+    "dialog:allow-open",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://github.com/abubakarsiddik31/skill-manager" },
+        { "url": "https://github.com/abubakarsiddik31/skill-manager/*" }
+      ]
+    }
   ]
 }
