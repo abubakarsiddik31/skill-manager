@@ -91,12 +91,26 @@ export function Sidebar({
       </div>
 
       <div className="sidebar-footer">
-        <div className="footer-version">
-          skill manager{version ? ` v${version}` : ""}
+        <div className="footer-row">
+          <img src="/logo.svg" alt="Skill Manager" />
+          <span className="footer-name">
+            Skill <span className="accent">Manager</span>
+          </span>
+          {version && (
+            <a
+              className="footer-version"
+              onClick={link(`${REPO_URL}/releases/latest`)}
+              title="release notes"
+            >
+              v{version}
+            </a>
+          )}
         </div>
         <div className="footer-links">
           <a onClick={link(REPO_URL)}>github</a>
+          <span className="sep">·</span>
           <a onClick={link(`${REPO_URL}/issues/new?template=bug_report.yml`)}>report a bug</a>
+          <span className="sep">·</span>
           <a onClick={link(`${REPO_URL}/blob/main/LICENSE`)}>mit</a>
         </div>
       </div>
