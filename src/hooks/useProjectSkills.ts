@@ -13,11 +13,18 @@ export function useProjectSkills(project: ProjectInfo | null) {
       setSkills([]);
       return;
     }
+    // a quick project switch must not let the previous project's slow
+    // response overwrite the new one
+    let cancelled = false;
     setLoading(true);
     api.listProjectSkills(project.path).then((s) => {
+      if (cancelled) return;
       setSkills(s);
       setLoading(false);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [project?.path]);
 
   const { toggle, remove } = useSkillMutations(setSkills);
