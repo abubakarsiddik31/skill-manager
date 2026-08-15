@@ -73,6 +73,11 @@ pub fn set_project_pinned(app: AppHandle, path: String, pinned: bool) -> Result<
 }
 
 #[tauri::command]
+pub fn touch_project(app: AppHandle, path: String) -> Result<(), String> {
+    projects::touch(&app, &path)
+}
+
+#[tauri::command]
 pub fn list_project_skills(path: String) -> Vec<Skill> {
     skills::discover_project_skills(Path::new(&path))
 }

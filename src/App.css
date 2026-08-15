@@ -129,11 +129,13 @@ body,
   padding: 16px 16px 6px;
 }
 
-.nav-item.add-project {
+.nav-item.add-project,
+.nav-item.expand {
   color: var(--text-faint);
 }
 
-.nav-item.add-project:hover {
+.nav-item.add-project:hover,
+.nav-item.expand:hover {
   color: var(--accent-bright);
 }
 

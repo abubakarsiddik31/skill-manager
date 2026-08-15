@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Manager};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11,6 +12,9 @@ pub struct ProjectInfo {
     /// Older projects.json files predate pinning — treat as unpinned.
     #[serde(default)]
     pub pinned: bool,
+    /// Unix seconds of the last open in this app, for latest-first order.
+    #[serde(default)]
+    pub last_opened: u64,
 }
 
 const STORE_FILE: &str = "projects.json";
@@ -60,6 +64,7 @@ pub fn add(app: &AppHandle, path: String) -> Result<ProjectInfo, String> {
         path,
         name,
         pinned: false,
+        last_opened: 0,
     };
     projects.push(info.clone());
     save(app, &projects)?;
@@ -77,6 +82,22 @@ pub fn set_pinned(app: &AppHandle, path: &str, pinned: bool) -> Result<(), Strin
     for project in projects.iter_mut() {
         if project.path == path {
             project.pinned = pinned;
+            break;
+        }
+    }
+    save(app, &projects)
+}
+
+/// Records an open so the sidebar can order projects latest-first.
+pub fn touch(app: &AppHandle, path: &str) -> Result<(), String> {
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let mut projects = load(app)?;
+    for project in projects.iter_mut() {
+        if project.path == path {
+            project.last_opened = now;
             break;
         }
     }

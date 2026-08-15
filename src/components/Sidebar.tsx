@@ -5,6 +5,8 @@ import type { ProjectInfo, ToolEntry, View } from "../types";
 
 const ALL = "all" as const;
 const REPO_URL = "https://github.com/abubakarsiddik31/skill-manager";
+/** Rows shown per sidebar list before it collapses behind "show more". */
+const PREVIEW_COUNT = 6;
 
 function link(url: string) {
   return () => openUrl(url).catch(console.error);
@@ -51,19 +53,29 @@ export function Sidebar({
   onAddProject,
 }: SidebarProps) {
   const [version, setVersion] = useState("");
+  const [toolsExpanded, setToolsExpanded] = useState(false);
+  const [projectsExpanded, setProjectsExpanded] = useState(false);
 
   useEffect(() => {
     getVersion().then(setVersion).catch(console.error);
   }, []);
 
-  // Pinned entries float to the top; sort is stable so registry order
-  // (tools) and insertion order (projects) are preserved within groups.
+  // Pinned entries float to the top; tools keep registry order within
+  // groups, projects order by recency (last open in this app).
   const sortedTools = [...toolEntries].sort(
     (a, b) => Number(pinnedTools.has(b.id)) - Number(pinnedTools.has(a.id)),
   );
-  const sortedProjects = [...projects].sort(
-    (a, b) => Number(b.pinned) - Number(a.pinned),
-  );
+  const sortedProjects = [...projects].sort((a, b) => {
+    if (a.pinned !== b.pinned) return Number(b.pinned) - Number(a.pinned);
+    return b.lastOpened - a.lastOpened;
+  });
+
+  const visibleTools = toolsExpanded ? sortedTools : sortedTools.slice(0, PREVIEW_COUNT);
+  const hiddenTools = sortedTools.length - visibleTools.length;
+  const visibleProjects = projectsExpanded
+    ? sortedProjects
+    : sortedProjects.slice(0, PREVIEW_COUNT);
+  const hiddenProjects = sortedProjects.length - visibleProjects.length;
 
   return (
     <aside className="sidebar">
@@ -82,7 +94,7 @@ export function Sidebar({
         <span className="count">{totalSkillCount}</span>
       </div>
 
-      {sortedTools.map((entry) => {
+      {visibleTools.map((entry) => {
         const anyDirExists = entry.folders.some((f) => f.dirExists);
         return (
           <div
@@ -109,9 +121,20 @@ export function Sidebar({
         );
       })}
 
+      {hiddenTools > 0 && (
+        <div className="nav-item expand" onClick={() => setToolsExpanded(true)}>
+          <span>+ {hiddenTools} more</span>
+        </div>
+      )}
+      {toolsExpanded && sortedTools.length > PREVIEW_COUNT && (
+        <div className="nav-item expand" onClick={() => setToolsExpanded(false)}>
+          <span>show less</span>
+        </div>
+      )}
+
       <div className="nav-section-label">projects</div>
 
-      {sortedProjects.map((p) => (
+      {visibleProjects.map((p) => (
         <div
           key={p.path}
           className={`nav-item ${view.kind === "project" && view.project.path === p.path ? "active" : ""}`}
@@ -133,6 +156,17 @@ export function Sidebar({
           </span>
         </div>
       ))}
+
+      {hiddenProjects > 0 && (
+        <div className="nav-item expand" onClick={() => setProjectsExpanded(true)}>
+          <span>+ {hiddenProjects} more</span>
+        </div>
+      )}
+      {projectsExpanded && sortedProjects.length > PREVIEW_COUNT && (
+        <div className="nav-item expand" onClick={() => setProjectsExpanded(false)}>
+          <span>show less</span>
+        </div>
+      )}
 
       <div className="nav-item add-project" onClick={onAddProject}>
         <span>+ add project</span>

@@ -41,5 +41,10 @@ export function useProjects() {
     await refresh();
   }
 
-  return { projects, add, pickAndAdd, forget, togglePin };
+  async function touch(project: ProjectInfo) {
+    await api.touchProject(project.path);
+    await refresh();
+  }
+
+  return { projects, add, pickAndAdd, forget, togglePin, touch };
 }

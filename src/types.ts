@@ -44,6 +44,8 @@ export interface ProjectInfo {
   path: string;
   name: string;
   pinned: boolean;
+  /** unix seconds of the last open in this app; 0 = never */
+  lastOpened: number;
 }
 
 /** A folder the user seems to work in, found by scanning tool history

@@ -44,6 +44,9 @@ export const api = {
   setProjectPinned(path: string, pinned: boolean): Promise<void> {
     return invoke("set_project_pinned", { path, pinned });
   },
+  touchProject(path: string): Promise<void> {
+    return invoke("touch_project", { path });
+  },
   listProjectSkills(path: string): Promise<Skill[]> {
     return invoke("list_project_skills", { path });
   },

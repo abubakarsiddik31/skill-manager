@@ -49,6 +49,7 @@ function App() {
 
   function openProject(project: ProjectInfo) {
     setView({ kind: "project", project });
+    projects.touch(project); // records the open for latest-first ordering
   }
 
   async function addDetectedProject(path: string) {
