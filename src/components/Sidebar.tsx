@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { lastUsed, usageCount } from "../lib/projectUsage";
 import type { ProjectInfo, ToolEntry, View } from "../types";
 
 const ALL = "all" as const;
 const REPO_URL = "https://github.com/abubakarsiddik31/skill-manager";
-/** Rows shown per sidebar list before it collapses behind "show more". */
+/** Rows shown for tools before the list collapses behind "more". */
 const PREVIEW_COUNT = 6;
+/** Most-used projects (30-day window) shown before the "more" dialog. */
+const MOST_USED_COUNT = 3;
+/** Minimum project rows in the sidebar for a fresh, usage-less setup. */
+const MIN_PROJECT_ROWS = 3;
 
 function link(url: string) {
   return () => openUrl(url).catch(console.error);
@@ -29,6 +34,7 @@ interface SidebarProps {
   onTogglePinTool: (toolId: string) => void;
   projects: ProjectInfo[];
   onTogglePinProject: (project: ProjectInfo) => void;
+  onShowAllProjects: () => void;
   view: View;
   activeToolId: string | typeof ALL;
   onSelectAll: () => void;
@@ -45,6 +51,7 @@ export function Sidebar({
   onTogglePinTool,
   projects,
   onTogglePinProject,
+  onShowAllProjects,
   view,
   activeToolId,
   onSelectAll,
@@ -54,28 +61,32 @@ export function Sidebar({
 }: SidebarProps) {
   const [version, setVersion] = useState("");
   const [toolsExpanded, setToolsExpanded] = useState(false);
-  const [projectsExpanded, setProjectsExpanded] = useState(false);
 
   useEffect(() => {
     getVersion().then(setVersion).catch(console.error);
   }, []);
 
-  // Pinned entries float to the top; tools keep registry order within
-  // groups, projects order by recency (last open in this app).
+  // Pinned tools float to the top; the rest keep registry order.
   const sortedTools = [...toolEntries].sort(
     (a, b) => Number(pinnedTools.has(b.id)) - Number(pinnedTools.has(a.id)),
   );
-  const sortedProjects = [...projects].sort((a, b) => {
-    if (a.pinned !== b.pinned) return Number(b.pinned) - Number(a.pinned);
-    return b.lastOpened - a.lastOpened;
-  });
-
   const visibleTools = toolsExpanded ? sortedTools : sortedTools.slice(0, PREVIEW_COUNT);
   const hiddenTools = sortedTools.length - visibleTools.length;
-  const visibleProjects = projectsExpanded
-    ? sortedProjects
-    : sortedProjects.slice(0, PREVIEW_COUNT);
-  const hiddenProjects = sortedProjects.length - visibleProjects.length;
+
+  // The sidebar only shows pins plus the most-used projects of the last
+  // 30 days (topped up to MIN_PROJECT_ROWS); everything else lives in
+  // the all-projects dialog.
+  const pinnedProjects = projects.filter((p) => p.pinned);
+  const mostUsed = projects
+    .filter((p) => !p.pinned)
+    .sort((a, b) => usageCount(b) - usageCount(a) || lastUsed(b) - lastUsed(a))
+    .slice(0, MOST_USED_COUNT);
+  const visibleProjects = [...pinnedProjects, ...mostUsed];
+  for (const p of projects) {
+    if (visibleProjects.length >= Math.max(pinnedProjects.length, MIN_PROJECT_ROWS)) break;
+    if (!visibleProjects.some((v) => v.path === p.path)) visibleProjects.push(p);
+  }
+  const hiddenProjects = projects.length - visibleProjects.length;
 
   return (
     <aside className="sidebar">
@@ -158,13 +169,8 @@ export function Sidebar({
       ))}
 
       {hiddenProjects > 0 && (
-        <div className="nav-item expand" onClick={() => setProjectsExpanded(true)}>
+        <div className="nav-item expand" onClick={onShowAllProjects}>
           <span>+ {hiddenProjects} more</span>
-        </div>
-      )}
-      {projectsExpanded && sortedProjects.length > PREVIEW_COUNT && (
-        <div className="nav-item expand" onClick={() => setProjectsExpanded(false)}>
-          <span>show less</span>
         </div>
       )}
 

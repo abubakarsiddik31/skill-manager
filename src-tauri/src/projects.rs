@@ -15,9 +15,15 @@ pub struct ProjectInfo {
     /// Unix seconds of the last open in this app, for latest-first order.
     #[serde(default)]
     pub last_opened: u64,
+    /// Recent opens (unix seconds), pruned to the last 30 days so the
+    /// sidebar can surface the most-used projects. Older files that
+    /// predate usage tracking start empty.
+    #[serde(default)]
+    pub opens: Vec<u64>,
 }
 
 const STORE_FILE: &str = "projects.json";
+const USAGE_WINDOW_SECS: u64 = 30 * 24 * 60 * 60;
 
 fn store_path(app: &AppHandle) -> Result<PathBuf, String> {
     let dir = app
@@ -65,6 +71,7 @@ pub fn add(app: &AppHandle, path: String) -> Result<ProjectInfo, String> {
         name,
         pinned: false,
         last_opened: 0,
+        opens: Vec::new(),
     };
     projects.push(info.clone());
     save(app, &projects)?;
@@ -88,16 +95,20 @@ pub fn set_pinned(app: &AppHandle, path: &str, pinned: bool) -> Result<(), Strin
     save(app, &projects)
 }
 
-/// Records an open so the sidebar can order projects latest-first.
+/// Records an open so the sidebar can order projects latest-first and
+/// surface the most-used ones.
 pub fn touch(app: &AppHandle, path: &str) -> Result<(), String> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
         .unwrap_or(0);
+    let cutoff = now.saturating_sub(USAGE_WINDOW_SECS);
     let mut projects = load(app)?;
     for project in projects.iter_mut() {
         if project.path == path {
             project.last_opened = now;
+            project.opens.retain(|t| *t >= cutoff);
+            project.opens.push(now);
             break;
         }
     }

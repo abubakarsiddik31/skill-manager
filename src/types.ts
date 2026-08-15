@@ -46,6 +46,8 @@ export interface ProjectInfo {
   pinned: boolean;
   /** unix seconds of the last open in this app; 0 = never */
   lastOpened: number;
+  /** recent opens (unix seconds), pruned server-side to ~30 days */
+  opens: number[];
 }
 
 /** A folder the user seems to work in, found by scanning tool history

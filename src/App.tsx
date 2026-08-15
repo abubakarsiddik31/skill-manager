@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AddProjectModal } from "./components/AddProjectModal";
 import { EditorModal } from "./components/EditorModal";
+import { ProjectsModal } from "./components/ProjectsModal";
 import { Sidebar } from "./components/Sidebar";
 import { SkillList } from "./components/SkillList";
 import { Topbar } from "./components/Topbar";
@@ -20,6 +21,7 @@ function App() {
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Skill | null>(null);
   const [addingProject, setAddingProject] = useState(false);
+  const [showingAllProjects, setShowingAllProjects] = useState(false);
   const skillListRef = useRef<HTMLDivElement>(null);
 
   const global = useGlobalSkills();
@@ -106,6 +108,7 @@ function App() {
         onTogglePinTool={pinnedTools.toggle}
         projects={projects.projects}
         onTogglePinProject={projects.togglePin}
+        onShowAllProjects={() => setShowingAllProjects(true)}
         view={view}
         activeToolId={activeToolId}
         onSelectAll={selectAll}
@@ -162,6 +165,15 @@ function App() {
           onClose={() => setAddingProject(false)}
           onAdd={addDetectedProject}
           onBrowse={browseAndAddProject}
+        />
+      )}
+
+      {showingAllProjects && (
+        <ProjectsModal
+          projects={projects.projects}
+          activePath={activeProject?.path}
+          onClose={() => setShowingAllProjects(false)}
+          onOpen={openProject}
         />
       )}
     </div>

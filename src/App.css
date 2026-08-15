@@ -767,6 +767,15 @@ body,
   background: var(--bg-panel);
 }
 
+.detected-row.active {
+  border-color: var(--border-strong);
+  background: var(--bg-panel);
+}
+
+.detected-row.active .row-name {
+  color: var(--accent-bright);
+}
+
 .detected-row .row-main {
   display: flex;
   align-items: baseline;
