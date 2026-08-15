@@ -1,6 +1,7 @@
 mod agents;
 mod claude;
 mod copilot;
+mod crush;
 mod cursor;
 mod gemini;
 mod opencode;
@@ -13,6 +14,7 @@ use std::path::{Path, PathBuf};
 pub use agents::AgentsAdapter;
 pub use claude::ClaudeAdapter;
 pub use copilot::CopilotAdapter;
+pub use crush::CrushAdapter;
 pub use cursor::CursorAdapter;
 pub use gemini::GeminiAdapter;
 pub use opencode::OpenCodeAdapter;
@@ -26,6 +28,7 @@ pub enum AgentTool {
     /// "Agents" rather than after any one tool because it has no owner.
     Agents,
     Copilot,
+    Crush,
     Cursor,
     Gemini,
     Opencode,
@@ -37,6 +40,7 @@ impl AgentTool {
             AgentTool::Claude => "Claude",
             AgentTool::Agents => "Agents (shared)",
             AgentTool::Copilot => "Copilot",
+            AgentTool::Crush => "Crush",
             AgentTool::Cursor => "Cursor",
             AgentTool::Gemini => "Gemini",
             AgentTool::Opencode => "OpenCode",
@@ -243,6 +247,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
         Box::new(ClaudeAdapter),
         Box::new(AgentsAdapter),
         Box::new(CopilotAdapter),
+        Box::new(CrushAdapter),
         Box::new(CursorAdapter),
         Box::new(GeminiAdapter),
         Box::new(OpenCodeAdapter),
@@ -254,6 +259,7 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
         AgentTool::Claude => Box::new(ClaudeAdapter),
         AgentTool::Agents => Box::new(AgentsAdapter),
         AgentTool::Copilot => Box::new(CopilotAdapter),
+        AgentTool::Crush => Box::new(CrushAdapter),
         AgentTool::Cursor => Box::new(CursorAdapter),
         AgentTool::Gemini => Box::new(GeminiAdapter),
         AgentTool::Opencode => Box::new(OpenCodeAdapter),

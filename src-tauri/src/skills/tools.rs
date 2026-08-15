@@ -71,6 +71,7 @@ pub const TOOLS: &[ToolDef] = &[
         id: "crush",
         label: "Crush",
         folders: &[
+            own(AgentTool::Crush),
             compat(AgentTool::Agents),
             compat(AgentTool::Claude),
             compat(AgentTool::Cursor),
