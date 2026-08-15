@@ -1,6 +1,14 @@
+import { useEffect, useState } from "react";
+import { getVersion } from "@tauri-apps/api/app";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import type { ProjectInfo, ToolEntry, View } from "../types";
 
 const ALL = "all" as const;
+const REPO_URL = "https://github.com/abubakarsiddik31/skill-manager";
+
+function link(url: string) {
+  return () => openUrl(url).catch(console.error);
+}
 
 interface SidebarProps {
   toolEntries: ToolEntry[];
@@ -27,6 +35,12 @@ export function Sidebar({
   onOpenProject,
   onAddProject,
 }: SidebarProps) {
+  const [version, setVersion] = useState("");
+
+  useEffect(() => {
+    getVersion().then(setVersion).catch(console.error);
+  }, []);
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -76,7 +90,16 @@ export function Sidebar({
         <span>+ add project</span>
       </div>
 
-      <div className="sidebar-footer">open source · MIT</div>
+      <div className="sidebar-footer">
+        <div className="footer-version">
+          skill manager{version ? ` v${version}` : ""}
+        </div>
+        <div className="footer-links">
+          <a onClick={link(REPO_URL)}>github</a>
+          <a onClick={link(`${REPO_URL}/issues/new?template=bug_report.yml`)}>report a bug</a>
+          <a onClick={link(`${REPO_URL}/blob/main/LICENSE`)}>mit</a>
+        </div>
+      </div>
     </aside>
   );
 }

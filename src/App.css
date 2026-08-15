@@ -147,6 +147,19 @@ body,
 
 .sidebar-footer a {
   color: var(--text-faint);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sidebar-footer a:hover {
+  color: var(--text-dim);
+  text-decoration: underline;
+}
+
+.footer-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* ---------- main ---------- */
