@@ -1,4 +1,4 @@
-export type AgentTool = "claude" | "codex" | "cursor" | "opencode";
+export type AgentTool = "claude" | "codex" | "cursor" | "gemini" | "opencode";
 
 export type SkillScope = "user" | "project";
 

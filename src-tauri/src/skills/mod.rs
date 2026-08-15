@@ -1,6 +1,7 @@
 mod claude;
 mod codex;
 mod cursor;
+mod gemini;
 mod opencode;
 
 use serde::{Deserialize, Serialize};
@@ -10,6 +11,7 @@ use std::path::{Path, PathBuf};
 pub use claude::ClaudeAdapter;
 pub use codex::CodexAdapter;
 pub use cursor::CursorAdapter;
+pub use gemini::GeminiAdapter;
 pub use opencode::OpenCodeAdapter;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -18,6 +20,7 @@ pub enum AgentTool {
     Claude,
     Codex,
     Cursor,
+    Gemini,
     Opencode,
 }
 
@@ -27,6 +30,7 @@ impl AgentTool {
             AgentTool::Claude => "Claude",
             AgentTool::Codex => "Codex",
             AgentTool::Cursor => "Cursor",
+            AgentTool::Gemini => "Gemini",
             AgentTool::Opencode => "OpenCode",
         }
     }
@@ -240,6 +244,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
         Box::new(ClaudeAdapter),
         Box::new(CodexAdapter),
         Box::new(CursorAdapter),
+        Box::new(GeminiAdapter),
         Box::new(OpenCodeAdapter),
     ]
 }
@@ -249,6 +254,7 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
         AgentTool::Claude => Box::new(ClaudeAdapter),
         AgentTool::Codex => Box::new(CodexAdapter),
         AgentTool::Cursor => Box::new(CursorAdapter),
+        AgentTool::Gemini => Box::new(GeminiAdapter),
         AgentTool::Opencode => Box::new(OpenCodeAdapter),
     }
 }

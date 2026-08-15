@@ -4,7 +4,7 @@ import type { ProjectInfo, Skill, ToolInfo } from "../types";
 
 /**
  * Thin client over the Rust-side adapters (src-tauri/src/skills).
- * Each supported tool (Claude, Codex, Cursor, OpenCode) implements the
+ * Each supported tool (Claude, Codex, Cursor, Gemini, OpenCode) implements the
  * same SkillAdapter trait on the backend; this module is the single
  * place the frontend talks to that layer.
  */

@@ -8,11 +8,11 @@
     </title>
     <meta
       name="description"
-      content="Skill Manager is a free, open-source desktop app to discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, and OpenCode. Available for macOS, Windows, and Linux."
+      content="Skill Manager is a free, open-source desktop app to discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode. Available for macOS, Windows, and Linux."
     />
     <meta
       name="keywords"
-      content="skill manager, claude code skills, agent skills, claude skills manager, codex skills, cursor skills, opencode skills, ai coding agent, developer tools, tauri desktop app, skill hell"
+      content="skill manager, claude code skills, agent skills, claude skills manager, codex skills, cursor skills, gemini cli skills, opencode skills, ai coding agent, developer tools, tauri desktop app, skill hell"
     />
     <meta name="author" content="Skill Manager contributors" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -30,7 +30,7 @@
     />
     <meta
       property="og:description"
-      content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, and OpenCode — from one desktop app."
+      content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode — from one desktop app."
     />
     <meta
       property="og:url"
@@ -53,7 +53,7 @@
     />
     <meta
       name="twitter:description"
-      content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, and OpenCode."
+      content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode."
     />
     <meta
       name="twitter:image"
@@ -70,7 +70,7 @@
         "name": "Skill Manager",
         "operatingSystem": "macOS, Windows, Linux",
         "applicationCategory": "DeveloperApplication",
-        "description": "One dashboard to discover, enable, disable, edit, and delete AI coding agent skills across Claude Code, Codex, Cursor, and OpenCode.",
+        "description": "One dashboard to discover, enable, disable, edit, and delete AI coding agent skills across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode.",
         "url": "https://abubakarsiddik31.github.io/skill-manager/",
         "image": "https://abubakarsiddik31.github.io/skill-manager/assets/social-card.png",
         "downloadUrl": "https://github.com/abubakarsiddik31/skill-manager/releases/latest",
@@ -725,14 +725,15 @@
       <header class="hero">
         <img class="hero-mark" src="./logo.svg" alt="Skill Manager" />
         <div class="badge">
-          <b>OSS</b> Claude Code, Codex, Cursor &amp; OpenCode — fully supported
+          <b>OSS</b> Claude Code, Codex, Cursor, Gemini CLI &amp; OpenCode —
+          fully supported
         </div>
         <h1>One dashboard for<br />every agent skill.</h1>
         <p class="tagline">
           Discover, enable, disable, edit, and delete AI coding agent skills
-          across Claude Code, Codex, Cursor, and OpenCode — instead of digging
-          through four different config folders by hand, and letting every skill
-          you've ever installed sit there active.
+          across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode — instead
+          of digging through five different config folders by hand, and letting
+          every skill you've ever installed sit there active.
         </p>
 
         <div class="downloads" id="downloads">
@@ -805,11 +806,12 @@
               >
               — a folder with a <code>SKILL.md</code> manifest describing when
               an agent should reach for it, and what to do once it does. The
-              idea spread fast: Claude Code, Codex, Cursor, and OpenCode all
-              read the same shape now, just from their own directory.
+              idea spread fast: Claude Code, Codex, Cursor, Gemini CLI, and
+              OpenCode all read the same shape now, just from their own
+              directory.
             </p>
             <p>
-              Which is exactly the problem. Four tools, four folders, and the
+              Which is exactly the problem. Five tools, five folders, and the
               moment you're using more than one of them, nothing shows you the
               whole picture.
             </p>
@@ -850,7 +852,7 @@
             <tr>
               <td>See what's installed</td>
               <td class="without">
-                Open a terminal, <code>ls</code> four different folders
+                Open a terminal, <code>ls</code> five different folders
               </td>
               <td class="with">One dashboard, every tool</td>
             </tr>
@@ -889,7 +891,7 @@
 
       <section id="features">
         <div class="kicker">features</div>
-        <h2>Everything the four config folders won't show you.</h2>
+        <h2>Everything the five config folders won't show you.</h2>
         <div class="features">
           <div class="feature">
             <h3>Unified view</h3>
@@ -941,7 +943,7 @@
         <div class="kicker">coverage</div>
         <h2>Supported tools</h2>
         <p class="lead">
-          All four paths are verified against each tool's own docs — not
+          All five paths are verified against each tool's own docs — not
           guessed.
         </p>
         <table class="tools">
@@ -970,6 +972,12 @@
               <td>Cursor</td>
               <td><code>~/.cursor/skills</code></td>
               <td><code>.cursor/skills</code></td>
+              <td><span class="status-ok">fully supported</span></td>
+            </tr>
+            <tr>
+              <td>Gemini CLI</td>
+              <td><code>~/.gemini/skills</code></td>
+              <td><code>.gemini/skills</code></td>
               <td><span class="status-ok">fully supported</span></td>
             </tr>
             <tr>

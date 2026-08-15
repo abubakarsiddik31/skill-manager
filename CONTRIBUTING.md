@@ -6,7 +6,8 @@ participating.
 
 ### Keep a tool's skill directory in sync
 
-Claude Code, Codex, Cursor, and OpenCode's skill directories are all verified
+Claude Code, Codex, Cursor, Gemini CLI, and OpenCode's skill directories are
+all verified
 against each tool's own docs (see the [README](README.md#supported-tools)),
 but these tools evolve. If a tool changes its convention or you find it's
 wrong:

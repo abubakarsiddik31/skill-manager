@@ -7,8 +7,8 @@
 ### One dashboard to manage every AI coding agent skill you've installed.
 
 Discover, enable, disable, edit, and delete [Agent Skills](#what-is-a-skill)
-across Claude Code, Codex, Cursor, and OpenCode — without hand-editing a
-config file ever again.
+across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode — without
+hand-editing a config file ever again.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-000000.svg)](LICENSE)
 [![Built with Tauri](https://img.shields.io/badge/Tauri-000000.svg?logo=tauri&logoColor=FFC131)](https://tauri.app)
@@ -26,7 +26,7 @@ config file ever again.
 
 <br />
 
-<img src="docs/assets/demo.gif" width="760" alt="Skill Manager demo: browsing, filtering, searching, and viewing a skill across Claude Code, Codex, Cursor, and OpenCode" />
+<img src="docs/assets/demo.gif" width="760" alt="Skill Manager demo: browsing, filtering, searching, and viewing a skill across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode" />
 
 </div>
 
@@ -49,8 +49,9 @@ config file ever again.
 ## The problem
 
 If you use more than one AI coding agent, your skills are scattered across
-`~/.claude/skills`, `~/.agents/skills`, `~/.cursor/skills`, and
-`~/.config/opencode/skills` — four folders, four formats, zero shared view.
+`~/.claude/skills`, `~/.agents/skills`, `~/.cursor/skills`,
+`~/.gemini/skills`, and `~/.config/opencode/skills` — five folders, zero
+shared view.
 
 Left unchecked, this turns into **skill hell**: every skill you've ever
 installed sits there active, and your agent has to disambiguate against all
@@ -61,7 +62,7 @@ what you don't need for the current project is how you climb back out.
 
 | | Without Skill Manager | With Skill Manager |
 | --- | --- | --- |
-| **See what's installed** | Open a terminal, `ls` four different folders | One dashboard, every tool |
+| **See what's installed** | Open a terminal, `ls` five different folders | One dashboard, every tool |
 | **Turn a skill off** | Delete the folder and hope you don't need it back | Toggle it — fully reversible |
 | **Keep triggering accurate** | Every installed skill competes for a match, even ones irrelevant to this project | Disable the noise, leave only what's relevant enabled |
 | **Know what's wired into a project** | Global and project-level skills look identical until something breaks | Per-project breakdown, separate from global |
@@ -74,12 +75,12 @@ what you don't need for the current project is how you climb back out.
 Anthropic introduced **[Agent Skills](https://code.claude.com/docs/en/skills)**
 — folders containing a `SKILL.md` file with instructions an AI coding agent
 can load on demand — and the idea has since been picked up across the
-ecosystem (Claude Code, Codex, Cursor, OpenCode, and others).
+ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 
 ## Features
 
 - 🗂️ **Unified view** across every tool's skills directory — no more digging
-  through four different config folders by hand.
+  through five different config folders by hand.
 - 🔀 **Enable / disable** any skill without deleting it (skills move to a
   sibling `.disabled/` folder — fully reversible, and it never touches the
   tool's own config).
@@ -98,9 +99,10 @@ ecosystem (Claude Code, Codex, Cursor, OpenCode, and others).
 | [Claude Code](https://claude.com/claude-code) | `~/.claude/skills` | `.claude/skills` | ✅ fully supported |
 | [Codex](https://developers.openai.com/codex/skills) | `~/.agents/skills` | `.agents/skills` | ✅ fully supported |
 | [Cursor](https://cursor.com/docs/skills) | `~/.cursor/skills` | `.cursor/skills` | ✅ fully supported |
+| [Gemini CLI](https://geminicli.com/docs/cli/skills/) | `~/.gemini/skills` | `.gemini/skills` | ✅ fully supported |
 | [OpenCode](https://opencode.ai/docs/skills/) | `~/.config/opencode/skills` | `.opencode/skills` | ✅ fully supported |
 
-All four paths are verified against each tool's own docs — not guessed. If a
+All five paths are verified against each tool's own docs — not guessed. If a
 tool changes its convention, [open an issue](.github/ISSUE_TEMPLATE/tool_directory.yml)
 and we'll update the adapter.
 
