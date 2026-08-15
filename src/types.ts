@@ -43,6 +43,7 @@ export interface Skill {
 export interface ProjectInfo {
   path: string;
   name: string;
+  pinned: boolean;
 }
 
 /** A folder the user seems to work in, found by scanning tool history

@@ -5,6 +5,7 @@ import { Sidebar } from "./components/Sidebar";
 import { SkillList } from "./components/SkillList";
 import { Topbar } from "./components/Topbar";
 import { useGlobalSkills } from "./hooks/useGlobalSkills";
+import { usePinnedTools } from "./hooks/usePinnedTools";
 import { useProjects } from "./hooks/useProjects";
 import { useProjectSkills } from "./hooks/useProjectSkills";
 import { filterSkills } from "./lib/filterSkills";
@@ -23,6 +24,7 @@ function App() {
 
   const global = useGlobalSkills();
   const projects = useProjects();
+  const pinnedTools = usePinnedTools();
   const activeProject = view.kind === "project" ? view.project : null;
   const projectView = useProjectSkills(activeProject);
 
@@ -99,7 +101,10 @@ function App() {
         toolEntries={global.toolEntries}
         totalSkillCount={global.skills.length}
         countForEntry={countForEntry}
+        pinnedTools={pinnedTools.pinned}
+        onTogglePinTool={pinnedTools.toggle}
         projects={projects.projects}
+        onTogglePinProject={projects.togglePin}
         view={view}
         activeToolId={activeToolId}
         onSelectAll={selectAll}

@@ -808,3 +808,44 @@ body,
   color: var(--text-dim);
   flex-shrink: 0;
 }
+
+/* ---------- sidebar pins ---------- */
+
+.nav-item .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nav-item > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  opacity: 0;
+}
+
+.nav-item:hover .pin-btn,
+.pin-btn.pinned {
+  opacity: 1;
+}
+
+.pin-btn:hover {
+  color: var(--text);
+}
+
+.pin-btn.pinned {
+  color: var(--accent-bright);
+}

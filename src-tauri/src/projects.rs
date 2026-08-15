@@ -8,6 +8,9 @@ use tauri::{AppHandle, Manager};
 pub struct ProjectInfo {
     pub path: String,
     pub name: String,
+    /// Older projects.json files predate pinning — treat as unpinned.
+    #[serde(default)]
+    pub pinned: bool,
 }
 
 const STORE_FILE: &str = "projects.json";
@@ -53,7 +56,11 @@ pub fn add(app: &AppHandle, path: String) -> Result<ProjectInfo, String> {
         .and_then(|n| n.to_str())
         .unwrap_or(&path)
         .to_string();
-    let info = ProjectInfo { path, name };
+    let info = ProjectInfo {
+        path,
+        name,
+        pinned: false,
+    };
     projects.push(info.clone());
     save(app, &projects)?;
     Ok(info)
@@ -62,5 +69,16 @@ pub fn add(app: &AppHandle, path: String) -> Result<ProjectInfo, String> {
 pub fn remove(app: &AppHandle, path: &str) -> Result<(), String> {
     let mut projects = load(app)?;
     projects.retain(|p| p.path != path);
+    save(app, &projects)
+}
+
+pub fn set_pinned(app: &AppHandle, path: &str, pinned: bool) -> Result<(), String> {
+    let mut projects = load(app)?;
+    for project in projects.iter_mut() {
+        if project.path == path {
+            project.pinned = pinned;
+            break;
+        }
+    }
     save(app, &projects)
 }

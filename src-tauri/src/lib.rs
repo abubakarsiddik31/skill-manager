@@ -19,6 +19,7 @@ pub fn run() {
             commands::list_projects,
             commands::add_project,
             commands::remove_project,
+            commands::set_project_pinned,
             commands::list_project_skills,
         ])
         .run(tauri::generate_context!())

@@ -36,5 +36,10 @@ export function useProjects() {
     await refresh();
   }
 
-  return { projects, add, pickAndAdd, forget };
+  async function togglePin(project: ProjectInfo) {
+    await api.setProjectPinned(project.path, !project.pinned);
+    await refresh();
+  }
+
+  return { projects, add, pickAndAdd, forget, togglePin };
 }

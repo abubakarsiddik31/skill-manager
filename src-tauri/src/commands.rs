@@ -68,6 +68,11 @@ pub fn remove_project(app: AppHandle, path: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub fn set_project_pinned(app: AppHandle, path: String, pinned: bool) -> Result<(), String> {
+    projects::set_pinned(&app, &path, pinned)
+}
+
+#[tauri::command]
 pub fn list_project_skills(path: String) -> Vec<Skill> {
     skills::discover_project_skills(Path::new(&path))
 }

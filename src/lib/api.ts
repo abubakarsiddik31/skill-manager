@@ -41,6 +41,9 @@ export const api = {
   removeProject(path: string): Promise<void> {
     return invoke("remove_project", { path });
   },
+  setProjectPinned(path: string, pinned: boolean): Promise<void> {
+    return invoke("set_project_pinned", { path, pinned });
+  },
   listProjectSkills(path: string): Promise<Skill[]> {
     return invoke("list_project_skills", { path });
   },
