@@ -92,10 +92,14 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 - 📁 **Per-project breakdown** — track individual project folders and see
   exactly which skills are wired into each one, separate from your global
   skills.
-- 🧭 **Smart project setup** — the app detects folders you already work in
+- 🧭 **Detected projects** — the app finds folders you already work in
   (Claude Code history, editor recents, git repos) and offers them as
-  one-click suggestions; the sidebar keeps pinned and most-used projects on
-  top, and every project row shows its skill count.
+  one-click suggestions in the sidebar and in a searchable picker, with
+  activity times and skill counts on every row.
+- 📌 **Pinned & most-used first** — pin the tools and projects you touch
+  daily; the sidebar keeps your top three most-used projects (30-day
+  window) on top, and every project list can sort by use or by skill
+  count.
 - 🔍 **Search** across names and descriptions.
 
 ## Supported tools
@@ -191,15 +195,8 @@ new module pointing at its skills directory.
 
 ## Roadmap
 
-Shipped:
-
-- [x] Add Gemini CLI support
-- [x] Cover the agentskills.io ecosystem — VS Code / Copilot, Crush, Roo Code,
-  Kiro, Junie, Factory Droid, plus the shared `~/.agents/skills` folder read
-  by Codex, Goose, and Amp, all through one tool-level registry
-
-Next up:
-
+- [ ] Skill browser & install — browse community skills and install them
+  into any tool's skills folder in one click
 - [ ] Auto-update support (in-app update checks, no manual reinstall)
 - [ ] Code-signed builds (no more Gatekeeper/SmartScreen warnings)
 - [ ] Keep adding agents as they adopt `SKILL.md` — Windsurf and Trae are on
