@@ -5,6 +5,7 @@ export type AgentTool =
   | "crush"
   | "cursor"
   | "gemini"
+  | "junie"
   | "kiro"
   | "opencode"
   | "roo";
