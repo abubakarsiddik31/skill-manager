@@ -9,6 +9,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             commands::list_tools,
+            commands::list_tool_entries,
             commands::list_skills,
             commands::set_skill_enabled,
             commands::delete_skill,

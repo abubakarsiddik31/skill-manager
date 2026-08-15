@@ -1,15 +1,16 @@
+mod agents;
 mod claude;
-mod codex;
 mod cursor;
 mod gemini;
 mod opencode;
+pub mod tools;
 
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+pub use agents::AgentsAdapter;
 pub use claude::ClaudeAdapter;
-pub use codex::CodexAdapter;
 pub use cursor::CursorAdapter;
 pub use gemini::GeminiAdapter;
 pub use opencode::OpenCodeAdapter;
@@ -18,7 +19,10 @@ pub use opencode::OpenCodeAdapter;
 #[serde(rename_all = "lowercase")]
 pub enum AgentTool {
     Claude,
-    Codex,
+    /// The shared `~/.agents/skills` folder — the Agent Skills standard's
+    /// interop directory, read natively by Codex, Goose, and Amp. Named
+    /// "Agents" rather than after any one tool because it has no owner.
+    Agents,
     Cursor,
     Gemini,
     Opencode,
@@ -28,7 +32,7 @@ impl AgentTool {
     pub fn label(&self) -> &'static str {
         match self {
             AgentTool::Claude => "Claude",
-            AgentTool::Codex => "Codex",
+            AgentTool::Agents => "Agents (shared)",
             AgentTool::Cursor => "Cursor",
             AgentTool::Gemini => "Gemini",
             AgentTool::Opencode => "OpenCode",
@@ -242,7 +246,7 @@ pub fn delete_skill_dir(skill_path: &Path) -> std::io::Result<()> {
 pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
     vec![
         Box::new(ClaudeAdapter),
-        Box::new(CodexAdapter),
+        Box::new(AgentsAdapter),
         Box::new(CursorAdapter),
         Box::new(GeminiAdapter),
         Box::new(OpenCodeAdapter),
@@ -252,7 +256,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
 pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
     match tool {
         AgentTool::Claude => Box::new(ClaudeAdapter),
-        AgentTool::Codex => Box::new(CodexAdapter),
+        AgentTool::Agents => Box::new(AgentsAdapter),
         AgentTool::Cursor => Box::new(CursorAdapter),
         AgentTool::Gemini => Box::new(GeminiAdapter),
         AgentTool::Opencode => Box::new(OpenCodeAdapter),

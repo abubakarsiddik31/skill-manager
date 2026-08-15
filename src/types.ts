@@ -1,4 +1,21 @@
-export type AgentTool = "claude" | "codex" | "cursor" | "gemini" | "opencode";
+export type AgentTool = "claude" | "agents" | "cursor" | "gemini" | "opencode";
+
+/** How a tool relates to a skills folder it reads. */
+export type FolderRole = "own" | "compat";
+
+export interface ToolFolderInfo {
+  tool: AgentTool;
+  dir: string;
+  role: FolderRole;
+  dirExists: boolean;
+}
+
+/** A coding agent and every skills folder it reads (own + compat). */
+export interface ToolEntry {
+  id: string;
+  label: string;
+  folders: ToolFolderInfo[];
+}
 
 export type SkillScope = "user" | "project";
 
