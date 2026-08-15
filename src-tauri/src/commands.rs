@@ -115,9 +115,12 @@ fn find_skill_by_manifest(app: &AppHandle, manifest: &Path) -> Option<Skill> {
         return in_user_scope;
     }
 
-    projects::list(app).unwrap_or_default().into_iter().find_map(|p| {
-        skills::discover_project_skills(Path::new(&p.path))
-            .into_iter()
-            .find(|s| s.id == target)
-    })
+    projects::list(app)
+        .unwrap_or_default()
+        .into_iter()
+        .find_map(|p| {
+            skills::discover_project_skills(Path::new(&p.path))
+                .into_iter()
+                .find(|s| s.id == target)
+        })
 }

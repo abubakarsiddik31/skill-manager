@@ -163,7 +163,11 @@ fn parse_frontmatter(raw: &str) -> (String, String) {
         let Some((key, value)) = line.split_once(':') else {
             continue;
         };
-        let value = value.trim().trim_matches('"').trim_matches('\'').to_string();
+        let value = value
+            .trim()
+            .trim_matches('"')
+            .trim_matches('\'')
+            .to_string();
         match key.trim() {
             "name" => name = value,
             "description" => description = value,
@@ -190,7 +194,10 @@ pub fn toggle_enabled(skill_path: &Path, enable: bool) -> std::io::Result<PathBu
     };
 
     let (from, to) = if enable {
-        (skills_dir.join(DISABLED_DIR).join(name), skills_dir.join(name))
+        (
+            skills_dir.join(DISABLED_DIR).join(name),
+            skills_dir.join(name),
+        )
     } else {
         let disabled_root = skills_dir.join(DISABLED_DIR);
         fs::create_dir_all(&disabled_root)?;
@@ -204,11 +211,11 @@ pub fn toggle_enabled(skill_path: &Path, enable: bool) -> std::io::Result<PathBu
 /// Moves a skill folder from `from` to `to`. Plain directories are renamed
 /// as usual, but a symlinked skill (common for tools like Cursor that share
 /// skills with other tools via a link) needs special care: naively renaming
-/// the link node would leave a relative target - e.g. `../../.claude/skills/x`
-/// - resolving from the wrong depth once it's nested one level into/out of
-/// `.disabled`, silently turning it into a dangling link. Resolve the link's
-/// real target first and recreate an absolute symlink at the destination
-/// instead.
+/// the link node would leave a relative target (e.g.
+/// `../../.claude/skills/x`) resolving from the wrong depth once it's
+/// nested one level into/out of `.disabled`, silently turning it into a
+/// dangling link. Resolve the link's real target first and recreate an
+/// absolute symlink at the destination instead.
 fn move_skill_entry(from: &Path, to: &Path) -> std::io::Result<()> {
     if from.is_symlink() {
         let target = fs::canonicalize(from)?;
@@ -288,10 +295,15 @@ mod tests {
     use super::*;
 
     fn temp_skills_dir(tag: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("skill-manager-test-{tag}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("skill-manager-test-{tag}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("demo")).unwrap();
-        fs::write(dir.join("demo").join(MANIFEST_FILE), "---\nname: demo\n---\n").unwrap();
+        fs::write(
+            dir.join("demo").join(MANIFEST_FILE),
+            "---\nname: demo\n---\n",
+        )
+        .unwrap();
         dir
     }
 
@@ -306,7 +318,10 @@ mod tests {
 
         let re_enabled_manifest =
             toggle_enabled(&disabled_manifest, true).expect("re-enable should succeed");
-        assert_eq!(re_enabled_manifest, skills_dir.join("demo").join(MANIFEST_FILE));
+        assert_eq!(
+            re_enabled_manifest,
+            skills_dir.join("demo").join(MANIFEST_FILE)
+        );
         assert!(re_enabled_manifest.is_file());
 
         fs::remove_dir_all(&skills_dir).unwrap();
@@ -319,8 +334,8 @@ mod tests {
         // linked into a tool's skills dir with a relative target (e.g.
         // Cursor sharing a skill from `~/.claude/skills` via
         // `../../.claude/skills/<name>`).
-        let real_dir = std::env::temp_dir()
-            .join(format!("skill-manager-test-real-{}", std::process::id()));
+        let real_dir =
+            std::env::temp_dir().join(format!("skill-manager-test-real-{}", std::process::id()));
         let _ = fs::remove_dir_all(&real_dir);
         fs::create_dir_all(&real_dir).unwrap();
         fs::write(real_dir.join(MANIFEST_FILE), "---\nname: linked\n---\n").unwrap();
@@ -331,11 +346,17 @@ mod tests {
         let manifest = link.join(MANIFEST_FILE);
 
         let disabled_manifest = toggle_enabled(&manifest, false).expect("disable should succeed");
-        assert!(disabled_manifest.is_file(), "symlink must still resolve once disabled");
+        assert!(
+            disabled_manifest.is_file(),
+            "symlink must still resolve once disabled"
+        );
 
         let re_enabled_manifest =
             toggle_enabled(&disabled_manifest, true).expect("re-enable should succeed");
-        assert!(re_enabled_manifest.is_file(), "symlink must still resolve once re-enabled");
+        assert!(
+            re_enabled_manifest.is_file(),
+            "symlink must still resolve once re-enabled"
+        );
 
         fs::remove_dir_all(&skills_dir).unwrap();
         fs::remove_dir_all(&real_dir).unwrap();

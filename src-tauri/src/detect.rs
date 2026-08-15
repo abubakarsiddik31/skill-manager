@@ -40,7 +40,15 @@ struct Candidate {
 /// Folders scanned for git repos, relative to the home directory. Kept
 /// deliberately small — detection should stay fast, not enumerate disk.
 const COMMON_ROOTS: &[&str] = &[
-    "Projects", "projects", "dev", "src", "code", "repos", "github", "work", "Desktop",
+    "Projects",
+    "projects",
+    "dev",
+    "src",
+    "code",
+    "repos",
+    "github",
+    "work",
+    "Desktop",
     "Documents",
 ];
 const GIT_SCAN_DEPTH: usize = 2;
@@ -78,7 +86,9 @@ fn collect_claude(out: &mut Candidates) {
     let Ok(raw) = fs::read_to_string(home.join(".claude.json")) else {
         return;
     };
-    let Ok(value) = serde_json::from_str::<Value>(&raw) else { return };
+    let Ok(value) = serde_json::from_str::<Value>(&raw) else {
+        return;
+    };
     let Some(projects) = value.get("projects").and_then(|p| p.as_object()) else {
         return;
     };
@@ -115,7 +125,9 @@ fn collect_editor(home: &Path, app_dir: &str, source: &'static str, out: &mut Ca
         .map(|base| base.join(app_dir).join("User/globalStorage/storage.json"))
         .find_map(|p| fs::read_to_string(p).ok());
     let Some(raw) = storage else { return };
-    let Ok(value) = serde_json::from_str::<Value>(&raw) else { return };
+    let Ok(value) = serde_json::from_str::<Value>(&raw) else {
+        return;
+    };
 
     let mut uris = Vec::new();
     collect_file_uris(&value, &mut uris);
@@ -175,7 +187,9 @@ fn scan_for_git(dir: &Path, depth: usize, budget: &mut usize, out: &mut Candidat
     if depth > GIT_SCAN_DEPTH || *budget == 0 {
         return;
     }
-    let Ok(entries) = fs::read_dir(dir) else { return };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
     for entry in entries.flatten() {
         if *budget == 0 {
             return;
@@ -220,7 +234,9 @@ fn is_container(path: &Path, home: &Path) -> bool {
 }
 
 pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
-    let Some(home) = home() else { return Vec::new() };
+    let Some(home) = home() else {
+        return Vec::new();
+    };
     let mut candidates: Candidates = HashMap::new();
     collect_claude(&mut candidates);
     collect_editor(&home, "Cursor", "cursor", &mut candidates);
@@ -304,11 +320,20 @@ mod tests {
             assert!(is_container(Path::new(path), home), "{path}");
         }
         // well-known children of home
-        for path in ["/Users/foo/Desktop", "/Users/foo/Documents", "/Users/foo/Downloads", "/Users/foo/projects"] {
+        for path in [
+            "/Users/foo/Desktop",
+            "/Users/foo/Documents",
+            "/Users/foo/Downloads",
+            "/Users/foo/projects",
+        ] {
             assert!(is_container(Path::new(path), home), "{path}");
         }
         // real project folders pass
-        for path in ["/Users/foo/Desktop/app", "/Users/foo/projects/app", "/Users/foo/app"] {
+        for path in [
+            "/Users/foo/Desktop/app",
+            "/Users/foo/projects/app",
+            "/Users/foo/app",
+        ] {
             assert!(!is_container(Path::new(path), home), "{path}");
         }
     }

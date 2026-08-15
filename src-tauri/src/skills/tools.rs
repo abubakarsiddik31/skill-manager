@@ -1,5 +1,5 @@
-use serde::Serialize;
 use super::{adapter_for, AgentTool};
+use serde::Serialize;
 
 /// How a tool relates to a skills folder. `Own` is the directory the tool
 /// documents as its primary location (and where it installs skills);
@@ -17,11 +17,17 @@ pub struct FolderRef {
 }
 
 const fn own(folder: AgentTool) -> FolderRef {
-    FolderRef { folder, role: FolderRole::Own }
+    FolderRef {
+        folder,
+        role: FolderRole::Own,
+    }
 }
 
 const fn compat(folder: AgentTool) -> FolderRef {
-    FolderRef { folder, role: FolderRole::Compat }
+    FolderRef {
+        folder,
+        role: FolderRole::Compat,
+    }
 }
 
 /// A coding agent in the registry. Tools are pure readers of folders —
@@ -37,10 +43,22 @@ pub struct ToolDef {
 
 pub const TOOLS: &[ToolDef] = &[
     // Claude Code: ~/.claude/skills only.
-    ToolDef { id: "claude-code", label: "Claude Code", folders: &[own(AgentTool::Claude)] },
+    ToolDef {
+        id: "claude-code",
+        label: "Claude Code",
+        folders: &[own(AgentTool::Claude)],
+    },
     // Codex: ~/.agents/skills is its only location.
-    ToolDef { id: "codex", label: "Codex", folders: &[own(AgentTool::Agents)] },
-    ToolDef { id: "cursor", label: "Cursor", folders: &[own(AgentTool::Cursor)] },
+    ToolDef {
+        id: "codex",
+        label: "Codex",
+        folders: &[own(AgentTool::Agents)],
+    },
+    ToolDef {
+        id: "cursor",
+        label: "Cursor",
+        folders: &[own(AgentTool::Cursor)],
+    },
     // Gemini CLI: ~/.gemini/skills, with ~/.agents/skills as an alias.
     ToolDef {
         id: "gemini",
@@ -58,13 +76,25 @@ pub const TOOLS: &[ToolDef] = &[
     ToolDef {
         id: "copilot",
         label: "VS Code / Copilot",
-        folders: &[own(AgentTool::Copilot), compat(AgentTool::Agents), compat(AgentTool::Claude)],
+        folders: &[
+            own(AgentTool::Copilot),
+            compat(AgentTool::Agents),
+            compat(AgentTool::Claude),
+        ],
     },
     // Goose: recommends ~/.agents/skills (legacy .goose/skills still read).
-    ToolDef { id: "goose", label: "Goose", folders: &[own(AgentTool::Agents)] },
+    ToolDef {
+        id: "goose",
+        label: "Goose",
+        folders: &[own(AgentTool::Agents)],
+    },
     // Amp: top preference is the shared agents folders; its own
     // ~/.config/amp/skills is the lowest-priority fallback, not scanned.
-    ToolDef { id: "amp", label: "Amp", folders: &[own(AgentTool::Agents)] },
+    ToolDef {
+        id: "amp",
+        label: "Amp",
+        folders: &[own(AgentTool::Agents)],
+    },
     // Crush: ~/.config/crush/skills, also scans the shared, Claude, and
     // Cursor folders.
     ToolDef {
@@ -78,9 +108,21 @@ pub const TOOLS: &[ToolDef] = &[
         ],
     },
     // Roo Code: ~/.roo/skills (higher priority), .agents/skills (shared).
-    ToolDef { id: "roo", label: "Roo Code", folders: &[own(AgentTool::Roo), compat(AgentTool::Agents)] },
-    ToolDef { id: "kiro", label: "Kiro", folders: &[own(AgentTool::Kiro)] },
-    ToolDef { id: "junie", label: "Junie", folders: &[own(AgentTool::Junie)] },
+    ToolDef {
+        id: "roo",
+        label: "Roo Code",
+        folders: &[own(AgentTool::Roo), compat(AgentTool::Agents)],
+    },
+    ToolDef {
+        id: "kiro",
+        label: "Kiro",
+        folders: &[own(AgentTool::Kiro)],
+    },
+    ToolDef {
+        id: "junie",
+        label: "Junie",
+        folders: &[own(AgentTool::Junie)],
+    },
     // Factory Droid: ~/.factory/skills, .agents/skills as compatibility.
     ToolDef {
         id: "factory",
