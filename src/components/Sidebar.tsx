@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { lastUsed, usageCount } from "../lib/projectUsage";
-import type { ProjectInfo, ToolEntry, View } from "../types";
+import { relativeTime } from "../lib/relativeTime";
+import type { DetectedProject, ProjectInfo, ToolEntry, View } from "../types";
 
 const ALL = "all" as const;
 const REPO_URL = "https://github.com/abubakarsiddik31/skill-manager";
@@ -12,6 +13,8 @@ const PREVIEW_COUNT = 6;
 const MOST_USED_COUNT = 3;
 /** Minimum project rows in the sidebar for a fresh, usage-less setup. */
 const MIN_PROJECT_ROWS = 3;
+/** Untracked-but-detected folders offered as one-click adds. */
+const SUGGESTED_COUNT = 3;
 
 function link(url: string) {
   return () => openUrl(url).catch(console.error);
@@ -35,6 +38,9 @@ interface SidebarProps {
   projects: ProjectInfo[];
   onTogglePinProject: (project: ProjectInfo) => void;
   onShowAllProjects: () => void;
+  /** Detected but untracked folders, most recently active first. */
+  suggested: DetectedProject[];
+  onAddSuggested: (path: string) => void;
   view: View;
   activeToolId: string | typeof ALL;
   onSelectAll: () => void;
@@ -52,6 +58,8 @@ export function Sidebar({
   projects,
   onTogglePinProject,
   onShowAllProjects,
+  suggested,
+  onAddSuggested,
   view,
   activeToolId,
   onSelectAll,
@@ -172,6 +180,23 @@ export function Sidebar({
         <div className="nav-item expand" onClick={onShowAllProjects}>
           <span>+ {hiddenProjects} more</span>
         </div>
+      )}
+
+      {suggested.slice(0, SUGGESTED_COUNT).length > 0 && (
+        <>
+          <div className="nav-section-label">suggested</div>
+          {suggested.slice(0, SUGGESTED_COUNT).map((d) => (
+            <div
+              key={d.path}
+              className="nav-item suggested"
+              onClick={() => onAddSuggested(d.path)}
+              title={`${d.path} — from ${d.sources.join(", ")}`}
+            >
+              <span>+ {d.name}</span>
+              <span className="suggested-time">{relativeTime(d.lastActive)}</span>
+            </div>
+          ))}
+        </>
       )}
 
       <div className="nav-item add-project" onClick={onAddProject}>
