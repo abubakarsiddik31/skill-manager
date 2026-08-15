@@ -1,4 +1,4 @@
-export type AgentTool = "claude" | "agents" | "cursor" | "gemini" | "opencode";
+export type AgentTool = "claude" | "agents" | "copilot" | "cursor" | "gemini" | "opencode";
 
 /** How a tool relates to a skills folder it reads. */
 export type FolderRole = "own" | "compat";

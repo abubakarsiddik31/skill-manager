@@ -58,7 +58,7 @@ pub const TOOLS: &[ToolDef] = &[
     ToolDef {
         id: "copilot",
         label: "VS Code / Copilot",
-        folders: &[compat(AgentTool::Agents), compat(AgentTool::Claude)],
+        folders: &[own(AgentTool::Copilot), compat(AgentTool::Agents), compat(AgentTool::Claude)],
     },
     // Goose: recommends ~/.agents/skills (legacy .goose/skills still read).
     ToolDef { id: "goose", label: "Goose", folders: &[own(AgentTool::Agents)] },

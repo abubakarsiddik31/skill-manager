@@ -1,5 +1,6 @@
 mod agents;
 mod claude;
+mod copilot;
 mod cursor;
 mod gemini;
 mod opencode;
@@ -11,6 +12,7 @@ use std::path::{Path, PathBuf};
 
 pub use agents::AgentsAdapter;
 pub use claude::ClaudeAdapter;
+pub use copilot::CopilotAdapter;
 pub use cursor::CursorAdapter;
 pub use gemini::GeminiAdapter;
 pub use opencode::OpenCodeAdapter;
@@ -23,6 +25,7 @@ pub enum AgentTool {
     /// interop directory, read natively by Codex, Goose, and Amp. Named
     /// "Agents" rather than after any one tool because it has no owner.
     Agents,
+    Copilot,
     Cursor,
     Gemini,
     Opencode,
@@ -33,6 +36,7 @@ impl AgentTool {
         match self {
             AgentTool::Claude => "Claude",
             AgentTool::Agents => "Agents (shared)",
+            AgentTool::Copilot => "Copilot",
             AgentTool::Cursor => "Cursor",
             AgentTool::Gemini => "Gemini",
             AgentTool::Opencode => "OpenCode",
@@ -238,6 +242,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
     vec![
         Box::new(ClaudeAdapter),
         Box::new(AgentsAdapter),
+        Box::new(CopilotAdapter),
         Box::new(CursorAdapter),
         Box::new(GeminiAdapter),
         Box::new(OpenCodeAdapter),
@@ -248,6 +253,7 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
     match tool {
         AgentTool::Claude => Box::new(ClaudeAdapter),
         AgentTool::Agents => Box::new(AgentsAdapter),
+        AgentTool::Copilot => Box::new(CopilotAdapter),
         AgentTool::Cursor => Box::new(CursorAdapter),
         AgentTool::Gemini => Box::new(GeminiAdapter),
         AgentTool::Opencode => Box::new(OpenCodeAdapter),
