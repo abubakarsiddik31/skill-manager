@@ -7,8 +7,10 @@
 ### One dashboard to manage every AI coding agent skill you've installed.
 
 Discover, enable, disable, edit, and delete [Agent Skills](#what-is-a-skill)
-across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode — without
-hand-editing a config file ever again.
+across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Crush, Roo Code,
+Kiro, Junie, Factory Droid, OpenCode — and every tool that reads the
+shared `~/.agents/skills` folder (Goose, Amp, …) — without hand-editing
+a config file ever again.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-000000.svg)](LICENSE)
 [![Built with Tauri](https://img.shields.io/badge/Tauri-000000.svg?logo=tauri&logoColor=FFC131)](https://tauri.app)
@@ -50,8 +52,8 @@ hand-editing a config file ever again.
 
 If you use more than one AI coding agent, your skills are scattered across
 `~/.claude/skills`, `~/.agents/skills`, `~/.cursor/skills`,
-`~/.gemini/skills`, and `~/.config/opencode/skills` — five folders, zero
-shared view.
+`~/.gemini/skills`, `~/.copilot/skills`, `~/.roo/skills`, and more —
+eleven folders, zero shared view.
 
 Left unchecked, this turns into **skill hell**: every skill you've ever
 installed sits there active, and your agent has to disambiguate against all
@@ -62,7 +64,7 @@ what you don't need for the current project is how you climb back out.
 
 | | Without Skill Manager | With Skill Manager |
 | --- | --- | --- |
-| **See what's installed** | Open a terminal, `ls` five different folders | One dashboard, every tool |
+| **See what's installed** | Open a terminal, `ls` eleven different folders | One dashboard, every tool |
 | **Turn a skill off** | Delete the folder and hope you don't need it back | Toggle it — fully reversible |
 | **Keep triggering accurate** | Every installed skill competes for a match, even ones irrelevant to this project | Disable the noise, leave only what's relevant enabled |
 | **Know what's wired into a project** | Global and project-level skills look identical until something breaks | Per-project breakdown, separate from global |
@@ -80,7 +82,7 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 ## Features
 
 - 🗂️ **Unified view** across every tool's skills directory — no more digging
-  through five different config folders by hand.
+  through a dozen different config folders by hand.
 - 🔀 **Enable / disable** any skill without deleting it (skills move to a
   sibling `.disabled/` folder — fully reversible, and it never touches the
   tool's own config).
@@ -97,7 +99,7 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 | Tool | User-level directory | Project-level directory | Status |
 | --- | --- | --- | --- |
 | [Claude Code](https://claude.com/claude-code) | `~/.claude/skills` | `.claude/skills` | ✅ fully supported |
-| [Codex](https://developers.openai.com/codex/skills) | `~/.agents/skills` | `.agents/skills` | ✅ fully supported |
+| [Agents (shared)](https://agentskills.io) — read by Codex, Goose, Amp, and others | `~/.agents/skills` | `.agents/skills` | ✅ fully supported |
 | [Cursor](https://cursor.com/docs/skills) | `~/.cursor/skills` | `.cursor/skills` | ✅ fully supported |
 | [Gemini CLI](https://geminicli.com/docs/cli/skills/) | `~/.gemini/skills` | `.gemini/skills` | ✅ fully supported |
 | [VS Code / Copilot](https://code.visualstudio.com/docs/copilot/customization/agent-skills) | `~/.copilot/skills` | `.github/skills` | ✅ fully supported |
@@ -108,9 +110,14 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 | [Factory Droid](https://docs.factory.ai/cli/configuration/skills) | `~/.factory/skills` | `.factory/skills` | ✅ fully supported |
 | [OpenCode](https://opencode.ai/docs/skills/) | `~/.config/opencode/skills` | `.opencode/skills` | ✅ fully supported |
 
-All five paths are verified against each tool's own docs — not guessed. If a
+All eleven paths are verified against each tool's own docs — not guessed. If a
 tool changes its convention, [open an issue](.github/ISSUE_TEMPLATE/tool_directory.yml)
 and we'll update the adapter.
+
+The sidebar itself is tool-level: each tool's view shows every folder it
+reads, skills in the shared `~/.agents/skills` folder carry a "seen by" chip
+for every tool that discovers them, and toggling one warns that it affects
+all of them — there's a single copy on disk.
 
 ## Download
 

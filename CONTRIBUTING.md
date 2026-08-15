@@ -21,14 +21,19 @@ wrong:
 
 ### Add a new tool adapter
 
-Every tool implements the same `SkillAdapter` trait
-(`src-tauri/src/skills/mod.rs`). To add one:
+Every skills folder implements the same `SkillAdapter` trait
+(`src-tauri/src/skills/mod.rs`). Tools themselves live in the registry at
+`src-tauri/src/skills/tools.rs` — a tool either owns a folder adapter or
+just reads existing ones (like Goose and Amp read the shared
+`~/.agents/skills`). To add one:
 
 1. Create `src-tauri/src/skills/<tool>.rs` following the existing adapters as
    a template.
 2. Register it in `all_adapters()` and `adapter_for()` in
    `src-tauri/src/skills/mod.rs`.
-3. Add the tool to the `AgentTool` enum and its `label()`.
+3. Add the folder to the `AgentTool` enum and its `label()`, and add or
+   update the tool's entry in `skills/tools.rs` with every folder it reads
+   (`own` vs `compat`).
 4. Cite the source you verified the directory paths against, in a doc
    comment — same as the existing adapters.
 

@@ -12,14 +12,16 @@ src/
   lib/                  api client, markdown rendering, filtering helpers
   types.ts              shared frontend types
 src-tauri/src/
-  skills/               one adapter per tool, all implementing SkillAdapter
+  skills/               one adapter per skills folder (claude, agents, copilot, ...),
+                        plus tools.rs — the tool→folder registry driving the sidebar
   projects.rs           persisted list of tracked project folders
   commands.rs           tauri commands exposed to the frontend
 docs/                   the landing page (GitHub Pages, docs/index.html)
 ```
 
-Each supported tool (Claude Code, Codex, Cursor, OpenCode) implements the
-same `SkillAdapter` trait (`src-tauri/src/skills/mod.rs`). See
+Each skills folder implements the same `SkillAdapter` trait
+(`src-tauri/src/skills/mod.rs`); tools are readers listed in
+`src-tauri/src/skills/tools.rs`. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new adapter or fix a
 tool's skills-directory path.
 
