@@ -200,6 +200,25 @@ fn scan_for_git(dir: &Path, depth: usize, budget: &mut usize, out: &mut Candidat
     }
 }
 
+/// True for folders that are containers, not projects: the home folder,
+/// anything at or above it, and its immediate well-known children (our
+/// scan roots plus the standard macOS user folders). Claude Code's
+/// history contains launches in these, but suggesting them as projects
+/// is noise.
+fn is_container(path: &Path, home: &Path) -> bool {
+    if path.components().count() <= home.components().count() {
+        return true;
+    }
+    let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
+        return true;
+    };
+    if path.parent() == Some(home) {
+        const USER_DIRS: &[&str] = &["Downloads", "Movies", "Music", "Pictures", "Public"];
+        return COMMON_ROOTS.contains(&name) || USER_DIRS.contains(&name);
+    }
+    false
+}
+
 pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
     let Some(home) = home() else { return Vec::new() };
     let mut candidates: Candidates = HashMap::new();
@@ -213,6 +232,7 @@ pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
 
     let mut list: Vec<DetectedProject> = candidates
         .into_iter()
+        .filter(|(path, _)| !is_container(path, &home))
         .filter(|(path, _)| !excluded.contains(&normalize(&path.to_string_lossy())))
         .map(|(path, mut candidate)| {
             // weak signals for every candidate: repo activity and direct
@@ -274,5 +294,22 @@ mod tests {
         collect_file_uris(&value, &mut uris);
         uris.sort();
         assert_eq!(uris, vec!["file:///a/one", "file:///a/two"]);
+    }
+
+    #[test]
+    fn containers_are_not_projects() {
+        let home = Path::new("/Users/foo");
+        // home itself and everything at or above it
+        for path in ["/Users/foo", "/Users", "/"] {
+            assert!(is_container(Path::new(path), home), "{path}");
+        }
+        // well-known children of home
+        for path in ["/Users/foo/Desktop", "/Users/foo/Documents", "/Users/foo/Downloads", "/Users/foo/projects"] {
+            assert!(is_container(Path::new(path), home), "{path}");
+        }
+        // real project folders pass
+        for path in ["/Users/foo/Desktop/app", "/Users/foo/projects/app", "/Users/foo/app"] {
+            assert!(!is_container(Path::new(path), home), "{path}");
+        }
     }
 }
