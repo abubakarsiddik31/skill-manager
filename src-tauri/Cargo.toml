@@ -1,8 +1,8 @@
 [package]
 name = "skill-manager"
-version = "0.1.2"
+version = "0.2.0"
 description = "Manage AI coding agent skills (Claude, Codex, Cursor, OpenCode) from one desktop dashboard."
-authors = ["Skill Manager contributors"]
+authors = ["Abu Bakar Siddik <abubakar1808031@gmail.com>"]
 edition = "2021"
 license = "MIT"
 

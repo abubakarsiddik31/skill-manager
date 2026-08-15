@@ -1,8 +1,10 @@
 {
   "name": "skill-manager",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.2.0",
   "type": "module",
+  "author": "Abu Bakar Siddik <abubakar1808031@gmail.com>",
+  "license": "MIT",
   "description": "Discover, enable, disable, edit, and delete AI coding agent skills across Claude, Codex, Cursor, and OpenCode.",
   "scripts": {
     "dev": "vite",

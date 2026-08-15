@@ -92,6 +92,10 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 - 📁 **Per-project breakdown** — track individual project folders and see
   exactly which skills are wired into each one, separate from your global
   skills.
+- 🧭 **Smart project setup** — the app detects folders you already work in
+  (Claude Code history, editor recents, git repos) and offers them as
+  one-click suggestions; the sidebar keeps pinned and most-used projects on
+  top, and every project row shows its skill count.
 - 🔍 **Search** across names and descriptions.
 
 ## Supported tools
