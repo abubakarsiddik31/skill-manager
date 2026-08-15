@@ -1,3 +1,4 @@
+use crate::detect::{self, DetectedProject};
 use crate::projects::{self, ProjectInfo};
 use crate::skills::{self, tools::ToolEntry, Skill};
 use std::fs;
@@ -46,6 +47,14 @@ pub fn write_skill_content(id: String, content: String) -> Result<(), String> {
 #[tauri::command]
 pub fn list_projects(app: AppHandle) -> Result<Vec<ProjectInfo>, String> {
     projects::list(&app)
+}
+
+/// Suggests project folders the user seems to work in, most recently
+/// active first. Already-tracked paths are passed in `exclude` so the
+/// picker never re-offers them.
+#[tauri::command]
+pub fn detect_projects(exclude: Vec<String>) -> Vec<DetectedProject> {
+    detect::detect(&exclude)
 }
 
 #[tauri::command]

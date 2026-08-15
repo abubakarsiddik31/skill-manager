@@ -45,5 +45,15 @@ export interface ProjectInfo {
   name: string;
 }
 
+/** A folder the user seems to work in, found by scanning tool history
+ *  and common dev roots — most recently active first. */
+export interface DetectedProject {
+  path: string;
+  name: string;
+  /** unix seconds; 0 = unknown */
+  lastActive: number;
+  sources: string[];
+}
+
 export type View = { kind: "global" } | { kind: "project"; project: ProjectInfo };
 

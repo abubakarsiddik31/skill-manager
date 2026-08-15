@@ -1,4 +1,5 @@
 mod commands;
+mod detect;
 mod projects;
 mod skills;
 
@@ -14,6 +15,7 @@ pub fn run() {
             commands::delete_skill,
             commands::read_skill_content,
             commands::write_skill_content,
+            commands::detect_projects,
             commands::list_projects,
             commands::add_project,
             commands::remove_project,

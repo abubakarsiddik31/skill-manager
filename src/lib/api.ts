@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import type { ProjectInfo, Skill, ToolEntry } from "../types";
+import type { DetectedProject, ProjectInfo, Skill, ToolEntry } from "../types";
 
 /**
  * Thin client over the Rust-side adapters (src-tauri/src/skills).
@@ -31,6 +31,9 @@ export const api = {
 
   listProjects(): Promise<ProjectInfo[]> {
     return invoke("list_projects");
+  },
+  detectProjects(exclude: string[]): Promise<DetectedProject[]> {
+    return invoke("detect_projects", { exclude });
   },
   addProject(path: string): Promise<ProjectInfo> {
     return invoke("add_project", { path });

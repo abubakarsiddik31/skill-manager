@@ -1,0 +1,273 @@
+//! Project auto-detection: find the folders a user actually works in so
+//! the app can suggest them instead of making everyone browse manually.
+//!
+//! Sources, in order of confidence:
+//! - Claude Code's project history (`~/.claude.json`) — real agent usage,
+//!   with last-active time taken from the session folder it writes to
+//! - Cursor / VS Code global state — recently opened workspaces
+//! - a bounded scan of common dev roots for `.git` folders
+//!
+//! Everything is best-effort: unreadable or missing sources are skipped,
+//! never fatal.
+
+use serde::Serialize;
+use serde_json::Value;
+use std::collections::{BTreeSet, HashMap};
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::time::UNIX_EPOCH;
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DetectedProject {
+    pub path: String,
+    pub name: String,
+    /// Unix seconds of the strongest activity signal found; 0 = unknown.
+    pub last_active: u64,
+    pub sources: Vec<&'static str>,
+}
+
+#[derive(Default)]
+struct Candidate {
+    last_active: u64,
+    sources: BTreeSet<&'static str>,
+}
+
+/// Folders scanned for git repos, relative to the home directory. Kept
+/// deliberately small — detection should stay fast, not enumerate disk.
+const COMMON_ROOTS: &[&str] = &[
+    "Projects", "projects", "dev", "src", "code", "repos", "github", "work", "Desktop",
+    "Documents",
+];
+const GIT_SCAN_DEPTH: usize = 2;
+const GIT_SCAN_BUDGET: usize = 500;
+const MAX_RESULTS: usize = 50;
+
+fn home() -> Option<PathBuf> {
+    std::env::var_os("HOME")
+        .or_else(|| std::env::var_os("USERPROFILE"))
+        .map(PathBuf::from)
+}
+
+fn mtime(path: &Path) -> u64 {
+    fs::metadata(path)
+        .and_then(|m| m.modified())
+        .ok()
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
+
+type Candidates = HashMap<PathBuf, Candidate>;
+
+fn record(out: &mut Candidates, path: PathBuf, source: &'static str, last_active: u64) {
+    if !path.is_dir() {
+        return;
+    }
+    let entry = out.entry(path).or_default();
+    entry.sources.insert(source);
+    entry.last_active = entry.last_active.max(last_active);
+}
+
+fn collect_claude(out: &mut Candidates) {
+    let Some(home) = home() else { return };
+    let Ok(raw) = fs::read_to_string(home.join(".claude.json")) else {
+        return;
+    };
+    let Ok(value) = serde_json::from_str::<Value>(&raw) else { return };
+    let Some(projects) = value.get("projects").and_then(|p| p.as_object()) else {
+        return;
+    };
+    // Claude Code stores session transcripts under ~/.claude/projects/,
+    // in folders named after the project path with every non-alphanumeric
+    // character replaced by '-'. That folder's mtime is the best
+    // last-active signal available without parsing the transcripts.
+    let sessions_root = home.join(".claude").join("projects");
+    for path in projects.keys() {
+        let munged: String = path
+            .chars()
+            .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+            .collect();
+        record(
+            out,
+            PathBuf::from(path),
+            "claude",
+            mtime(&sessions_root.join(munged)),
+        );
+    }
+}
+
+/// Reads a `storage.json` global-state file and keeps every `file://`
+/// URI it contains — editors move this data between keys and formats
+/// (json vs sqlite), but the URIs themselves are stable.
+fn collect_editor(home: &Path, app_dir: &str, source: &'static str, out: &mut Candidates) {
+    let candidates = [
+        home.join("Library/Application Support"),
+        home.join("AppData/Roaming"),
+        home.join(".config"),
+    ];
+    let storage = candidates
+        .iter()
+        .map(|base| base.join(app_dir).join("User/globalStorage/storage.json"))
+        .find_map(|p| fs::read_to_string(p).ok());
+    let Some(raw) = storage else { return };
+    let Ok(value) = serde_json::from_str::<Value>(&raw) else { return };
+
+    let mut uris = Vec::new();
+    collect_file_uris(&value, &mut uris);
+    for uri in uris {
+        let path = file_uri_to_path(&uri);
+        record(out, path, source, 0);
+    }
+}
+
+fn collect_file_uris(value: &Value, out: &mut Vec<String>) {
+    match value {
+        Value::String(s) if s.starts_with("file://") => out.push(s.clone()),
+        Value::Array(items) => items.iter().for_each(|v| collect_file_uris(v, out)),
+        Value::Object(map) => map.values().for_each(|v| collect_file_uris(v, out)),
+        _ => {}
+    }
+}
+
+fn file_uri_to_path(uri: &str) -> PathBuf {
+    let rest = &uri["file://".len()..];
+    // percent-decode into raw bytes, then interpret as utf-8
+    let bytes = rest.as_bytes();
+    let mut decoded: Vec<u8> = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' && i + 2 < bytes.len() {
+            if let Ok(byte) = u8::from_str_radix(&rest[i + 1..i + 3], 16) {
+                decoded.push(byte);
+                i += 3;
+                continue;
+            }
+        }
+        decoded.push(bytes[i]);
+        i += 1;
+    }
+    let mut path = String::from_utf8_lossy(&decoded).into_owned();
+    // windows URIs look like file:///C:/... — drop the slash before the drive
+    let bytes = path.as_bytes();
+    if bytes.len() > 3 && bytes[0] == b'/' && bytes[1].is_ascii_alphabetic() && bytes[2] == b':' {
+        path.remove(0);
+    }
+    while path.ends_with('/') {
+        path.pop();
+    }
+    PathBuf::from(path)
+}
+
+fn collect_git(out: &mut Candidates) {
+    let Some(home) = home() else { return };
+    for root in COMMON_ROOTS {
+        let mut budget = GIT_SCAN_BUDGET;
+        scan_for_git(&home.join(root), 0, &mut budget, out);
+    }
+}
+
+fn scan_for_git(dir: &Path, depth: usize, budget: &mut usize, out: &mut Candidates) {
+    if depth > GIT_SCAN_DEPTH || *budget == 0 {
+        return;
+    }
+    let Ok(entries) = fs::read_dir(dir) else { return };
+    for entry in entries.flatten() {
+        if *budget == 0 {
+            return;
+        }
+        *budget -= 1;
+        let path = entry.path();
+        if !path.is_dir() {
+            continue;
+        }
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if name.starts_with('.') || name == "node_modules" || name == "Library" {
+            continue;
+        }
+        let git = path.join(".git");
+        if git.exists() {
+            // commits and branch switches touch .git and HEAD
+            record(out, path, "git", mtime(&git).max(mtime(&git.join("HEAD"))));
+            continue; // don't descend into repos
+        }
+        scan_for_git(&path, depth + 1, budget, out);
+    }
+}
+
+pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
+    let Some(home) = home() else { return Vec::new() };
+    let mut candidates: Candidates = HashMap::new();
+    collect_claude(&mut candidates);
+    collect_editor(&home, "Cursor", "cursor", &mut candidates);
+    collect_editor(&home, "Code", "vscode", &mut candidates);
+    collect_git(&mut candidates);
+
+    let normalize = |p: &str| p.trim_end_matches('/').to_string();
+    let excluded: Vec<String> = exclude.iter().map(|p| normalize(p)).collect();
+
+    let mut list: Vec<DetectedProject> = candidates
+        .into_iter()
+        .filter(|(path, _)| !excluded.contains(&normalize(&path.to_string_lossy())))
+        .map(|(path, mut candidate)| {
+            // weak signals for every candidate: repo activity and direct
+            // children being added/removed
+            candidate.last_active = candidate
+                .last_active
+                .max(mtime(&path))
+                .max(mtime(&path.join(".git")));
+            let name = path
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_else(|| path.to_string_lossy().into_owned());
+            DetectedProject {
+                path: path.to_string_lossy().into_owned(),
+                name,
+                last_active: candidate.last_active,
+                sources: candidate.sources.into_iter().collect(),
+            }
+        })
+        .collect();
+
+    list.sort_by(|a, b| {
+        b.last_active
+            .cmp(&a.last_active)
+            .then_with(|| a.path.cmp(&b.path))
+    });
+    list.truncate(MAX_RESULTS);
+    list
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn decodes_file_uris() {
+        assert_eq!(
+            file_uri_to_path("file:///Users/foo/My%20Project"),
+            PathBuf::from("/Users/foo/My Project")
+        );
+        assert_eq!(
+            file_uri_to_path("file:///C%3A/Users/foo/app"),
+            PathBuf::from("C:/Users/foo/app")
+        );
+        assert_eq!(
+            file_uri_to_path("file:///home/foo/app/"),
+            PathBuf::from("/home/foo/app")
+        );
+    }
+
+    #[test]
+    fn collects_uris_from_nested_json() {
+        let value = serde_json::json!({
+            "known": ["file:///a/one", "https://example.com"],
+            "nested": { "deep": "file:///a/two" }
+        });
+        let mut uris = Vec::new();
+        collect_file_uris(&value, &mut uris);
+        uris.sort();
+        assert_eq!(uris, vec!["file:///a/one", "file:///a/two"]);
+    }
+}
