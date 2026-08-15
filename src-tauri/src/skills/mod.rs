@@ -46,24 +46,6 @@ pub enum AgentTool {
     Roo,
 }
 
-impl AgentTool {
-    pub fn label(&self) -> &'static str {
-        match self {
-            AgentTool::Claude => "Claude",
-            AgentTool::Agents => "Agents (shared)",
-            AgentTool::Copilot => "Copilot",
-            AgentTool::Crush => "Crush",
-            AgentTool::Cursor => "Cursor",
-            AgentTool::Factory => "Factory Droid",
-            AgentTool::Gemini => "Gemini",
-            AgentTool::Junie => "Junie",
-            AgentTool::Kiro => "Kiro",
-            AgentTool::Opencode => "OpenCode",
-            AgentTool::Roo => "Roo Code",
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum SkillScope {
