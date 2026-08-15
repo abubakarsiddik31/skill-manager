@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AddProjectModal } from "./components/AddProjectModal";
 import { EditorModal } from "./components/EditorModal";
 import { Sidebar } from "./components/Sidebar";
 import { SkillList } from "./components/SkillList";
@@ -17,6 +18,7 @@ function App() {
   const [activeToolId, setActiveToolId] = useState<string | typeof ALL>(ALL);
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Skill | null>(null);
+  const [addingProject, setAddingProject] = useState(false);
   const skillListRef = useRef<HTMLDivElement>(null);
 
   const global = useGlobalSkills();
@@ -47,9 +49,16 @@ function App() {
     setView({ kind: "project", project });
   }
 
-  async function addProject() {
+  async function addDetectedProject(path: string) {
+    const project = await projects.add(path);
+    if (project) openProject(project);
+    return project;
+  }
+
+  async function browseAndAddProject() {
     const project = await projects.pickAndAdd();
     if (project) openProject(project);
+    return project;
   }
 
   async function forgetProject(project: ProjectInfo) {
@@ -96,7 +105,7 @@ function App() {
         onSelectAll={selectAll}
         onSelectTool={selectTool}
         onOpenProject={openProject}
-        onAddProject={addProject}
+        onAddProject={() => setAddingProject(true)}
       />
 
       <main className="main">
@@ -138,6 +147,15 @@ function App() {
           toolEntries={global.toolEntries}
           onClose={() => setEditing(null)}
           onDelete={view.kind === "global" ? global.remove : projectView.remove}
+        />
+      )}
+
+      {addingProject && (
+        <AddProjectModal
+          trackedPaths={projects.projects.map((p) => p.path)}
+          onClose={() => setAddingProject(false)}
+          onAdd={addDetectedProject}
+          onBrowse={browseAndAddProject}
         />
       )}
     </div>

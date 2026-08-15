@@ -14,12 +14,21 @@ export function useProjects() {
     refresh();
   }, []);
 
+  async function add(path: string): Promise<ProjectInfo | null> {
+    try {
+      const project = await api.addProject(path);
+      await refresh();
+      return project;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }
+
   async function pickAndAdd(): Promise<ProjectInfo | null> {
     const path = await api.pickProjectFolder();
     if (!path) return null;
-    const project = await api.addProject(path);
-    await refresh();
-    return project;
+    return add(path);
   }
 
   async function forget(project: ProjectInfo) {
@@ -27,5 +36,5 @@ export function useProjects() {
     await refresh();
   }
 
-  return { projects, pickAndAdd, forget };
+  return { projects, add, pickAndAdd, forget };
 }

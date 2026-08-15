@@ -704,3 +704,107 @@ body,
   color: var(--text-faint);
   line-height: 1.4;
 }
+
+/* ---------- add-project modal ---------- */
+
+.add-modal {
+  width: 540px;
+}
+
+.add-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  min-height: 280px;
+  max-height: 60vh;
+}
+
+.add-search {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.add-search:focus {
+  border-color: var(--border-strong);
+}
+
+.detected-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.add-modal-empty {
+  margin: auto;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.detected-row {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.detected-row:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-panel);
+}
+
+.detected-row .row-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.detected-row .row-name {
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detected-row .row-time {
+  font-size: 11px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.detected-row .row-sub {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.detected-row .row-path {
+  font-size: 11px;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detected-row .row-sources {
+  font-size: 11px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
