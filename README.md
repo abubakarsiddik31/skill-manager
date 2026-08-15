@@ -105,6 +105,7 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 | [Roo Code](https://docs.roocode.com/features/skills) | `~/.roo/skills` | `.roo/skills` | ✅ fully supported |
 | [Kiro](https://kiro.dev/docs/skills/) | `~/.kiro/skills` | `.kiro/skills` | ✅ fully supported |
 | [Junie](https://junie.jetbrains.com/docs/agent-skills.html) | `~/.junie/skills` | `.junie/skills` | ✅ fully supported |
+| [Factory Droid](https://docs.factory.ai/cli/configuration/skills) | `~/.factory/skills` | `.factory/skills` | ✅ fully supported |
 | [OpenCode](https://opencode.ai/docs/skills/) | `~/.config/opencode/skills` | `.opencode/skills` | ✅ fully supported |
 
 All five paths are verified against each tool's own docs — not guessed. If a

@@ -4,6 +4,7 @@ export type AgentTool =
   | "copilot"
   | "crush"
   | "cursor"
+  | "factory"
   | "gemini"
   | "junie"
   | "kiro"

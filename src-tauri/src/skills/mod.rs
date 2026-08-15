@@ -3,6 +3,7 @@ mod claude;
 mod copilot;
 mod crush;
 mod cursor;
+mod factory;
 mod gemini;
 mod junie;
 mod kiro;
@@ -19,6 +20,7 @@ pub use claude::ClaudeAdapter;
 pub use copilot::CopilotAdapter;
 pub use crush::CrushAdapter;
 pub use cursor::CursorAdapter;
+pub use factory::FactoryAdapter;
 pub use gemini::GeminiAdapter;
 pub use junie::JunieAdapter;
 pub use kiro::KiroAdapter;
@@ -36,6 +38,7 @@ pub enum AgentTool {
     Copilot,
     Crush,
     Cursor,
+    Factory,
     Gemini,
     Junie,
     Kiro,
@@ -51,6 +54,7 @@ impl AgentTool {
             AgentTool::Copilot => "Copilot",
             AgentTool::Crush => "Crush",
             AgentTool::Cursor => "Cursor",
+            AgentTool::Factory => "Factory Droid",
             AgentTool::Gemini => "Gemini",
             AgentTool::Junie => "Junie",
             AgentTool::Kiro => "Kiro",
@@ -261,6 +265,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
         Box::new(CopilotAdapter),
         Box::new(CrushAdapter),
         Box::new(CursorAdapter),
+        Box::new(FactoryAdapter),
         Box::new(GeminiAdapter),
         Box::new(JunieAdapter),
         Box::new(KiroAdapter),
@@ -276,6 +281,7 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
         AgentTool::Copilot => Box::new(CopilotAdapter),
         AgentTool::Crush => Box::new(CrushAdapter),
         AgentTool::Cursor => Box::new(CursorAdapter),
+        AgentTool::Factory => Box::new(FactoryAdapter),
         AgentTool::Gemini => Box::new(GeminiAdapter),
         AgentTool::Junie => Box::new(JunieAdapter),
         AgentTool::Kiro => Box::new(KiroAdapter),

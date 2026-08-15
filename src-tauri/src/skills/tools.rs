@@ -82,7 +82,11 @@ pub const TOOLS: &[ToolDef] = &[
     ToolDef { id: "kiro", label: "Kiro", folders: &[own(AgentTool::Kiro)] },
     ToolDef { id: "junie", label: "Junie", folders: &[own(AgentTool::Junie)] },
     // Factory Droid: ~/.factory/skills, .agents/skills as compatibility.
-    ToolDef { id: "factory", label: "Factory Droid", folders: &[compat(AgentTool::Agents)] },
+    ToolDef {
+        id: "factory",
+        label: "Factory Droid",
+        folders: &[own(AgentTool::Factory), compat(AgentTool::Agents)],
+    },
 ];
 
 #[derive(Debug, Clone, Serialize)]
