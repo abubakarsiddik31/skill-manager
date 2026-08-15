@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import { relativeTime } from "../lib/relativeTime";
+import { SortToggle } from "./SortToggle";
 import type { DetectedProject, ProjectInfo } from "../types";
 
 interface AddProjectModalProps {
@@ -18,6 +19,7 @@ interface AddProjectModalProps {
 export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddProjectModalProps) {
   const [detected, setDetected] = useState<DetectedProject[] | null>(null);
   const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"activity" | "skills">("activity");
   const [adding, setAdding] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,11 +38,15 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
   const filtered = useMemo(() => {
     if (!detected) return [];
     const q = query.trim().toLowerCase();
-    if (!q) return detected;
-    return detected.filter(
-      (d) => d.name.toLowerCase().includes(q) || d.path.toLowerCase().includes(q),
-    );
-  }, [detected, query]);
+    const byQuery = (d: DetectedProject) =>
+      !q || d.name.toLowerCase().includes(q) || d.path.toLowerCase().includes(q);
+    // backend order is most-recently-active first; skill sort is local
+    const list =
+      sortBy === "skills"
+        ? [...detected].sort((a, b) => b.skillCount - a.skillCount || b.lastActive - a.lastActive)
+        : detected;
+    return list.filter(byQuery);
+  }, [detected, query, sortBy]);
 
   async function add(path: string) {
     if (adding) return;
@@ -60,6 +66,14 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
       <div className="modal add-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <span className="title">add project</span>
+          <SortToggle
+            value={sortBy}
+            options={[
+              { id: "activity", label: "by activity" },
+              { id: "skills", label: "by skills" },
+            ]}
+            onChange={(id) => setSortBy(id as "activity" | "skills")}
+          />
           <button className="icon-btn square" onClick={onClose} title="close">
             <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
               <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />

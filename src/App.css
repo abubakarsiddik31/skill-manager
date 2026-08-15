@@ -874,3 +874,31 @@ body,
 .pin-btn.pinned {
   color: var(--accent-bright);
 }
+
+/* ---------- list sort toggle ---------- */
+
+.sort-toggle {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.sort-toggle button {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.sort-toggle button:hover {
+  color: var(--text);
+}
+
+.sort-toggle button.active {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
