@@ -103,6 +103,7 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 | [VS Code / Copilot](https://code.visualstudio.com/docs/copilot/customization/agent-skills) | `~/.copilot/skills` | `.github/skills` | ✅ fully supported |
 | [Crush](https://github.com/charmbracelet/crush) | `~/.config/crush/skills` | `.crush/skills` | ✅ fully supported |
 | [Roo Code](https://docs.roocode.com/features/skills) | `~/.roo/skills` | `.roo/skills` | ✅ fully supported |
+| [Kiro](https://kiro.dev/docs/skills/) | `~/.kiro/skills` | `.kiro/skills` | ✅ fully supported |
 | [OpenCode](https://opencode.ai/docs/skills/) | `~/.config/opencode/skills` | `.opencode/skills` | ✅ fully supported |
 
 All five paths are verified against each tool's own docs — not guessed. If a

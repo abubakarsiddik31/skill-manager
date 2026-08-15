@@ -4,6 +4,7 @@ mod copilot;
 mod crush;
 mod cursor;
 mod gemini;
+mod kiro;
 mod opencode;
 mod roo;
 pub mod tools;
@@ -18,6 +19,7 @@ pub use copilot::CopilotAdapter;
 pub use crush::CrushAdapter;
 pub use cursor::CursorAdapter;
 pub use gemini::GeminiAdapter;
+pub use kiro::KiroAdapter;
 pub use opencode::OpenCodeAdapter;
 pub use roo::RooAdapter;
 
@@ -33,6 +35,7 @@ pub enum AgentTool {
     Crush,
     Cursor,
     Gemini,
+    Kiro,
     Opencode,
     Roo,
 }
@@ -46,6 +49,7 @@ impl AgentTool {
             AgentTool::Crush => "Crush",
             AgentTool::Cursor => "Cursor",
             AgentTool::Gemini => "Gemini",
+            AgentTool::Kiro => "Kiro",
             AgentTool::Opencode => "OpenCode",
             AgentTool::Roo => "Roo Code",
         }
@@ -254,6 +258,7 @@ pub fn all_adapters() -> Vec<Box<dyn SkillAdapter>> {
         Box::new(CrushAdapter),
         Box::new(CursorAdapter),
         Box::new(GeminiAdapter),
+        Box::new(KiroAdapter),
         Box::new(OpenCodeAdapter),
         Box::new(RooAdapter),
     ]
@@ -267,6 +272,7 @@ pub fn adapter_for(tool: AgentTool) -> Box<dyn SkillAdapter> {
         AgentTool::Crush => Box::new(CrushAdapter),
         AgentTool::Cursor => Box::new(CursorAdapter),
         AgentTool::Gemini => Box::new(GeminiAdapter),
+        AgentTool::Kiro => Box::new(KiroAdapter),
         AgentTool::Opencode => Box::new(OpenCodeAdapter),
         AgentTool::Roo => Box::new(RooAdapter),
     }

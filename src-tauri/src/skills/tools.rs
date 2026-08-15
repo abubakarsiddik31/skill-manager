@@ -79,7 +79,7 @@ pub const TOOLS: &[ToolDef] = &[
     },
     // Roo Code: ~/.roo/skills (higher priority), .agents/skills (shared).
     ToolDef { id: "roo", label: "Roo Code", folders: &[own(AgentTool::Roo), compat(AgentTool::Agents)] },
-    ToolDef { id: "kiro", label: "Kiro", folders: &[] },
+    ToolDef { id: "kiro", label: "Kiro", folders: &[own(AgentTool::Kiro)] },
     ToolDef { id: "junie", label: "Junie", folders: &[] },
     // Factory Droid: ~/.factory/skills, .agents/skills as compatibility.
     ToolDef { id: "factory", label: "Factory Droid", folders: &[compat(AgentTool::Agents)] },
