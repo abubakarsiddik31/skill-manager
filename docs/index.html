@@ -570,6 +570,15 @@
         flex-shrink: 0;
       }
 
+      .roadmap li.done {
+        color: var(--text-faint);
+      }
+
+      .roadmap li.done::before {
+        content: "[x]";
+        color: var(--text-dim);
+      }
+
       /* ---------- faq ---------- */
 
       .faq {
@@ -1029,16 +1038,20 @@
       <section id="roadmap">
         <div class="kicker">roadmap</div>
         <h2>What's next.</h2>
-        <p class="lead">With all four tools verified, the focus moves to:</p>
+        <p class="lead">
+          Recent releases shipped the tool registry. The focus moves to:
+        </p>
         <ul class="roadmap">
-          <li>Add Gemini / Google AI support</li>
-          <li>
-            Add support for other emerging coding agents as they adopt
-            <code>SKILL.md</code>
+          <li class="done">Gemini CLI support</li>
+          <li class="done">
+            The wider agentskills.io ecosystem — VS Code / Copilot, Crush, Roo
+            Code, Kiro, Junie, Factory Droid, and the shared
+            <code>~/.agents/skills</code> folder read by Codex, Goose, and Amp
           </li>
           <li>
             Auto-update support (in-app update checks, no manual reinstall)
           </li>
+          <li>Code-signed builds (no Gatekeeper/SmartScreen warnings)</li>
         </ul>
       </section>
 

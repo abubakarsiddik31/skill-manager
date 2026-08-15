@@ -187,12 +187,19 @@ new module pointing at its skills directory.
 
 ## Roadmap
 
-With all four tools verified, the focus moves to:
+Shipped:
 
-- [ ] Add Gemini / Google AI support
-- [ ] Add support for other emerging coding agents as they adopt `SKILL.md`
+- [x] Add Gemini CLI support
+- [x] Cover the agentskills.io ecosystem — VS Code / Copilot, Crush, Roo Code,
+  Kiro, Junie, Factory Droid, plus the shared `~/.agents/skills` folder read
+  by Codex, Goose, and Amp, all through one tool-level registry
+
+Next up:
+
 - [ ] Auto-update support (in-app update checks, no manual reinstall)
 - [ ] Code-signed builds (no more Gatekeeper/SmartScreen warnings)
+- [ ] Keep adding agents as they adopt `SKILL.md` — Windsurf and Trae are on
+  the radar, but their conventions aren't verified yet
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to pick any of these up, or add
 support for a tool not listed above.
