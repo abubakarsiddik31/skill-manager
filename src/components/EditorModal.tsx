@@ -77,22 +77,23 @@ export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorMod
             <div className="readers-head">
               read by {seers.length} tool{seers.length === 1 ? "" : "s"}
             </div>
-            {seers.map((t) => {
-              const via = t.folders.find((f) => f.tool === skill.tool);
-              return (
-                <div key={t.id} className="reader-row">
-                  <span className={`dot ${skill.enabled ? "on" : ""}`} />
-                  <span>{t.label}</span>
-                  <span className="reader-via">
-                    {via?.role === "own" ? "primary" : `via ${skill.tool}`}
+            <div className="readers-chips">
+              {seers.map((t) => {
+                const via = t.folders.find((f) => f.tool === skill.tool);
+                return (
+                  <span
+                    key={t.id}
+                    className={`chip ${via?.role === "compat" ? "compat" : ""}`}
+                    title={via?.role === "compat" ? `via the shared ${skill.tool} folder` : "primary location"}
+                  >
+                    {t.label}
                   </span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
             {seers.length > 1 && (
               <div className="readers-warn">
-                disabling or deleting this skill affects all {seers.length} tools
-                above — the folder holds one copy on disk.
+                one copy on disk — disabling or deleting affects all {seers.length} tools
               </div>
             )}
           </div>

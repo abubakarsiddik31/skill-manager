@@ -12,7 +12,6 @@
   --accent-dim: rgba(255, 255, 255, 0.16);
   --danger: #ef4444;
   --danger-bright: #f87171;
-  --ok: #4ade80;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace,
     Menlo, Consolas, monospace;
 
@@ -614,10 +613,10 @@ body,
 /* ---------- editor modal: read-by box ---------- */
 
 .readers-box {
-  margin: 12px 16px 0;
+  margin: 10px 16px 0;
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 7px 10px 8px;
 }
 
 .readers-head {
@@ -625,40 +624,18 @@ body,
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
-.reader-row {
+.readers-chips {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-dim);
-  padding: 2px 0;
-}
-
-.reader-row .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--text-faint);
-}
-
-.reader-row .dot.on {
-  background: var(--ok, #4ade80);
-}
-
-.reader-via {
-  margin-left: auto;
-  font-size: 10px;
-  color: var(--text-faint);
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .readers-warn {
-  margin-top: 8px;
-  font-size: 11px;
-  color: var(--text-dim);
-  border-left: 2px solid var(--danger);
-  padding: 2px 10px;
-  line-height: 1.5;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-faint);
+  line-height: 1.4;
 }
