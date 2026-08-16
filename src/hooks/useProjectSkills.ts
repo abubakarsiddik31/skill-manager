@@ -7,6 +7,7 @@ import { useSkillMutations } from "./useSkillMutations";
 export function useProjectSkills(project: ProjectInfo | null) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(false);
+  const [nonce, setNonce] = useState(0);
 
   useEffect(() => {
     if (!project) {
@@ -25,9 +26,15 @@ export function useProjectSkills(project: ProjectInfo | null) {
     return () => {
       cancelled = true;
     };
-  }, [project?.path]);
+  }, [project?.path, nonce]);
 
   const { toggle, remove } = useSkillMutations(setSkills);
 
-  return { skills, loading, toggle, remove };
+  /** Re-fetches after an out-of-band mutation (e.g. a skill created in
+   *  this project from the new-skill modal). */
+  function reload() {
+    setNonce((n) => n + 1);
+  }
+
+  return { skills, loading, toggle, remove, reload };
 }

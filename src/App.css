@@ -919,3 +919,49 @@ body,
   color: var(--text);
   border-color: var(--border-strong);
 }
+
+/* --- new-skill modal --- */
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  min-width: 380px;
+}
+
+.create-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.create-form select,
+.create-form textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.create-form select:focus,
+.create-form textarea:focus {
+  border-color: var(--border-strong);
+}
+
+.create-form .field-hint {
+  color: #c66;
+  font-size: 11px;
+}
+
+.create-error {
+  color: #c66;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
