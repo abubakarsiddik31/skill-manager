@@ -96,7 +96,9 @@ export function ProjectsModal({ projects, skillCounts, activePath, onClose, onOp
                     <div className="row-main">
                       <span className="row-name">{p.name}</span>
                       <span className="row-time">
-                        {skillCounts[p.path] ?? 0} skills
+                        {skillCounts[p.path] === undefined
+                          ? "open to check skills"
+                          : `${skillCounts[p.path]} skills`}
                         {uses > 0 ? ` · ${uses} open${uses === 1 ? "" : "s"}` : ""} ·{" "}
                         {relativeTime(lastUsed(p))}
                       </span>

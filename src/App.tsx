@@ -6,7 +6,6 @@ import { Sidebar } from "./components/Sidebar";
 import { SkillList } from "./components/SkillList";
 import { Topbar } from "./components/Topbar";
 import { useGlobalSkills } from "./hooks/useGlobalSkills";
-import { useDetectedProjects } from "./hooks/useDetectedProjects";
 import { usePinnedTools } from "./hooks/usePinnedTools";
 import { useProjects } from "./hooks/useProjects";
 import { useProjectSkills } from "./hooks/useProjectSkills";
@@ -28,7 +27,6 @@ function App() {
   const global = useGlobalSkills();
   const projects = useProjects();
   const pinnedTools = usePinnedTools();
-  const detected = useDetectedProjects(projects.projects.map((p) => p.path));
   const activeProject = view.kind === "project" ? view.project : null;
   const projectView = useProjectSkills(activeProject);
 
@@ -66,11 +64,6 @@ function App() {
     const project = await projects.pickAndAdd();
     if (project) openProject(project);
     return project;
-  }
-
-  async function addSuggestedProject(path: string) {
-    const project = await projects.add(path);
-    if (project) openProject(project);
   }
 
   async function removeProjectSkill(skill: Skill) {
@@ -122,8 +115,6 @@ function App() {
         skillCounts={projects.skillCounts}
         onTogglePinProject={projects.togglePin}
         onShowAllProjects={() => setShowingAllProjects(true)}
-        suggested={detected ?? []}
-        onAddSuggested={addSuggestedProject}
         view={view}
         activeToolId={activeToolId}
         onSelectAll={selectAll}

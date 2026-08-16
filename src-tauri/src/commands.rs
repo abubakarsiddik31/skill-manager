@@ -101,7 +101,17 @@ pub fn delete_skill(app: AppHandle, id: String) -> Result<(), String> {
     if !manifest_is_manageable(&app, path) {
         return Err("not a managed skill path".into());
     }
-    skills::delete_skill_dir(path).map_err(|e| e.to_string())
+    skills::delete_skill_dir(path).map_err(|e| e.to_string())?;
+    // A project count is only a cache; clear it after a mutation rather than
+    // scanning the project again in the background.
+    if let Some(project) = projects::list(&app)
+        .unwrap_or_default()
+        .into_iter()
+        .find(|p| path.starts_with(&p.path))
+    {
+        let _ = projects::clear_skill_count(&app, &project.path);
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -141,16 +151,18 @@ pub struct ProjectSkillCount {
     pub count: usize,
 }
 
-/// Skill counts for every tracked project, so the sidebar can badge
-/// rows without the frontend issuing one scan per project.
+/// Cached counts for tracked projects. This command never reads a project
+/// directory, so opening the app cannot trigger a batch of macOS prompts.
 #[tauri::command]
 pub fn list_project_skill_counts(app: AppHandle) -> Vec<ProjectSkillCount> {
     projects::list(&app)
         .unwrap_or_default()
         .into_iter()
-        .map(|p| ProjectSkillCount {
-            count: skills::discover_project_skills(Path::new(&p.path)).len(),
-            path: p.path,
+        .filter_map(|p| {
+            p.skill_count.map(|count| ProjectSkillCount {
+                path: p.path,
+                count,
+            })
         })
         .collect()
 }
@@ -185,7 +197,11 @@ pub fn list_project_skills(app: AppHandle, path: String) -> Vec<Skill> {
     if !tracked {
         return Vec::new();
     }
-    skills::discover_project_skills(Path::new(&path))
+    let skills = skills::discover_project_skills(Path::new(&path));
+    // This scan follows an explicit project open, so cache it for future
+    // launches instead of re-reading every tracked project on startup.
+    let _ = projects::set_skill_count(&app, &path, skills.len());
+    skills
 }
 
 fn find_skill_by_manifest(app: &AppHandle, manifest: &Path) -> Option<Skill> {
@@ -202,7 +218,8 @@ fn find_skill_by_manifest(app: &AppHandle, manifest: &Path) -> Option<Skill> {
     projects::list(app)
         .unwrap_or_default()
         .into_iter()
-        .find_map(|p| {
+        .find(|p| manifest.starts_with(&p.path))
+        .and_then(|p| {
             skills::discover_project_skills(Path::new(&p.path))
                 .into_iter()
                 .find(|s| s.id == target)
@@ -220,6 +237,7 @@ mod tests {
             pinned: false,
             last_opened: 0,
             opens: Vec::new(),
+            skill_count: None,
         }
     }
 

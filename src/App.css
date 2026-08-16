@@ -765,6 +765,23 @@ body,
   font-size: 12px;
 }
 
+.discovery-empty {
+  display: grid;
+  gap: 12px;
+  place-items: center;
+  padding: 36px 24px;
+}
+
+.discovery-empty p {
+  margin: 0;
+}
+
+.discovery-note {
+  max-width: 380px;
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+
 .detected-row {
   padding: 8px 10px;
   border: 1px solid var(--border);

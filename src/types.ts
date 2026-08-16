@@ -48,6 +48,8 @@ export interface ProjectInfo {
   lastOpened: number;
   /** recent opens (unix seconds), pruned server-side to ~30 days */
   opens: number[];
+  /** cached after the user explicitly opens this project; absent until then */
+  skillCount?: number;
 }
 
 /** A folder the user seems to work in, found by scanning tool history
@@ -63,4 +65,3 @@ export interface DetectedProject {
 }
 
 export type View = { kind: "global" } | { kind: "project"; project: ProjectInfo };
-

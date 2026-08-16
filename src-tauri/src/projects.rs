@@ -20,6 +20,11 @@ pub struct ProjectInfo {
     /// predate usage tracking start empty.
     #[serde(default)]
     pub opens: Vec<u64>,
+    /// Last known number of skills. Counts are refreshed only after the user
+    /// explicitly opens a project, never by scanning every tracked folder at
+    /// startup.
+    #[serde(default)]
+    pub skill_count: Option<usize>,
 }
 
 const STORE_FILE: &str = "projects.json";
@@ -69,6 +74,7 @@ pub fn add(app: &AppHandle, path: String) -> Result<ProjectInfo, String> {
         pinned: false,
         last_opened: 0,
         opens: Vec::new(),
+        skill_count: None,
     };
     projects.push(info.clone());
     save(app, &projects)?;
@@ -110,4 +116,49 @@ pub fn touch(app: &AppHandle, path: &str) -> Result<(), String> {
         }
     }
     save(app, &projects)
+}
+
+/// Stores a count already obtained during an explicit project action. This
+/// keeps the sidebar useful without reading every project folder at startup.
+pub fn set_skill_count(app: &AppHandle, path: &str, count: usize) -> Result<(), String> {
+    let mut projects = load(app)?;
+    for project in projects.iter_mut() {
+        if project.path == path {
+            project.skill_count = Some(count);
+            break;
+        }
+    }
+    save(app, &projects)
+}
+
+pub fn clear_skill_count(app: &AppHandle, path: &str) -> Result<(), String> {
+    let mut projects = load(app)?;
+    for project in projects.iter_mut() {
+        if project.path == path {
+            project.skill_count = None;
+            break;
+        }
+    }
+    save(app, &projects)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ProjectInfo;
+
+    #[test]
+    fn older_project_records_start_with_an_unknown_skill_count() {
+        let project: ProjectInfo = serde_json::from_str(
+            r#"{
+                "path": "/tmp/demo",
+                "name": "demo",
+                "pinned": false,
+                "lastOpened": 0,
+                "opens": []
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(project.skill_count, None);
+    }
 }
