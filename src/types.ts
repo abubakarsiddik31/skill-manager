@@ -59,8 +59,8 @@ export interface DetectedProject {
   name: string;
   /** unix seconds; 0 = unknown */
   lastActive: number;
-  /** agent skills found in the project folder */
-  skillCount: number;
+  /** deliberately unknown until the user opens the project */
+  skillCount?: number;
   sources: string[];
 }
 

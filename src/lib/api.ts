@@ -32,8 +32,11 @@ export const api = {
   listProjects(): Promise<ProjectInfo[]> {
     return invoke("list_projects");
   },
-  detectProjects(exclude: string[]): Promise<DetectedProject[]> {
-    return invoke("detect_projects", { exclude });
+  listDetectedProjects(exclude: string[]): Promise<DetectedProject[] | null> {
+    return invoke("list_detected_projects", { exclude });
+  },
+  refreshDetectedProjects(exclude: string[]): Promise<DetectedProject[]> {
+    return invoke("refresh_detected_projects", { exclude });
   },
   addProject(path: string): Promise<ProjectInfo> {
     return invoke("add_project", { path });

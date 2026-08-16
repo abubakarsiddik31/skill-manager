@@ -18,6 +18,7 @@ interface AddProjectModalProps {
  */
 export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddProjectModalProps) {
   const [detected, setDetected] = useState<DetectedProject[] | null>(null);
+  const [loadingCached, setLoadingCached] = useState(true);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"activity" | "skills">("activity");
   const [adding, setAdding] = useState<string | null>(null);
@@ -31,6 +32,21 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 
+  useEffect(() => {
+    let active = true;
+    api.listDetectedProjects(trackedPaths)
+      .then((projects) => {
+        if (active && projects !== null) setDetected(projects);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setLoadingCached(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [trackedPaths]);
+
   const filtered = useMemo(() => {
     if (!detected) return [];
     const q = query.trim().toLowerCase();
@@ -39,7 +55,9 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
     // backend order is most-recently-active first; skill sort is local
     const list =
       sortBy === "skills"
-        ? [...detected].sort((a, b) => b.skillCount - a.skillCount || b.lastActive - a.lastActive)
+        ? [...detected].sort(
+            (a, b) => (b.skillCount ?? -1) - (a.skillCount ?? -1) || b.lastActive - a.lastActive,
+          )
         : detected;
     return list.filter(byQuery);
   }, [detected, query, sortBy]);
@@ -58,13 +76,13 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
   }
 
   async function discover() {
-    if (scanning || detected !== null) return;
+    if (scanning) return;
     setScanning(true);
     try {
-      // This is deliberately user initiated: detection may inspect folders
-      // named in agent history or editor recents, including protected macOS
-      // locations such as Desktop and Documents.
-      setDetected(await api.detectProjects(trackedPaths));
+      // Discovery is explicitly requested and its result is persisted. The
+      // next visit uses the saved result rather than scanning protected
+      // folders again.
+      setDetected(await api.refreshDetectedProjects(trackedPaths));
     } catch {
       setDetected([]);
     } finally {
@@ -93,12 +111,14 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
         </div>
 
         <div className="add-modal-body">
-          {detected === null ? (
+          {loadingCached ? (
+            <div className="add-modal-empty">loading saved projects…</div>
+          ) : detected === null ? (
             <div className="add-modal-empty discovery-empty">
               <p>Choose a folder yourself, or look for recent projects.</p>
               <p className="discovery-note">
-                Finding recent projects can ask macOS for access to folders mentioned in your editor
-                and agent history. It never runs until you choose it.
+                This checks only normal development folders and project paths from your editor and
+                agent history. The result is saved, so reopening this picker does not scan again.
               </p>
               <button className="btn" onClick={discover} disabled={scanning}>
                 {scanning ? "finding recent projects…" : "find recent projects"}
@@ -133,7 +153,9 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
                       <div className="row-main">
                         <span className="row-name">{d.name}</span>
                         <span className="row-time">
-                          {d.skillCount} skill{d.skillCount === 1 ? "" : "s"} ·{" "}
+                          {d.skillCount === undefined
+                            ? "skills checked when opened"
+                            : `${d.skillCount} skill${d.skillCount === 1 ? "" : "s"}`} ·{" "}
                           {relativeTime(d.lastActive)}
                         </span>
                       </div>
@@ -151,6 +173,11 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
 
         <div className="modal-footer">
           <div className="footer-spacer">
+            {detected !== null && (
+              <button className="btn" onClick={discover} disabled={scanning || adding !== null}>
+                {scanning ? "refreshing…" : "refresh recent projects"}
+              </button>
+            )}
             <button className="btn" onClick={browse} disabled={adding !== null}>
               browse folders…
             </button>

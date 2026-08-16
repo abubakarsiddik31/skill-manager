@@ -10,25 +10,24 @@
 //! Everything is best-effort: unreadable or missing sources are skipped,
 //! never fatal.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashMap};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
-use crate::skills;
-
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DetectedProject {
     pub path: String,
     pub name: String,
     /// Unix seconds of the strongest activity signal found; 0 = unknown.
     pub last_active: u64,
-    /// Agent skills found in the project folder (any tool's subdir).
-    pub skill_count: usize,
-    pub sources: Vec<&'static str>,
+    /// Agent skills are deliberately not counted during discovery: reading
+    /// every candidate would trigger access requests for protected folders.
+    pub skill_count: Option<usize>,
+    pub sources: Vec<String>,
 }
 
 #[derive(Default)]
@@ -40,16 +39,7 @@ struct Candidate {
 /// Folders scanned for git repos, relative to the home directory. Kept
 /// deliberately small — detection should stay fast, not enumerate disk.
 const COMMON_ROOTS: &[&str] = &[
-    "Projects",
-    "projects",
-    "dev",
-    "src",
-    "code",
-    "repos",
-    "github",
-    "work",
-    "Desktop",
-    "Documents",
+    "Projects", "projects", "dev", "src", "code", "repos", "github", "work",
 ];
 const GIT_SCAN_DEPTH: usize = 2;
 const GIT_SCAN_BUDGET: usize = 500;
@@ -73,9 +63,6 @@ fn mtime(path: &Path) -> u64 {
 type Candidates = HashMap<PathBuf, Candidate>;
 
 fn record(out: &mut Candidates, path: PathBuf, source: &'static str, last_active: u64) {
-    if !path.is_dir() {
-        return;
-    }
     let entry = out.entry(path).or_default();
     entry.sources.insert(source);
     entry.last_active = entry.last_active.max(last_active);
@@ -237,7 +224,15 @@ fn is_container(path: &Path, home: &Path) -> bool {
         return true;
     };
     if path.parent() == Some(home) {
-        const USER_DIRS: &[&str] = &["Downloads", "Movies", "Music", "Pictures", "Public"];
+        const USER_DIRS: &[&str] = &[
+            "Desktop",
+            "Documents",
+            "Downloads",
+            "Movies",
+            "Music",
+            "Pictures",
+            "Public",
+        ];
         return COMMON_ROOTS.contains(&name) || USER_DIRS.contains(&name);
     }
     false
@@ -260,13 +255,10 @@ pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
         .into_iter()
         .filter(|(path, _)| !is_container(path, &home))
         .filter(|(path, _)| !excluded.contains(&normalize(&path.to_string_lossy())))
-        .map(|(path, mut candidate)| {
-            // weak signals for every candidate: repo activity and direct
-            // children being added/removed
-            candidate.last_active = candidate
-                .last_active
-                .max(mtime(&path))
-                .max(mtime(&path.join(".git")));
+        .map(|(path, candidate)| {
+            // A project path recovered from editor or agent history may live
+            // in Documents or Desktop. Do not touch it here: macOS may ask
+            // for access, and the user has not chosen that project yet.
             let name = path
                 .file_name()
                 .map(|n| n.to_string_lossy().into_owned())
@@ -275,8 +267,8 @@ pub fn detect(exclude: &[String]) -> Vec<DetectedProject> {
                 path: path.to_string_lossy().into_owned(),
                 name,
                 last_active: candidate.last_active,
-                skill_count: skills::discover_project_skills(&path).len(),
-                sources: candidate.sources.into_iter().collect(),
+                skill_count: None,
+                sources: candidate.sources.into_iter().map(str::to_owned).collect(),
             }
         })
         .collect();
@@ -353,5 +345,11 @@ mod tests {
         ] {
             assert!(!is_container(Path::new(path), home), "{path}");
         }
+    }
+
+    #[test]
+    fn background_git_scan_never_walks_privacy_sensitive_user_folders() {
+        assert!(!COMMON_ROOTS.contains(&"Desktop"));
+        assert!(!COMMON_ROOTS.contains(&"Documents"));
     }
 }

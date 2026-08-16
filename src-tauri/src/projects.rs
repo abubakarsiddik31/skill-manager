@@ -1,3 +1,4 @@
+use crate::detect::DetectedProject;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -28,6 +29,7 @@ pub struct ProjectInfo {
 }
 
 const STORE_FILE: &str = "projects.json";
+const DISCOVERY_STORE_FILE: &str = "detected-projects.json";
 const USAGE_WINDOW_SECS: u64 = 30 * 24 * 60 * 60;
 
 fn store_path(app: &AppHandle) -> Result<PathBuf, String> {
@@ -47,6 +49,38 @@ fn load(app: &AppHandle) -> Result<Vec<ProjectInfo>, String> {
 fn save(app: &AppHandle, projects: &[ProjectInfo]) -> Result<(), String> {
     let path = store_path(app)?;
     let raw = serde_json::to_string_pretty(projects).map_err(|e| e.to_string())?;
+    fs::write(path, raw).map_err(|e| e.to_string())
+}
+
+fn discovery_store_path(app: &AppHandle) -> Result<PathBuf, String> {
+    let dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir.join(DISCOVERY_STORE_FILE))
+}
+
+/// Returns `None` until the user has explicitly asked to find projects.
+/// Keeping this separate from tracked projects makes the consent boundary
+/// durable without treating suggestions as projects the app may inspect.
+pub fn list_detected(
+    app: &AppHandle,
+    exclude: &[String],
+) -> Result<Option<Vec<DetectedProject>>, String> {
+    let path = discovery_store_path(app)?;
+    let Ok(raw) = fs::read_to_string(path) else {
+        return Ok(None);
+    };
+    let projects: Vec<DetectedProject> = serde_json::from_str(&raw).map_err(|e| e.to_string())?;
+    Ok(Some(
+        projects
+            .into_iter()
+            .filter(|project| !exclude.contains(&project.path))
+            .collect(),
+    ))
+}
+
+pub fn save_detected(app: &AppHandle, detected: &[DetectedProject]) -> Result<(), String> {
+    let path = discovery_store_path(app)?;
+    let raw = serde_json::to_string_pretty(detected).map_err(|e| e.to_string())?;
     fs::write(path, raw).map_err(|e| e.to_string())
 }
 

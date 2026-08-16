@@ -136,12 +136,26 @@ pub fn list_projects(app: AppHandle) -> Result<Vec<ProjectInfo>, String> {
     projects::list(&app)
 }
 
-/// Suggests project folders the user seems to work in, most recently
-/// active first. Already-tracked paths are passed in `exclude` so the
-/// picker never re-offers them.
+/// Saved project suggestions. Opening the picker must not walk the user's
+/// folders again, especially protected locations such as Documents.
 #[tauri::command]
-pub fn detect_projects(exclude: Vec<String>) -> Vec<DetectedProject> {
-    detect::detect(&exclude)
+pub fn list_detected_projects(
+    app: AppHandle,
+    exclude: Vec<String>,
+) -> Result<Option<Vec<DetectedProject>>, String> {
+    projects::list_detected(&app, &exclude)
+}
+
+/// Explicitly refreshes the saved suggestions. This is the only discovery
+/// command that reads development folders.
+#[tauri::command]
+pub fn refresh_detected_projects(
+    app: AppHandle,
+    exclude: Vec<String>,
+) -> Result<Vec<DetectedProject>, String> {
+    let detected = detect::detect(&exclude);
+    projects::save_detected(&app, &detected)?;
+    Ok(detected)
 }
 
 #[derive(Serialize)]
