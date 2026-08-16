@@ -24,7 +24,23 @@ a config file ever again.
 [**Website**](https://abubakarsiddik31.github.io/skill-manager/) ·
 [**Download**](https://github.com/abubakarsiddik31/skill-manager/releases/latest) ·
 [**Report a bug**](https://github.com/abubakarsiddik31/skill-manager/issues/new?template=bug_report.yml) ·
-[**Contributing**](CONTRIBUTING.md)
+[**Contributing**](CONTRIBUTING.md) ·
+[**Support code signing**](https://github.com/sponsors/abubakarsiddik31)
+
+> [!IMPORTANT]
+> **Before downloading:** v0.3.0 is not code-signed or notarized by Apple, and
+> its Windows installer is not signed by a verified publisher. macOS Gatekeeper
+> and Windows SmartScreen may therefore warn on first launch.
+>
+> **macOS:** click **Done**, then Control-click the app in Finder → **Open** →
+> **Open**. Or go to **System Settings → Privacy & Security** and choose
+> **Open Anyway**. **Windows:** on the SmartScreen warning, choose **More
+> info** → **Run anyway**. Only continue if you downloaded the installer from
+> this repository's GitHub Releases page.
+>
+> We know these extra first-launch steps are inconvenient. Code signing and
+> notarization are in progress; if this project is useful to you and you would
+> like to help cover that work, [optional sponsorship is appreciated](https://github.com/sponsors/abubakarsiddik31).
 
 <br />
 
@@ -138,9 +154,13 @@ Grab a build from the [latest release](https://github.com/abubakarsiddik31/skill
 | Linux | `.deb`, `.rpm`, or `.AppImage` |
 
 > [!NOTE]
-> **Builds are currently unsigned.** We're working on code-signed releases
-> (see [Roadmap](#roadmap)) so this warning goes away — until then, here's
-> how to open the app anyway:
+> **v0.3.0 is not code-signed or notarized by Apple, and its Windows installer
+> is not signed by a verified publisher.** We have not completed Apple or
+> Microsoft publisher verification. Only continue if you downloaded the
+> installer from this repository's GitHub Releases page. Code-signed releases
+> are on the [Roadmap](#roadmap). We know the extra steps are inconvenient;
+> [optional sponsorship](https://github.com/sponsors/abubakarsiddik31) helps
+> fund code-signing and notarization work.
 >
 > **macOS** — Gatekeeper will say *"Skill Manager" Not Opened* / *Apple could
 > not verify "Skill Manager" is free of malware*. Click **Done**, then either:

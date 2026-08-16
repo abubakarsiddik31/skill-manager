@@ -125,7 +125,7 @@
             "name": "Why does macOS/Windows warn that the app isn't verified?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Builds are currently unsigned — code-signed releases are on the roadmap. On macOS, click Done, then right-click the app in Finder and choose Open twice, or go to System Settings > Privacy & Security and click Open Anyway. On Windows, click More info then Run anyway on the SmartScreen warning. You only need to do this once."
+              "text": "v0.3.0 is not code-signed or notarized by Apple, and its Windows installer is not signed by a verified publisher. Only continue if you downloaded the installer from this repository's GitHub Releases page. On macOS, click Done, then right-click the app in Finder and choose Open twice, or go to System Settings > Privacy & Security and click Open Anyway. On Windows, click More info then Run anyway on the SmartScreen warning."
             }
           }
         ]
@@ -349,6 +349,30 @@
         font-family: var(--mono);
         color: var(--text-faint);
         font-size: 11.5px;
+      }
+      .install-notice {
+        max-width: 660px;
+        margin: 18px auto 0;
+        padding: 14px 16px;
+        text-align: left;
+        border: 1px solid #765c20;
+        border-radius: 10px;
+        background: #1a1408;
+        color: #e8d6a2;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .install-notice strong {
+        color: #fff3c8;
+      }
+      .install-notice ol {
+        margin: 8px 0 0;
+        padding-left: 20px;
+      }
+      .install-notice a {
+        color: #fff3c8;
+        text-decoration: underline;
+        text-underline-offset: 2px;
       }
 
       /* ---------- demo ---------- */
@@ -749,19 +773,19 @@
           <a
             class="dl-btn"
             data-os="mac"
-            href="https://github.com/abubakarsiddik31/skill-manager/releases/download/v0.2.0/Skill.Manager_0.2.0_universal.dmg"
+            href="https://github.com/abubakarsiddik31/skill-manager/releases/download/v0.3.0/Skill.Manager_0.3.0_universal.dmg"
             >macOS</a
           >
           <a
             class="dl-btn"
             data-os="win"
-            href="https://github.com/abubakarsiddik31/skill-manager/releases/download/v0.2.0/Skill.Manager_0.2.0_x64-setup.exe"
+            href="https://github.com/abubakarsiddik31/skill-manager/releases/download/v0.3.0/Skill.Manager_0.3.0_x64-setup.exe"
             >Windows</a
           >
           <a
             class="dl-btn"
             data-os="linux"
-            href="https://github.com/abubakarsiddik31/skill-manager/releases/download/v0.2.0/Skill.Manager_0.2.0_amd64.AppImage"
+            href="https://github.com/abubakarsiddik31/skill-manager/releases/download/v0.3.0/Skill.Manager_0.3.0_amd64.AppImage"
             >Linux</a
           >
           <a
@@ -769,20 +793,33 @@
             href="https://github.com/abubakarsiddik31/skill-manager"
             >Star on GitHub</a
           >
+          <a
+            class="dl-btn"
+            href="https://github.com/sponsors/abubakarsiddik31"
+            >Support code signing</a
+          >
         </div>
         <p class="dl-note">
-          v0.2.0 · free · open source · mit licensed ·
+          v0.3.0 · free · open source · mit licensed ·
           <a
             href="https://github.com/abubakarsiddik31/skill-manager/releases/latest"
             >all downloads</a
           >
         </p>
-        <p class="dl-note">
-          Builds are unsigned for now (code-signing is
-          <a href="#roadmap">in progress</a>) — macOS/Windows will warn on
-          first launch, see the
-          <a href="#faq">FAQ</a> for the one-time fix.
-        </p>
+        <aside class="install-notice" aria-label="Important installation note">
+          <strong>Important installation note for v0.3.0</strong><br />
+          This app is not code-signed or notarized by Apple, and the Windows
+          installer is not signed by a verified publisher. Gatekeeper and
+          SmartScreen may warn on first launch. Download only from this
+          project's <a href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">GitHub Releases page</a>.
+          <ol>
+            <li><strong>macOS:</strong> click <strong>Done</strong>, then Control-click the app in Finder → <strong>Open</strong> → <strong>Open</strong>; or use <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>.</li>
+            <li><strong>Windows:</strong> on the SmartScreen warning, choose <strong>More info → Run anyway</strong>.</li>
+          </ol>
+          We know those steps are inconvenient. Code signing and notarization
+          are in progress; if Skill Manager is useful to you, <a href="https://github.com/sponsors/abubakarsiddik31">optional sponsorship</a>
+          helps fund that work.
+        </aside>
       </header>
 
       <section id="demo" style="border-top: none; padding-top: 0">
@@ -1056,7 +1093,8 @@
         <div class="kicker">roadmap</div>
         <h2>What's next.</h2>
         <p class="lead">
-          v0.2.0 shipped the full ecosystem and smart project setup. The
+          v0.2.0 shipped the full ecosystem and smart project setup. v0.3.0
+          makes project discovery privacy-first. The
           focus moves to:
         </p>
         <ul class="roadmap">
@@ -1111,9 +1149,15 @@
               Why does macOS/Windows warn that the app isn't verified?
             </summary>
             <p>
-              Builds are currently unsigned — we're working on code-signed
-              releases (see <a href="#roadmap">roadmap</a>) so this warning
-              goes away. Until then:
+              v0.3.0 is not code-signed or notarized by Apple, and its Windows
+              installer is not signed by a verified publisher. We have not
+              completed Apple or Microsoft publisher verification. Only
+              continue if you downloaded it from this project's
+              <a href="https://github.com/abubakarsiddik31/skill-manager/releases/latest">GitHub Releases page</a>.
+              Code-signed releases are on the <a href="#roadmap">roadmap</a>.
+              We know the extra steps are inconvenient; <a href="https://github.com/sponsors/abubakarsiddik31">optional sponsorship</a>
+              helps fund code-signing and notarization work.
+              Until then:
             </p>
             <p>
               <b>macOS</b> — click <b>Done</b> on the warning, then either
