@@ -1,0 +1,18 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skill Manager v2 logo concept">
+  <rect x="2" y="2" width="124" height="124" rx="28" fill="#000000" stroke="#ffffff" stroke-opacity="0.16" stroke-width="2"/>
+
+  <!-- Three distinct skills, kept deliberately simple for small app-icon sizes. -->
+  <rect x="24" y="30" width="26" height="20" rx="5" fill="none" stroke="#ffffff" stroke-width="4"/>
+  <rect x="24" y="55" width="26" height="20" rx="5" fill="none" stroke="#ffffff" stroke-width="4"/>
+  <rect x="24" y="80" width="26" height="20" rx="5" fill="none" stroke="#ffffff" stroke-width="4"/>
+
+  <!-- The shared routing spine: many installed skills, one controlled view. -->
+  <path d="M50 40H66C72 40 74 46 74 52V76C74 82 76 88 82 88H94"
+        fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 65H74" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 90H66C72 90 74 84 74 78" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Active destination / cursor. -->
+  <rect x="88" y="78" width="20" height="20" rx="5" fill="#ffffff"/>
+  <path d="M94 84L101 88L94 92" fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skill Manager logo concept: command palette">
+  <rect x="2" y="2" width="124" height="124" rx="28" fill="#000" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
+  <rect x="22" y="32" width="84" height="64" rx="12" fill="none" stroke="#fff" stroke-width="4"/>
+  <path d="M37 49h20M37 64h34M37 79h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+  <rect x="75" y="43" width="17" height="17" rx="4" fill="#fff"/>
+  <rect x="75" y="68" width="17" height="17" rx="4" fill="none" stroke="#fff" stroke-width="4"/>
+  <path d="M80 49l6 3-6 3" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
