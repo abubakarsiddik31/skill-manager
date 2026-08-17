@@ -965,3 +965,24 @@ body,
   font-size: 12px;
   white-space: pre-wrap;
 }
+
+/* --- new-skill modal: scroll inside small windows --- */
+
+.modal.create-modal {
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-modal .modal-header {
+  flex-shrink: 0;
+}
+
+.create-modal .create-form {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.create-modal .modal-footer {
+  flex-shrink: 0;
+}

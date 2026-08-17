@@ -173,7 +173,9 @@ fn validate_skill_folder_name(name: &str) -> Result<(), String> {
 
 /// A one-line description rendered as a YAML double-quoted scalar, so
 /// colons, quotes and other YAML-significant characters survive the
-/// frontmatter round trip without inventing a parser.
+/// frontmatter round trip without inventing a parser. Multi-line values
+/// are emitted as YAML `\n` escapes inside the double-quoted scalar, so
+/// a multi-line description round-trips exactly.
 fn yaml_double_quoted(value: &str) -> String {
     let mut out = String::with_capacity(value.len() + 2);
     out.push('"');
@@ -181,9 +183,8 @@ fn yaml_double_quoted(value: &str) -> String {
         match c {
             '"' => out.push_str("\\\""),
             '\\' => out.push_str("\\\\"),
-            // Defensive: validation rejects line breaks in descriptions;
-            // flattening here keeps the manifest single-line regardless.
-            '\n' | '\r' => out.push(' '),
+            '\n' => out.push_str("\\n"),
+            '\r' => {}
             _ => out.push(c),
         }
     }
@@ -209,9 +210,6 @@ fn create_skill_manifest(
     let description = description.trim();
     if description.is_empty() {
         return Err("description is empty".into());
-    }
-    if description.lines().count() > 1 {
-        return Err("description must be a single line".into());
     }
     let skill_dir = root.join(name);
     if skill_dir.exists() {
@@ -623,9 +621,27 @@ mod tests {
         assert!(create_skill_manifest(&roots, &managed, ".disabled", "d").is_err());
         assert!(create_skill_manifest(&roots, &managed, "ok-name", "").is_err());
         assert!(create_skill_manifest(&roots, &managed, "ok-name", "   ").is_err());
-        assert!(create_skill_manifest(&roots, &managed, "ok-name", "two\nlines").is_err());
         // nothing was created by any rejected attempt
         assert!(!managed.exists());
+
+        let _ = fs::remove_dir_all(managed.parent().unwrap());
+    }
+
+    #[test]
+    fn multi_line_descriptions_round_trip_through_the_frontmatter() {
+        let (managed, _unmanaged) = fresh_roots("multiline");
+        let roots = vec![managed.clone()];
+
+        let description = "what it does\nand when to use it";
+        let manifest =
+            create_skill_manifest(&roots, &managed, "my-skill", description).expect("creation");
+        let content = fs::read_to_string(&manifest).unwrap();
+        // YAML double-quoted scalar carries the newline as an escape, so the
+        // line stays single-line YAML while parsing yields the original text.
+        assert_eq!(
+            content,
+            "---\nname: my-skill\ndescription: \"what it does\\nand when to use it\"\n---\n"
+        );
 
         let _ = fs::remove_dir_all(managed.parent().unwrap());
     }

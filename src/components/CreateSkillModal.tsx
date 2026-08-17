@@ -44,6 +44,7 @@ export function CreateSkillModal({
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -55,25 +56,24 @@ export function CreateSkillModal({
 
   const trimmedName = name.trim();
   const trimmedDescription = description.trim();
-  const nameProblem = !trimmedName
-    ? null
+  // Hints only appear after the user tries to submit with invalid input —
+  // the button never goes silent about why nothing happened.
+  const nameProblemHint = !trimmedName
+    ? "a name is required"
     : !NAME_PATTERN.test(trimmedName) || trimmedName.length > 64
       ? "letters, digits, '_', '-', '.' only; no leading dot; max 64 chars"
       : null;
-  const descriptionProblem =
-    trimmedDescription && trimmedDescription.includes("\n")
-      ? "description must be a single line"
-      : null;
+  const descriptionProblemHint = !trimmedDescription ? "a description is required" : null;
+  const nameValid = NAME_PATTERN.test(trimmedName) && trimmedName.length <= 64;
   const canSubmit =
-    !submitting &&
-    !nameProblem &&
-    !descriptionProblem &&
-    NAME_PATTERN.test(trimmedName) &&
-    trimmedDescription.length > 0 &&
-    (scope === "user" || projectPath !== "");
+    !submitting && nameValid && trimmedDescription.length > 0 && (scope === "user" || projectPath !== "");
 
   async function submit() {
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      // Explain why nothing happened instead of silently doing nothing.
+      setAttempted(true);
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -160,19 +160,21 @@ export function CreateSkillModal({
               onChange={(e) => setName(e.target.value)}
               autoFocus
             />
-            {nameProblem && <span className="field-hint">{nameProblem}</span>}
+            {attempted && nameProblemHint && <span className="field-hint">{nameProblemHint}</span>}
           </label>
 
           <label>
             description
             <textarea
               className="add-search"
-              rows={2}
-              placeholder="what the skill does, and when to use it"
+              rows={3}
+              placeholder={"what the skill does, and when to use it\n(newlines are kept)"}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            {descriptionProblem && <span className="field-hint">{descriptionProblem}</span>}
+            {attempted && descriptionProblemHint && (
+              <span className="field-hint">{descriptionProblemHint}</span>
+            )}
           </label>
 
           {error && <div className="create-error">{error}</div>}
@@ -180,7 +182,9 @@ export function CreateSkillModal({
 
         <div className="modal-footer">
           <div className="footer-spacer" />
-          <button className="btn" onClick={submit} disabled={!canSubmit}>
+          {/* Stay clickable when input is incomplete: clicking explains what's
+              missing instead of doing nothing. Only in-flight submits block. */}
+          <button className="btn" onClick={submit} disabled={submitting}>
             {submitting ? "creating…" : "create & edit"}
           </button>
         </div>
