@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "../../api";
+import { CloseIcon } from "../ui/icons";
+import { ModalShell } from "../ui/ModalShell";
 import type { AgentTool, ProjectInfo, Skill, ToolEntry } from "../../types";
 
 interface CreateSkillModalProps {
@@ -46,14 +48,6 @@ export function CreateSkillModal({
   const [submitting, setSubmitting] = useState(false);
   const [attempted, setAttempted] = useState(false);
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
   const trimmedName = name.trim();
   const trimmedDescription = description.trim();
   // Hints only appear after the user tries to submit with invalid input —
@@ -92,14 +86,11 @@ export function CreateSkillModal({
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal create-modal" onClick={(e) => e.stopPropagation()}>
+    <ModalShell className="create-modal" onClose={onClose}>
         <div className="modal-header">
           <span className="title">new skill</span>
           <button className="icon-btn square" onClick={onClose} title="close">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
-            </svg>
+            <CloseIcon />
           </button>
         </div>
 
@@ -188,7 +179,6 @@ export function CreateSkillModal({
             {submitting ? "creating…" : "create & edit"}
           </button>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

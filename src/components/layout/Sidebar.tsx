@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { orderToolsByPin, selectVisibleProjects } from "../../utils/sidebarLists";
+import { PinIcon } from "../ui/icons";
 import type { ProjectInfo, ToolEntry, View } from "../../types";
 
 const ALL = "all" as const;
@@ -15,15 +16,6 @@ const MIN_PROJECT_ROWS = 3;
 
 function link(url: string) {
   return () => openUrl(url).catch(console.error);
-}
-
-function PinIcon() {
-  return (
-    <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <path d="M7 3h6l-1 5 3 2v2H5v-2l3-2-1-5z" strokeLinejoin="round" />
-      <path d="M10 12v5" strokeLinecap="round" />
-    </svg>
-  );
 }
 
 interface SidebarProps {

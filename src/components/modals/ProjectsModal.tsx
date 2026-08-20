@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { lastUsed, usageCount } from "../../utils/projectUsage";
 import { relativeTime } from "../../utils/relativeTime";
 import { SortToggle } from "../skills/SortToggle";
+import { CloseIcon } from "../ui/icons";
+import { ModalShell } from "../ui/ModalShell";
 import type { ProjectInfo } from "../../types";
 
 interface ProjectsModalProps {
@@ -16,14 +18,6 @@ interface ProjectsModalProps {
 export function ProjectsModal({ projects, skillCounts, activePath, onClose, onOpen }: ProjectsModalProps) {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"usage" | "skills">("usage");
-
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
 
   const sorted = useMemo(() => {
     const byUsage = (a: ProjectInfo, b: ProjectInfo) =>
@@ -44,8 +38,7 @@ export function ProjectsModal({ projects, skillCounts, activePath, onClose, onOp
   }, [sorted, query]);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal add-modal" onClick={(e) => e.stopPropagation()}>
+    <ModalShell className="add-modal" onClose={onClose}>
         <div className="modal-header">
           <span className="title">projects · {projects.length}</span>
           <SortToggle
@@ -57,9 +50,7 @@ export function ProjectsModal({ projects, skillCounts, activePath, onClose, onOp
             onChange={(id) => setSortBy(id as "usage" | "skills")}
           />
           <button className="icon-btn square" onClick={onClose} title="close">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
-            </svg>
+            <CloseIcon />
           </button>
         </div>
 
@@ -113,7 +104,6 @@ export function ProjectsModal({ projects, skillCounts, activePath, onClose, onOp
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../../api";
+import { CloseIcon } from "../ui/icons";
+import { ModalShell } from "../ui/ModalShell";
 import { renderMarkdown } from "../../utils/markdown";
 import type { Skill, ToolEntry } from "../../types";
 
@@ -25,14 +27,6 @@ export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorMod
     });
   }, [skill.id]);
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
   async function save() {
     setSaving(true);
     await api.writeSkillContent(skill.id, content);
@@ -52,14 +46,11 @@ export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorMod
   const seers = toolEntries.filter((t) => t.folders.some((f) => f.tool === skill.tool));
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+    <ModalShell onClose={onClose}>
         <div className="modal-header">
           <span className="title">{skill.name} / SKILL.md</span>
           <button className="icon-btn square" onClick={onClose} title="close">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
-            </svg>
+            <CloseIcon />
           </button>
         </div>
 
@@ -125,7 +116,6 @@ export function EditorModal({ skill, toolEntries, onClose, onDelete }: EditorMod
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }
