@@ -10,7 +10,7 @@ import { useGlobalSkills } from "./hooks/useGlobalSkills";
 import { usePinnedTools } from "./hooks/usePinnedTools";
 import { useProjects } from "./hooks/useProjects";
 import { useProjectSkills } from "./hooks/useProjectSkills";
-import { filterSkills } from "./lib/filterSkills";
+import { filterSkills } from "./utils/filterSkills";
 import type { AgentTool, ProjectInfo, Skill, ToolEntry, View } from "./types";
 import "./App.css";
 

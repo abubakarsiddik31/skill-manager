@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
-import { renderMarkdown } from "../lib/markdown";
+import { renderMarkdown } from "../utils/markdown";
 import type { Skill, ToolEntry } from "../types";
 
 type EditorMode = "view" | "edit";

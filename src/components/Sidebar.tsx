@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { orderToolsByPin, selectVisibleProjects } from "../lib/sidebarLists";
+import { orderToolsByPin, selectVisibleProjects } from "../utils/sidebarLists";
 import type { ProjectInfo, ToolEntry, View } from "../types";
 
 const ALL = "all" as const;
