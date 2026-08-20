@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AddProjectModal } from "./components/AddProjectModal";
-import { CreateSkillModal } from "./components/CreateSkillModal";
-import { EditorModal } from "./components/EditorModal";
-import { ProjectsModal } from "./components/ProjectsModal";
-import { Sidebar } from "./components/Sidebar";
-import { SkillList } from "./components/SkillList";
-import { Topbar } from "./components/Topbar";
+import { AddProjectModal } from "./components/modals/AddProjectModal";
+import { CreateSkillModal } from "./components/modals/CreateSkillModal";
+import { EditorModal } from "./components/modals/EditorModal";
+import { ProjectsModal } from "./components/modals/ProjectsModal";
+import { Sidebar } from "./components/layout/Sidebar";
+import { SkillList } from "./components/skills/SkillList";
+import { Topbar } from "./components/layout/Topbar";
 import { useGlobalSkills } from "./hooks/useGlobalSkills";
 import { usePinnedTools } from "./hooks/usePinnedTools";
 import { useProjects } from "./hooks/useProjects";

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../api";
-import { relativeTime } from "../utils/relativeTime";
-import { SortToggle } from "./SortToggle";
-import type { DetectedProject, ProjectInfo } from "../types";
+import { api } from "../../api";
+import { relativeTime } from "../../utils/relativeTime";
+import { SortToggle } from "../skills/SortToggle";
+import type { DetectedProject, ProjectInfo } from "../../types";
 
 interface AddProjectModalProps {
   trackedPaths: string[];

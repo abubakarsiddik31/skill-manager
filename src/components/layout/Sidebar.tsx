@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { orderToolsByPin, selectVisibleProjects } from "../utils/sidebarLists";
-import type { ProjectInfo, ToolEntry, View } from "../types";
+import { orderToolsByPin, selectVisibleProjects } from "../../utils/sidebarLists";
+import type { ProjectInfo, ToolEntry, View } from "../../types";
 
 const ALL = "all" as const;
 const REPO_URL = "https://github.com/abubakarsiddik31/skill-manager";

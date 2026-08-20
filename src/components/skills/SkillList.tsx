@@ -1,4 +1,4 @@
-import type { Skill, ToolEntry } from "../types";
+import type { Skill, ToolEntry } from "../../types";
 import { SkillCard } from "./SkillCard";
 
 interface SkillListProps {

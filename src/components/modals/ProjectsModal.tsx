@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { lastUsed, usageCount } from "../utils/projectUsage";
-import { relativeTime } from "../utils/relativeTime";
-import { SortToggle } from "./SortToggle";
-import type { ProjectInfo } from "../types";
+import { lastUsed, usageCount } from "../../utils/projectUsage";
+import { relativeTime } from "../../utils/relativeTime";
+import { SortToggle } from "../skills/SortToggle";
+import type { ProjectInfo } from "../../types";
 
 interface ProjectsModalProps {
   projects: ProjectInfo[];

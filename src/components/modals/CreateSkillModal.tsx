@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
-import type { AgentTool, ProjectInfo, Skill, ToolEntry } from "../types";
+import { api } from "../../api";
+import type { AgentTool, ProjectInfo, Skill, ToolEntry } from "../../types";
 
 interface CreateSkillModalProps {
   toolEntries: ToolEntry[];
