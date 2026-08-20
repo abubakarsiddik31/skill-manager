@@ -41,7 +41,7 @@ npm install
 npm run tauri dev        # dev app
 npm run tauri build      # release binary for your platform
 npx tsc --noEmit         # typecheck — must pass clean before a PR
-npm test                 # vitest unit tests (lib helpers) — must pass before a PR
+npm test                 # vitest unit tests (utils helpers) — must pass before a PR
 cargo check              # from src-tauri/ — must pass clean before a PR
 cargo fmt                # from src-tauri/ — run before committing; no diff should remain
 cargo clippy --all-targets   # from src-tauri/ — must pass warning-free before a PR
@@ -51,8 +51,9 @@ cargo test               # from src-tauri/ — required if you touched src-tauri
 Security note: file-touching commands (`read_skill_content`,
 `write_skill_content`, `delete_skill`, `set_skill_enabled`) validate
 their paths against the skills roots the app manages (`skills_roots` /
-`validate_manifest_at` in `src-tauri/src/commands/mod.rs`). Never bypass that check when adding commands — the
-webview is untrusted input like any other frontend.
+`validate_manifest_at` in `src-tauri/src/commands/mod.rs`). Never
+bypass that check when adding commands — the webview is untrusted
+input like any other frontend.
 
 ## Release process
 
