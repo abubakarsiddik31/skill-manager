@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../lib/api";
+import { api } from "../api";
 import { relativeTime } from "../lib/relativeTime";
 import { SortToggle } from "./SortToggle";
 import type { DetectedProject, ProjectInfo } from "../types";

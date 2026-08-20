@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../lib/api";
+import { api } from "../api";
 import { renderMarkdown } from "../lib/markdown";
 import type { Skill, ToolEntry } from "../types";
 
