@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../lib/api";
-import { relativeTime } from "../lib/relativeTime";
-import { SortToggle } from "./SortToggle";
-import type { DetectedProject, ProjectInfo } from "../types";
+import { api } from "../../api";
+import { relativeTime } from "../../utils/relativeTime";
+import { SortToggle } from "../skills/SortToggle";
+import { CloseIcon } from "../ui/icons";
+import { ModalShell } from "../ui/ModalShell";
+import type { DetectedProject, ProjectInfo } from "../../types";
 
 interface AddProjectModalProps {
   trackedPaths: string[];
@@ -23,14 +25,6 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
   const [sortBy, setSortBy] = useState<"activity" | "skills">("activity");
   const [adding, setAdding] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
-
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
 
   useEffect(() => {
     let active = true;
@@ -91,8 +85,7 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal add-modal" onClick={(e) => e.stopPropagation()}>
+    <ModalShell className="add-modal" onClose={onClose}>
         <div className="modal-header">
           <span className="title">add project</span>
           <SortToggle
@@ -104,9 +97,7 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
             onChange={(id) => setSortBy(id as "activity" | "skills")}
           />
           <button className="icon-btn square" onClick={onClose} title="close">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M5 5l10 10M15 5 5 15" strokeLinecap="round" />
-            </svg>
+            <CloseIcon />
           </button>
         </div>
 
@@ -183,7 +174,6 @@ export function AddProjectModal({ trackedPaths, onClose, onAdd, onBrowse }: AddP
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

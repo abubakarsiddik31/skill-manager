@@ -1,4 +1,4 @@
-import type { ToolFolderInfo } from "../types";
+import type { ToolFolderInfo } from "../../types";
 
 interface TopbarProps {
   title: string;

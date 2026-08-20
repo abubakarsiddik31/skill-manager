@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../lib/api";
+import { api } from "../api";
 import type { Skill, ToolEntry } from "../types";
 import { useSkillMutations } from "./useSkillMutations";
 

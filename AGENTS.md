@@ -7,16 +7,25 @@ frontend, built with Vite.
 
 ```
 src/
-  components/           presentational react components (Sidebar, SkillCard, EditorModal, ...)
+  api/                  the invoke client over Rust commands (skills.ts, projects.ts)
+  components/
+    layout/             app chrome (Sidebar, Topbar)
+    skills/             skill grid (SkillList, SkillCard, SortToggle)
+    modals/             the four dialogs (Editor, CreateSkill, AddProject, Projects)
+    ui/                 shared primitives (ModalShell, icons)
   hooks/                data + mutations (useGlobalSkills, useProjects, useProjectSkills)
-  lib/                  api client, markdown rendering, filtering helpers
-  types.ts              shared frontend types
+  utils/                pure helpers + tests (filtering, sidebar lists, time, markdown)
+  types/                shared frontend types split by domain, barrel at types/index.ts
 src-tauri/src/
+  commands/             tauri commands split by domain — skills.rs, create_skill.rs,
+                        projects.rs; mod.rs holds the shared managed-path validation
+                        (see the security note below)
   skills/               one adapter per skills folder (claude, agents, copilot, ...),
                         plus tools.rs — the tool→folder registry driving the sidebar
   projects.rs           persisted list of tracked project folders
-  commands.rs           tauri commands exposed to the frontend
+  detect.rs             project-folder discovery for the add-project picker
 docs/                   the landing page (GitHub Pages, docs/index.html)
+                        and specs/plans under docs/superpowers/
 ```
 
 Each skills folder implements the same `SkillAdapter` trait
@@ -32,7 +41,7 @@ npm install
 npm run tauri dev        # dev app
 npm run tauri build      # release binary for your platform
 npx tsc --noEmit         # typecheck — must pass clean before a PR
-npm test                 # vitest unit tests (lib helpers) — must pass before a PR
+npm test                 # vitest unit tests (utils helpers) — must pass before a PR
 cargo check              # from src-tauri/ — must pass clean before a PR
 cargo fmt                # from src-tauri/ — run before committing; no diff should remain
 cargo clippy --all-targets   # from src-tauri/ — must pass warning-free before a PR
@@ -41,9 +50,10 @@ cargo test               # from src-tauri/ — required if you touched src-tauri
 
 Security note: file-touching commands (`read_skill_content`,
 `write_skill_content`, `delete_skill`, `set_skill_enabled`) validate
-their paths against the skills roots the app manages (`skills_roots`
-in `commands.rs`). Never bypass that check when adding commands — the
-webview is untrusted input like any other frontend.
+their paths against the skills roots the app manages (`skills_roots` /
+`validate_manifest_at` in `src-tauri/src/commands/mod.rs`). Never
+bypass that check when adding commands — the webview is untrusted
+input like any other frontend.
 
 ## Release process
 
