@@ -8,9 +8,11 @@ interface TopbarProps {
   query: string;
   onQueryChange: (query: string) => void;
   onForgetProject?: () => void;
+  /** Opens the new-skill flow. */
+  onNewSkill?: () => void;
 }
 
-export function Topbar({ title, subtitle, folders, query, onQueryChange, onForgetProject }: TopbarProps) {
+export function Topbar({ title, subtitle, folders, query, onQueryChange, onForgetProject, onNewSkill }: TopbarProps) {
   return (
     <div className="topbar">
       <div className="topbar-title">
@@ -31,6 +33,11 @@ export function Topbar({ title, subtitle, folders, query, onQueryChange, onForge
         )}
       </div>
       <div className="topbar-actions">
+        {onNewSkill && (
+          <button className="btn" onClick={onNewSkill} title="create a new skill from a minimal template">
+            new skill
+          </button>
+        )}
         <input
           className="search"
           placeholder="search skills..."

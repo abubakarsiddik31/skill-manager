@@ -1,6 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import type { DetectedProject, ProjectInfo, Skill, ToolEntry } from "../types";
+import type {
+  AgentTool,
+  DetectedProject,
+  ProjectInfo,
+  Skill,
+  SkillScope,
+  ToolEntry,
+} from "../types";
 
 /**
  * Thin client over the Rust-side adapters (src-tauri/src/skills).
@@ -27,6 +34,23 @@ export const api = {
   },
   writeSkillContent(id: string, content: string): Promise<void> {
     return invoke("write_skill_content", { id, content });
+  },
+  /** Creates `<skills-dir>/<name>/SKILL.md` with minimal frontmatter and
+   *  returns the new skill; the caller opens it in the editor. */
+  createSkill(input: {
+    tool: AgentTool;
+    scope: SkillScope;
+    projectPath?: string;
+    name: string;
+    description: string;
+  }): Promise<Skill> {
+    return invoke("create_skill", {
+      tool: input.tool,
+      scope: input.scope,
+      projectPath: input.projectPath ?? null,
+      name: input.name,
+      description: input.description,
+    });
   },
 
   listProjects(): Promise<ProjectInfo[]> {

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AddProjectModal } from "./components/AddProjectModal";
+import { CreateSkillModal } from "./components/CreateSkillModal";
 import { EditorModal } from "./components/EditorModal";
 import { ProjectsModal } from "./components/ProjectsModal";
 import { Sidebar } from "./components/Sidebar";
@@ -10,7 +11,7 @@ import { usePinnedTools } from "./hooks/usePinnedTools";
 import { useProjects } from "./hooks/useProjects";
 import { useProjectSkills } from "./hooks/useProjectSkills";
 import { filterSkills } from "./lib/filterSkills";
-import type { ProjectInfo, Skill, ToolEntry, View } from "./types";
+import type { AgentTool, ProjectInfo, Skill, ToolEntry, View } from "./types";
 import "./App.css";
 
 const ALL = "all" as const;
@@ -21,6 +22,7 @@ function App() {
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Skill | null>(null);
   const [addingProject, setAddingProject] = useState(false);
+  const [creatingSkill, setCreatingSkill] = useState(false);
   const [showingAllProjects, setShowingAllProjects] = useState(false);
   const skillListRef = useRef<HTMLDivElement>(null);
 
@@ -131,6 +133,7 @@ function App() {
           query={query}
           onQueryChange={setQuery}
           onForgetProject={view.kind === "project" ? () => forgetProject(view.project) : undefined}
+          onNewSkill={() => setCreatingSkill(true)}
         />
 
         <div className="skill-list" ref={skillListRef}>
@@ -162,6 +165,30 @@ function App() {
           toolEntries={global.toolEntries}
           onClose={() => setEditing(null)}
           onDelete={view.kind === "global" ? global.remove : removeProjectSkill}
+        />
+      )}
+
+      {creatingSkill && (
+        <CreateSkillModal
+          toolEntries={global.toolEntries}
+          projects={projects.projects}
+          activeProject={activeProject}
+          defaultTool={
+            activeTool
+              ? (activeTool.folders.find((f) => f.role === "own")?.tool ??
+                activeTool.folders[0]?.tool) as AgentTool | undefined
+              : undefined
+          }
+          onClose={() => setCreatingSkill(false)}
+          onCreated={async (skill) => {
+            setCreatingSkill(false);
+            await global.refresh();
+            if (skill.scope === "project") {
+              await projects.refresh(); // keep sidebar skill-count badges honest
+              projectView.reload();
+            }
+            setEditing(skill); // the instructions are the user's to write
+          }}
         />
       )}
 
