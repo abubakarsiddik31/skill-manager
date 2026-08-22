@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use super::github::GithubHttp;
+use super::store::{CollectionsCache, UserCollection};
+use super::CollectionInfo;
+
 pub const CATALOG_URL: &str = "https://raw.githubusercontent.com/abubakarsiddik31/claude-skills-collection/main/collections.json";
 
 /// The manifest compiled into the binary so a fresh install can browse
@@ -51,6 +55,73 @@ pub fn parse_manifest(json: &str) -> Result<Vec<ManifestCollection>, String> {
     Ok(raw.collections)
 }
 
+/// Remote manifest → cached manifest → bundled fallback. A tampered or
+/// broken manifest can at worst advertise unhelpful repos; it names
+/// repositories only and cannot bypass any install validation.
+pub fn load_catalog(
+    http: &dyn GithubHttp,
+    cache: &mut CollectionsCache,
+    now: u64,
+) -> (Vec<ManifestCollection>, CatalogSource) {
+    if let Ok(text) = http.get_text(CATALOG_URL) {
+        if let Ok(collections) = parse_manifest(&text) {
+            cache.manifest = Some(super::store::ManifestCache {
+                fetched_at: now,
+                raw: text,
+            });
+            return (collections, CatalogSource::Manifest);
+        }
+    }
+    if let Some(cached) = &cache.manifest {
+        if let Ok(collections) = parse_manifest(&cached.raw) {
+            return (collections, CatalogSource::Cached);
+        }
+    }
+    (
+        parse_manifest(BUNDLED_MANIFEST).unwrap_or_default(),
+        CatalogSource::Bundled,
+    )
+}
+
+/// Manifest entries first; user-added collections appended unless the
+/// same repo is already offered. Dedupe key is owner + repo.
+pub fn merge_collections(
+    manifest: &[ManifestCollection],
+    user: &[UserCollection],
+) -> Vec<CollectionInfo> {
+    let mut out: Vec<CollectionInfo> = manifest
+        .iter()
+        .filter_map(|c| {
+            let (owner, repo) = super::split_repo(&c.repo)?;
+            Some(CollectionInfo {
+                id: c.id.clone(),
+                title: c.title.clone(),
+                owner,
+                repo,
+                subpath: c.subpath.clone(),
+                builtin: true,
+                skill_count: None,
+            })
+        })
+        .collect();
+
+    for u in user {
+        if out.iter().any(|c| c.owner == u.owner && c.repo == u.repo) {
+            continue;
+        }
+        out.push(CollectionInfo {
+            id: u.id.clone(),
+            title: u.title.clone(),
+            owner: u.owner.clone(),
+            repo: u.repo.clone(),
+            subpath: u.subpath.clone(),
+            builtin: false,
+            skill_count: None,
+        });
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -92,5 +163,67 @@ mod tests {
         assert!(cols.iter().any(|c| c.repo == "anthropics/skills"));
         assert!(cols.iter().any(|c| c.repo == "obra/superpowers"));
         assert!(cols.iter().any(|c| c.repo == "mattpocock/skills"));
+    }
+
+    use crate::collections::github::testutil::FakeGithubHttp;
+    use crate::collections::store::{CollectionsCache, UserCollection};
+    use crate::collections::CollectionInfo;
+
+    const MANIFEST_BODY: &str = r#"{"version": 1, "collections": [
+        {"id": "anthropics-skills", "title": "Anthropic Skills", "repo": "anthropics/skills"}
+    ]}"#;
+
+    #[test]
+    fn load_catalog_prefers_the_remote_manifest_and_caches_it() {
+        let mut http = FakeGithubHttp::new();
+        http.mount("collections.json", MANIFEST_BODY);
+        let mut cache = CollectionsCache::default();
+
+        let (cols, source) = load_catalog(&http, &mut cache, 1_000);
+        assert_eq!(cols.len(), 1);
+        assert_eq!(source, CatalogSource::Manifest);
+        assert!(cache.manifest.as_ref().unwrap().raw.contains("anthropics"));
+
+        // offline afterwards: the cached manifest serves
+        let (cols, source) = load_catalog(&FakeGithubHttp::new(), &mut cache, 2_000);
+        assert_eq!(cols.len(), 1);
+        assert_eq!(source, CatalogSource::Cached);
+    }
+
+    #[test]
+    fn load_catalog_falls_back_to_the_bundled_copy() {
+        let (cols, source) = load_catalog(
+            &FakeGithubHttp::new(),
+            &mut CollectionsCache::default(),
+            1_000,
+        );
+        assert_eq!(source, CatalogSource::Bundled);
+        assert!(cols.len() >= 3);
+    }
+
+    #[test]
+    fn merge_dedupes_user_added_repos_already_in_the_manifest() {
+        let manifest = parse_manifest(MANIFEST_BODY).unwrap();
+        let user = vec![
+            UserCollection {
+                id: "anthropics/skills".into(),
+                title: "dupe".into(),
+                owner: "anthropics".into(),
+                repo: "skills".into(),
+                subpath: None,
+                added_at: 0,
+            },
+            UserCollection {
+                id: "my/own".into(),
+                title: "own".into(),
+                owner: "my".into(),
+                repo: "own".into(),
+                subpath: None,
+                added_at: 0,
+            },
+        ];
+        let merged: Vec<CollectionInfo> = merge_collections(&manifest, &user);
+        assert_eq!(merged.len(), 2);
+        assert!(merged.iter().all(|c| c.builtin == (c.repo != "own")));
     }
 }

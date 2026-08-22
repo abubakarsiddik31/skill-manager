@@ -1,11 +1,18 @@
 pub mod catalog;
 pub mod github;
 pub mod manifest;
+pub mod store;
 
 pub use catalog::{enumerate_repo_skills, skills_from_tree};
 pub use github::{GithubHttp, TreeEntry, TreeResponse, UreqGithubHttp};
 pub use manifest::{
-    parse_manifest, CatalogSource, ManifestCollection, BUNDLED_MANIFEST, CATALOG_URL,
+    load_catalog, merge_collections, parse_manifest, CatalogSource, ManifestCollection,
+    BUNDLED_MANIFEST, CATALOG_URL,
+};
+pub use store::{
+    add_user_collection, cache_fresh, load_cache, load_user_collections, now_secs,
+    remove_user_collection, save_cache, save_user_collections, CollectionsCache, ManifestCache,
+    RepoCache, UserCollection,
 };
 
 use serde::{Deserialize, Serialize};
@@ -22,6 +29,19 @@ pub struct RemoteSkill {
     pub repo: String,
     pub path: String,
     pub branch: String,
+}
+
+/// One browsable collection, regardless of where it came from.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionInfo {
+    pub id: String,
+    pub title: String,
+    pub owner: String,
+    pub repo: String,
+    pub subpath: Option<String>,
+    pub builtin: bool,
+    pub skill_count: Option<u64>,
 }
 
 /// Split an `"owner/repo"` slug into its parts, accepting exactly that
