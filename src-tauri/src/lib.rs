@@ -1,3 +1,4 @@
+mod collections;
 mod commands;
 mod detect;
 mod projects;
