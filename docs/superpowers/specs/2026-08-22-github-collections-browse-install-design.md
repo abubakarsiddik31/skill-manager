@@ -2,7 +2,9 @@
 
 Date: 2026-08-22
 Status: approved (approach chosen from three options: Rust-side GitHub
-client over webview-side fetching and a Vercel skills-CLI wrapper)
+client over webview-side fetching and a Vercel skills-CLI wrapper).
+Revised same day: dropped index-style collections (README-table
+parsing) — all sources are deterministic repo-style collections.
 
 ## Problem
 
@@ -19,13 +21,18 @@ target agent, and install in one click.
 
 ## Decisions (from brainstorming)
 
-- **Source model:** GitHub-native. Two collection kinds — repo-style
-  (folders containing `SKILL.md`) and index-style (a README table whose
-  links resolve into repo-style targets). No skills.sh / Vercel
-  integration.
-- **Built-ins:** `abubakarsiddik31/claude-skills-collection` (index),
-  `anthropics/skills`, `obra/superpowers` (repo-style). Users can add
-  any public GitHub repo as a collection.
+- **Source model:** GitHub-native, repo-style collections only. Every
+  source is a public repo whose skills are folders containing a
+  `SKILL.md` (the Agent Skills open standard,
+  `agentskills/agentskills`), enumerated deterministically via the
+  GitHub git-trees API. No README/index parsing — index lists like
+  `claude-skills-collection` are non-deterministic to parse and were
+  dropped. No skills.sh / Vercel integration.
+- **Built-ins:** `anthropics/skills` (20 skills, `skills/<name>/`),
+  `obra/superpowers` (14, `skills/<name>/`), `mattpocock/skills`
+  (36, `skills/engineering/<name>/` — nested, hence any-depth
+  enumeration). All three verified against the trees API on
+  2026-08-22. Users can add any other public GitHub repo.
 - **After install:** record provenance (`.collection-source.json` in the
   skill folder) so an update feature can be built later without
   name-matching. No update UI in v1.
@@ -51,8 +58,9 @@ target agent, and install in one click.
 - GitHub authentication (token) support.
 - Bulk "install whole collection".
 - Symlink downloads (tree entries with mode `120000` are skipped).
-- Parsing arbitrary third-party awesome-lists (only our own index
-  format, which we control).
+- Index/README-table sources of any kind (including
+  `claude-skills-collection`) — non-deterministic to parse; could
+  return later as a structured manifest if that repo ever ships one.
 
 ## Architecture
 
@@ -64,13 +72,14 @@ src-tauri/src/collections/
   github.rs     HTTP wrapper over api.github.com (ureq, blocking —
                 commands run off the main thread). Sends a User-Agent,
                 maps every failure to a typed error.
-  catalog.rs    CollectionKind::Repo — enumerate via
-                GET /repos/{owner}/{repo}/git/trees/{ref}?recursive=1,
-                keep blobs named SKILL.md (folder = parent dir).
-                CollectionKind::Index — fetch raw README.md, parse the
-                claude-skills-collection table format; each Link
-                resolves to Repo { owner, repo, path } (handles
-                /tree/{ref}/{path} URLs and bare repo URLs).
+  catalog.rs    Repo-style enumeration via
+                GET /repos/{owner}/{repo}/git/trees/{ref}?recursive=1:
+                keep blobs named SKILL.md at any depth (skill folder =
+                the blob's parent path; a root-level SKILL.md makes the
+                whole repo a single skill with path ""). Collections
+                are { owner, repo, subpath: Option<String> } — subpath
+                scopes enumeration for monorepos. Built-in constants
+                live here.
   install.rs    download a skill folder's blobs by SHA, write into a
                 managed root, write provenance.
   store.rs      user-added collections persisted to collections.json
@@ -81,9 +90,8 @@ src-tauri/src/commands/collections.rs
   fetch_skill_manifest
 ```
 
-Tree fetches are cached **per (owner, repo, ref)** — an index entry
-pointing into `anthropics/skills` reuses that repo's cached tree for
-enumeration and install.
+Tree fetches are cached **per (owner, repo, ref)**, so browsing and
+installing from the same repo share one enumeration.
 
 Built-in collection constants live in `catalog.rs`; the default branch
 is resolved once per repo via `GET /repos/{owner}/{repo}` and cached.
@@ -104,15 +112,13 @@ struct InstallRequest { skill: RemoteSkill, tool: AgentTool,
 struct Provenance { owner, repo, path, branch, tree_sha, installed_at, collection_id }
 ```
 
-Descriptions: the trees API returns paths only, so repo-style entries
-start with `description: None` and the grid fills them lazily —
+Descriptions: the trees API returns paths only, so entries start with
+`description: None` and the grid fills them lazily —
 `fetch_skill_manifest` fetches the SKILL.md blob (already keyed by SHA
 in the cached tree) when a card becomes visible, with results cached by
-blob SHA. Index-style entries get their description from the table row
-directly. `branch` for index-sourced entries resolves at install time
-(target repo's default branch). `tree_sha` records the enumerated tree
-object's SHA — the artifact we actually have; per-folder commit SHAs
-would cost an extra API call per skill and buy nothing for v1.
+blob SHA. `tree_sha` records the enumerated tree object's SHA — the
+artifact we actually have; per-folder commit SHAs would cost an extra
+API call per skill and buy nothing for v1.
 
 `collections-cache.json` (app_config_dir): per collection id —
 `{ fetched_at, skills: Vec<RemoteSkill> }`; per repo — resolved branch
@@ -157,8 +163,8 @@ mutation stays behind the managed-path validation.
 - `src/components/modals/BrowseModal.tsx` — wraps `ModalShell`. Left
   pane: collections with add (URL input validated as `owner/repo`) and
   remove (user-added only). Right pane: searchable card grid (name,
-  description — filled lazily for repo-style cards, see Data model —
-  and source repo). "Add" on a card reveals the tool + scope
+  description — filled lazily, see Data model — and source repo).
+  "Add" on a card reveals the tool + scope
   picker reused from `CreateSkillModal`; install → success state →
   grid stays open for further installs.
 - Topbar gains a **Browse** button next to "new skill".
@@ -171,18 +177,15 @@ mutation stays behind the managed-path validation.
 - `add_collection`: validate `owner/repo` shape, then probe-fetch to
   confirm reachability; report zero-skill repos as a warning, not an
   error.
-- Index parsing: entries whose links don't resolve to a GitHub skill
-  folder are skipped individually with a count surfaced in the UI; a
-  malformed table never aborts the whole browse.
 - Install failures mid-download leave no partial folder (temp-dir +
   rename).
 
 ## Testing
 
 - Rust (fixture-backed `GithubHttp` trait impl; no live network in
-  tests): README index parser against the real claude-skills-collection
-  table; tree → skills filtering; link resolution (tree URLs, bare
-  repo URLs, nested paths); folder-name and relative-path safety;
+  tests): tree → skills filtering (any depth, nested layouts like
+  `skills/engineering/<name>/`, root-SKILL.md single-skill repos,
+  subpath scoping); folder-name and relative-path safety;
   symlink skipping; provenance write; collision + overwrite; temp-dir
   cleanup on failure.
 - TS (vitest, `src/utils/`): collection search/filter helpers.
