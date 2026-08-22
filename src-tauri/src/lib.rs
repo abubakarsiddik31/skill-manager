@@ -1,4 +1,4 @@
-mod collections;
+pub mod collections; // TODO(task-6): revert to private once commands consume the API
 mod commands;
 mod detect;
 mod projects;
