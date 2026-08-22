@@ -13,6 +13,7 @@ mod skills;
 // `__tauri_command_name_X` companion macros beside each fn;
 // `generate_handler![commands::X]` in `lib.rs` looks them up under the
 // `commands::` path, so they are re-exported together with the fns.
+pub(crate) use create_skill::validate_skill_folder_name;
 pub use create_skill::{__cmd__create_skill, __tauri_command_name_create_skill, create_skill};
 pub use projects::{
     __cmd__add_project, __cmd__list_detected_projects, __cmd__list_project_skill_counts,
@@ -68,7 +69,7 @@ fn skills_roots(tracked: &[ProjectInfo]) -> Vec<PathBuf> {
 ///   Sharing a skill across tools via a link stays allowed because every
 ///   tool's folder is a root, so a Cursor link into `~/.claude/skills`
 ///   still resolves home.
-fn validate_manifest_at(path: &Path, roots: &[PathBuf]) -> bool {
+pub(crate) fn validate_manifest_at(path: &Path, roots: &[PathBuf]) -> bool {
     if path.file_name() != Some(OsStr::new(MANIFEST_FILE)) {
         return false;
     }

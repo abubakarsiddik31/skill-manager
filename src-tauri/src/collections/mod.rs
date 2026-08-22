@@ -1,10 +1,14 @@
 pub mod catalog;
 pub mod github;
+pub mod install;
 pub mod manifest;
 pub mod store;
 
 pub use catalog::{enumerate_repo_skills, skills_from_tree};
 pub use github::{GithubHttp, TreeEntry, TreeResponse, UreqGithubHttp};
+pub use install::{
+    files_for_skill, install_skill_files, safe_relative, Provenance, RemoteFile, PROVENANCE_FILE,
+};
 pub use manifest::{
     load_catalog, merge_collections, parse_manifest, CatalogSource, ManifestCollection,
     BUNDLED_MANIFEST, CATALOG_URL,
