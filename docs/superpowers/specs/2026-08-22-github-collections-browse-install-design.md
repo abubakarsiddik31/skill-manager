@@ -28,11 +28,16 @@ target agent, and install in one click.
   GitHub git-trees API. No README/index parsing — index lists like
   `claude-skills-collection` are non-deterministic to parse and were
   dropped. No skills.sh / Vercel integration.
-- **Built-ins:** `anthropics/skills` (20 skills, `skills/<name>/`),
-  `obra/superpowers` (14, `skills/<name>/`), `mattpocock/skills`
-  (36, `skills/engineering/<name>/` — nested, hence any-depth
-  enumeration). All three verified against the trees API on
-  2026-08-22. Users can add any other public GitHub repo.
+- **Built-ins (managed public manifest):** the user's
+  `claude-skills-collection` repo hosts a machine-readable
+  `collections.json` listing vetted repo-style collections. The app
+  fetches it as its built-in catalog — maintainers evaluate repos,
+  add entries, and every app install sees the update with no app
+  release. A fallback copy is bundled with the app (offline
+  first-run), seeded with `anthropics/skills` (20 skills),
+  `obra/superpowers` (14), `mattpocock/skills` (36, nested — hence
+  any-depth enumeration); all three verified against the trees API on
+  2026-08-22. Users can also add any public GitHub repo locally.
 - **After install:** record provenance (`.collection-source.json` in the
   skill folder) so an update feature can be built later without
   name-matching. No update UI in v1.
@@ -58,9 +63,10 @@ target agent, and install in one click.
 - GitHub authentication (token) support.
 - Bulk "install whole collection".
 - Symlink downloads (tree entries with mode `120000` are skipped).
-- Index/README-table sources of any kind (including
-  `claude-skills-collection`) — non-deterministic to parse; could
-  return later as a structured manifest if that repo ever ships one.
+- README-table parsing of any list, including `claude-skills-collection`'s
+  current format — curation happens in the manifest instead (if the
+  repo adopts `collections.json`, the README becomes human-facing
+  documentation of the same list).
 
 ## Architecture
 
@@ -69,17 +75,20 @@ New Rust module tree plus one commands file:
 ```
 src-tauri/src/collections/
   mod.rs        types + orchestration
-  github.rs     HTTP wrapper over api.github.com (ureq, blocking —
+  github.rs     HTTP wrapper over api.github.com and
+                raw.githubusercontent.com (ureq, blocking —
                 commands run off the main thread). Sends a User-Agent,
-                maps every failure to a typed error.
+                maps every failure to a typed error. Serves tree
+                fetches, blob fetches, and the manifest fetch.
   catalog.rs    Repo-style enumeration via
                 GET /repos/{owner}/{repo}/git/trees/{ref}?recursive=1:
                 keep blobs named SKILL.md at any depth (skill folder =
                 the blob's parent path; a root-level SKILL.md makes the
                 whole repo a single skill with path ""). Collections
                 are { owner, repo, subpath: Option<String> } — subpath
-                scopes enumeration for monorepos. Built-in constants
-                live here.
+                scopes enumeration for monorepos. The built-in catalog
+                comes from the remote manifest below; a fallback copy
+                is compiled in via include_str!.
   install.rs    download a skill folder's blobs by SHA, write into a
                 managed root, write provenance.
   store.rs      user-added collections persisted to collections.json
@@ -123,6 +132,42 @@ API call per skill and buy nothing for v1.
 `collections-cache.json` (app_config_dir): per collection id —
 `{ fetched_at, skills: Vec<RemoteSkill> }`; per repo — resolved branch
 and tree. TTL 24 h, plus a manual refresh button that bypasses it.
+
+### Built-in catalog manifest
+
+Fetched over HTTPS from
+
+```
+https://raw.githubusercontent.com/abubakarsiddik31/
+claude-skills-collection/main/collections.json
+```
+
+Schema (version-gated; `version: 1`):
+
+```json
+{
+  "version": 1,
+  "collections": [
+    { "id": "anthropics-skills", "title": "Anthropic Skills",
+      "repo": "anthropics/skills" },
+    { "id": "superpowers", "title": "Superpowers",
+      "repo": "obra/superpowers" }
+  ]
+}
+```
+
+Fetched when the browse UI loads (cached with the same TTL). On fetch
+failure, malformed JSON, or an unsupported `version`, fall back to
+cached manifest → bundled copy (`src-tauri/src/collections/
+fallback.json`, compiled in with `include_str!`). `list_collections`
+merges manifest entries with user-added local collections, deduped by
+repo. The manifest only *names* repositories — enumeration and install
+are unchanged, so a stale or tampered manifest can at worst advertise
+unhelpful repos; it cannot bypass any validation.
+
+Companion change outside this repo: add `collections.json` (seeded
+with the three verified repos) to `claude-skills-collection`. Until it
+exists there, the bundled fallback is the catalog.
 
 Frontend types mirror these in `src/types/collection.ts`, exported
 through the `types/index.ts` barrel.
@@ -172,7 +217,11 @@ mutation stays behind the managed-path validation.
 ## Error handling
 
 - Offline or GitHub unreachable: serve the stale cache with a visible
-  stale badge; only fail when no cache exists.
+  stale badge; only fail when no cache exists. The manifest chain
+  degrades the same way (remote → cached → bundled).
+- Manifest problems (unreachable, malformed, unsupported version):
+  fall back silently to cached/bundled with a subtle notice in the
+  collections pane, never a blocking error.
 - HTTP 429 / rate limit: friendly message with retry hint.
 - `add_collection`: validate `owner/repo` shape, then probe-fetch to
   confirm reachability; report zero-skill repos as a warning, not an
@@ -185,7 +234,9 @@ mutation stays behind the managed-path validation.
 - Rust (fixture-backed `GithubHttp` trait impl; no live network in
   tests): tree → skills filtering (any depth, nested layouts like
   `skills/engineering/<name>/`, root-SKILL.md single-skill repos,
-  subpath scoping); folder-name and relative-path safety;
+  subpath scoping); manifest parsing and the fallback chain (valid,
+  malformed, unsupported version → bundled); manifest + user-added
+  merge with dedupe; folder-name and relative-path safety;
   symlink skipping; provenance write; collision + overwrite; temp-dir
   cleanup on failure.
 - TS (vitest, `src/utils/`): collection search/filter helpers.
