@@ -1,4 +1,6 @@
-use super::{find_skill_by_manifest, skills_roots, DISABLED_DIR, MANIFEST_FILE};
+use super::{
+    find_skill_by_manifest, resolve_target_root, skills_roots, DISABLED_DIR, MANIFEST_FILE,
+};
 use crate::projects;
 use crate::skills::{self, Skill};
 use std::fs;
@@ -20,7 +22,7 @@ const WINDOWS_RESERVED_NAMES: &[&str] = &[
 /// whitespace, at most 64 chars, ASCII letters/digits plus `_`, `-` and
 /// `.`, no leading dot, and no reserved name. Deliberately tight so one
 /// folder is safe on every platform the app ships on.
-fn validate_skill_folder_name(name: &str) -> Result<(), String> {
+pub(crate) fn validate_skill_folder_name(name: &str) -> Result<(), String> {
     if name.trim() != name || name.is_empty() {
         return Err("skill name is empty or has surrounding whitespace".into());
     }
@@ -123,20 +125,8 @@ pub fn create_skill(
     name: String,
     description: String,
 ) -> Result<Skill, String> {
-    let adapter = skills::adapter_for(tool);
     let tracked = projects::list(&app).unwrap_or_default();
-    let root = match scope {
-        skills::SkillScope::User => adapter.skills_dir(),
-        skills::SkillScope::Project => {
-            let Some(path) = project_path else {
-                return Err("project scope requires a project".into());
-            };
-            if !tracked.iter().any(|p| p.path == path) {
-                return Err("project is not tracked by this app".into());
-            }
-            PathBuf::from(path).join(adapter.project_subpath())
-        }
-    };
+    let root = resolve_target_root(&tracked, tool, scope, project_path)?;
     let manifest = create_skill_manifest(&skills_roots(&tracked), &root, &name, &description)?;
     // A project count is only a cache; clear it after a mutation rather
     // than scanning the project again in the background.

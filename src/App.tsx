@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AddProjectModal } from "./components/modals/AddProjectModal";
+import { BrowseModal } from "./components/modals/BrowseModal";
 import { CreateSkillModal } from "./components/modals/CreateSkillModal";
 import { EditorModal } from "./components/modals/EditorModal";
 import { ProjectsModal } from "./components/modals/ProjectsModal";
@@ -23,6 +24,7 @@ function App() {
   const [editing, setEditing] = useState<Skill | null>(null);
   const [addingProject, setAddingProject] = useState(false);
   const [creatingSkill, setCreatingSkill] = useState(false);
+  const [browsing, setBrowsing] = useState(false);
   const [showingAllProjects, setShowingAllProjects] = useState(false);
   const skillListRef = useRef<HTMLDivElement>(null);
 
@@ -133,6 +135,7 @@ function App() {
           query={query}
           onQueryChange={setQuery}
           onForgetProject={view.kind === "project" ? () => forgetProject(view.project) : undefined}
+          onBrowse={() => setBrowsing(true)}
           onNewSkill={() => setCreatingSkill(true)}
         />
 
@@ -188,6 +191,28 @@ function App() {
               projectView.reload();
             }
             setEditing(skill); // the instructions are the user's to write
+          }}
+        />
+      )}
+
+      {browsing && (
+        <BrowseModal
+          toolEntries={global.toolEntries}
+          projects={projects.projects}
+          activeProject={activeProject}
+          defaultTool={
+            activeTool
+              ? (activeTool.folders.find((f) => f.role === "own")?.tool ??
+                activeTool.folders[0]?.tool) as AgentTool | undefined
+              : undefined
+          }
+          onClose={() => setBrowsing(false)}
+          onInstalled={async (skill) => {
+            await global.refresh();
+            if (skill.scope === "project") {
+              await projects.refresh();
+              projectView.reload();
+            }
           }}
         />
       )}
