@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "collections": [
+    { "id": "anthropics-skills", "title": "Anthropic Skills", "repo": "anthropics/skills" },
+    { "id": "superpowers", "title": "Superpowers", "repo": "obra/superpowers" },
+    { "id": "matt-skills", "title": "Matt's Skills", "repo": "mattpocock/skills" }
+  ]
+}
