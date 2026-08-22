@@ -4,19 +4,15 @@ pub mod install;
 pub mod manifest;
 pub mod store;
 
+// Re-exported for crate consumers (the tauri commands); the module is
+// private so anything unconsumed here would warn as an unused import.
 pub use catalog::{enumerate_repo_skills, skills_from_tree};
-pub use github::{GithubHttp, TreeEntry, TreeResponse, UreqGithubHttp};
-pub use install::{
-    files_for_skill, install_skill_files, safe_relative, Provenance, RemoteFile, PROVENANCE_FILE,
-};
-pub use manifest::{
-    load_catalog, merge_collections, parse_manifest, CatalogSource, ManifestCollection,
-    BUNDLED_MANIFEST, CATALOG_URL,
-};
+pub use github::TreeResponse;
+pub use install::{files_for_skill, install_skill_files, Provenance};
+pub use manifest::{load_catalog, merge_collections, CatalogSource, ManifestCollection};
 pub use store::{
     add_user_collection, cache_fresh, load_cache, load_user_collections, now_secs,
-    remove_user_collection, save_cache, save_user_collections, CollectionsCache, ManifestCache,
-    RepoCache, UserCollection,
+    remove_user_collection, save_cache, CollectionsCache, RepoCache, UserCollection,
 };
 
 use serde::{Deserialize, Serialize};

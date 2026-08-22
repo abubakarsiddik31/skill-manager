@@ -148,7 +148,7 @@ fn scan_dir(tool: AgentTool, dir: &Path, scope: SkillScope, enabled: bool) -> Ve
 /// Minimal YAML frontmatter reader for the two fields Skill Manager cares
 /// about (`name`, `description`). Intentionally not a full YAML parser —
 /// SKILL.md frontmatter is a flat key: value list.
-fn parse_frontmatter(raw: &str) -> (String, String) {
+pub(crate) fn parse_frontmatter(raw: &str) -> (String, String) {
     let mut name = String::new();
     let mut description = String::new();
 

@@ -5,6 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use tauri::AppHandle;
 
+mod collections;
 mod create_skill;
 mod projects;
 mod skills;
@@ -13,6 +14,16 @@ mod skills;
 // `__tauri_command_name_X` companion macros beside each fn;
 // `generate_handler![commands::X]` in `lib.rs` looks them up under the
 // `commands::` path, so they are re-exported together with the fns.
+pub use collections::{
+    __cmd__add_collection, __cmd__browse_collection, __cmd__fetch_skill_manifest,
+    __cmd__install_skill, __cmd__list_collections, __cmd__refresh_collection,
+    __cmd__remove_collection, __tauri_command_name_add_collection,
+    __tauri_command_name_browse_collection, __tauri_command_name_fetch_skill_manifest,
+    __tauri_command_name_install_skill, __tauri_command_name_list_collections,
+    __tauri_command_name_refresh_collection, __tauri_command_name_remove_collection,
+    add_collection, browse_collection, fetch_skill_manifest, install_skill, list_collections,
+    refresh_collection, remove_collection,
+};
 pub(crate) use create_skill::validate_skill_folder_name;
 pub use create_skill::{__cmd__create_skill, __tauri_command_name_create_skill, create_skill};
 pub use projects::{
@@ -52,6 +63,30 @@ fn skills_roots(tracked: &[ProjectInfo]) -> Vec<PathBuf> {
         }
     }
     roots
+}
+
+/// Resolve the destination skills root for a tool + scope selection —
+/// the shared front half of create_skill and install_skill. Project
+/// scope requires an already-tracked project, exactly like create_skill.
+pub(crate) fn resolve_target_root(
+    tracked: &[ProjectInfo],
+    tool: crate::skills::AgentTool,
+    scope: crate::skills::SkillScope,
+    project_path: Option<String>,
+) -> Result<PathBuf, String> {
+    let adapter = crate::skills::adapter_for(tool);
+    match scope {
+        crate::skills::SkillScope::User => Ok(adapter.skills_dir()),
+        crate::skills::SkillScope::Project => {
+            let Some(path) = project_path else {
+                return Err("project scope requires a project".into());
+            };
+            if !tracked.iter().any(|p| p.path == path) {
+                return Err("project is not tracked by this app".into());
+            }
+            Ok(PathBuf::from(path).join(adapter.project_subpath()))
+        }
+    }
 }
 
 /// The webview is untrusted input like any other frontend: file-taking
