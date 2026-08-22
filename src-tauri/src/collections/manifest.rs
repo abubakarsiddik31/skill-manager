@@ -55,14 +55,24 @@ pub fn parse_manifest(json: &str) -> Result<Vec<ManifestCollection>, String> {
     Ok(raw.collections)
 }
 
-/// Remote manifest → cached manifest → bundled fallback. A tampered or
-/// broken manifest can at worst advertise unhelpful repos; it names
-/// repositories only and cannot bypass any install validation.
+/// Remote manifest → cached manifest → bundled fallback. A cached
+/// manifest younger than the 24h TTL (`CACHE_TTL_SECS`) is served
+/// without any HTTP; only a stale or missing cache hits the network.
+/// A tampered or broken manifest can at worst advertise unhelpful
+/// repos; it names repositories only and cannot bypass any install
+/// validation.
 pub fn load_catalog(
     http: &dyn GithubHttp,
     cache: &mut CollectionsCache,
     now: u64,
 ) -> (Vec<ManifestCollection>, CatalogSource) {
+    if let Some(cached) = &cache.manifest {
+        if super::store::cache_fresh(cached.fetched_at, now) {
+            if let Ok(collections) = parse_manifest(&cached.raw) {
+                return (collections, CatalogSource::Cached);
+            }
+        }
+    }
     if let Ok(text) = http.get_text(CATALOG_URL) {
         if let Ok(collections) = parse_manifest(&text) {
             cache.manifest = Some(super::store::ManifestCache {
@@ -166,7 +176,7 @@ mod tests {
     }
 
     use crate::collections::github::testutil::FakeGithubHttp;
-    use crate::collections::store::{CollectionsCache, UserCollection};
+    use crate::collections::store::{CollectionsCache, UserCollection, CACHE_TTL_SECS};
     use crate::collections::CollectionInfo;
 
     const MANIFEST_BODY: &str = r#"{"version": 1, "collections": [
@@ -199,6 +209,34 @@ mod tests {
         );
         assert_eq!(source, CatalogSource::Bundled);
         assert!(cols.len() >= 3);
+    }
+
+    #[test]
+    fn a_fresh_cache_short_circuits_even_when_the_remote_changed() {
+        let mut http = FakeGithubHttp::new();
+        http.mount("collections.json", MANIFEST_BODY);
+        let mut cache = CollectionsCache::default();
+
+        let (cols, source) = load_catalog(&http, &mut cache, 1_000);
+        assert_eq!(source, CatalogSource::Manifest);
+        assert_eq!(cols[0].id, "anthropics-skills");
+
+        // The remote serves a DIFFERENT body now, but within the TTL
+        // the cached copy must win — no HTTP refetch.
+        let other = r#"{"version": 1, "collections": [
+            {"id": "other", "title": "Other", "repo": "other/repo"}
+        ]}"#;
+        http.mount("collections.json", other);
+        let (cols, source) = load_catalog(&http, &mut cache, 1_100);
+        assert_eq!(source, CatalogSource::Cached);
+        assert_eq!(cols.len(), 1);
+        assert_eq!(cols[0].id, "anthropics-skills");
+
+        // Past the TTL the remote is fetched again and the new body wins.
+        let (cols, source) = load_catalog(&http, &mut cache, 1_000 + CACHE_TTL_SECS + 1);
+        assert_eq!(source, CatalogSource::Manifest);
+        assert_eq!(cols.len(), 1);
+        assert_eq!(cols[0].id, "other");
     }
 
     #[test]

@@ -12,7 +12,8 @@ pub use install::{files_for_skill, install_skill_files, Provenance};
 pub use manifest::{load_catalog, merge_collections, CatalogSource, ManifestCollection};
 pub use store::{
     add_user_collection, cache_fresh, load_cache, load_user_collections, now_secs,
-    remove_user_collection, save_cache, CollectionsCache, RepoCache, UserCollection,
+    remove_user_collection, save_cache, CachedSkillManifest, CollectionsCache, RepoCache,
+    UserCollection,
 };
 
 use serde::{Deserialize, Serialize};

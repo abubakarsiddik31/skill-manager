@@ -129,7 +129,9 @@ export function BrowseModal({
       <div className="browse-layout">
         <aside className="collection-pane">
           {browseState.source === "bundled" && (
-            <div className="collection-notice">built-in list (catalog unreachable)</div>
+            <div className="collection-notice">
+              built-in fallback list (remote catalog not available yet)
+            </div>
           )}
           {browseState.collections.map((collection) => (
             <div key={collection.id} className="collection-row">
@@ -229,7 +231,13 @@ export function BrowseModal({
                       <button className="btn" onClick={() => install(skill)}>
                         install
                       </button>
-                      <button className="btn" onClick={() => setInstalling(null)}>
+                      <button
+                        className="btn"
+                        onClick={() => {
+                          setInstallError(null);
+                          setInstalling(null);
+                        }}
+                      >
                         cancel
                       </button>
                       {installError && <div className="create-error">{installError}</div>}
@@ -237,7 +245,10 @@ export function BrowseModal({
                   ) : (
                     <button
                       className="btn"
-                      onClick={() => setInstalling(skill)}
+                      onClick={() => {
+                        setInstallError(null);
+                        setInstalling(skill);
+                      }}
                       disabled={installed}
                     >
                       {installed ? "installed ✓" : "add"}
@@ -246,9 +257,12 @@ export function BrowseModal({
                 </div>
               );
             })}
-            {!browseState.loading && filtered.length === 0 && !browseState.error && (
-              <div className="empty-state">no skills in this collection.</div>
-            )}
+            {!browseState.loading &&
+              filtered.length === 0 &&
+              !browseState.error &&
+              browseState.activeId !== null && (
+                <div className="empty-state">no skills in this collection.</div>
+              )}
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
 use super::{find_skill_by_manifest, resolve_target_root, skills_roots};
 use crate::collections::github::{GithubHttp, UreqGithubHttp};
 use crate::collections::{
-    self, CatalogSource, CollectionInfo, CollectionsCache, ManifestCollection, Provenance,
-    RemoteSkill,
+    self, CachedSkillManifest, CatalogSource, CollectionInfo, CollectionsCache, ManifestCollection,
+    Provenance, RemoteSkill,
 };
 use crate::projects;
 use crate::skills::{self, Skill};
@@ -163,6 +163,18 @@ pub fn add_collection(
             "'{repo}' is not a valid owner/repo repository slug"
         ));
     };
+    // Refuse repos the catalog already offers: merge would dedupe the
+    // entry out and the stored row would linger invisibly forever.
+    let mut scratch = collections::load_cache(&dir);
+    let (manifest, user) = catalog_and_user(&app, &mut scratch)?;
+    if collections::merge_collections(&manifest, &user)
+        .iter()
+        .any(|c| c.owner == owner && c.repo == name)
+    {
+        return Err(format!(
+            "'{owner}/{name}' is already available as a built-in collection"
+        ));
+    }
     // Probe before persisting: a typo'd or unreachable repo must not
     // leave a phantom entry behind when the command errors.
     HTTP.fetch_default_branch(&owner, &name)?;
@@ -247,6 +259,9 @@ pub fn install_skill(
     })
 }
 
+/// The SKILL.md frontmatter for one remote skill, cached by blob SHA
+/// in `CollectionsCache` so descriptions survive modal closes and app
+/// restarts without refetching.
 #[tauri::command]
 pub fn fetch_skill_manifest(app: AppHandle, skill: RemoteSkill) -> Result<SkillManifest, String> {
     let dir = config_dir(&app)?;
@@ -260,10 +275,16 @@ pub fn fetch_skill_manifest(app: AppHandle, skill: RemoteSkill) -> Result<SkillM
     let Some(entry) = tree.tree.iter().find(|e| e.path == manifest_path) else {
         return Err(format!("no SKILL.md found at '{manifest_path}'"));
     };
+    if let Some(hit) = cache.manifests.get(&entry.sha) {
+        return Ok(SkillManifest {
+            name: hit.name.clone(),
+            description: hit.description.clone(),
+        });
+    }
     let bytes = HTTP.fetch_blob(&skill.owner, &skill.repo, &entry.sha)?;
     let text = String::from_utf8(bytes).map_err(|_| "SKILL.md is not valid UTF-8".to_string())?;
     let (name, description) = skills::parse_frontmatter(&text);
-    Ok(SkillManifest {
+    let manifest = SkillManifest {
         name: if name.is_empty() {
             skill.name.clone()
         } else {
@@ -274,5 +295,14 @@ pub fn fetch_skill_manifest(app: AppHandle, skill: RemoteSkill) -> Result<SkillM
         } else {
             Some(description)
         },
-    })
+    };
+    cache.manifests.insert(
+        entry.sha.clone(),
+        CachedSkillManifest {
+            name: manifest.name.clone(),
+            description: manifest.description.clone(),
+        },
+    );
+    let _ = collections::save_cache(&dir, &cache);
+    Ok(manifest)
 }
