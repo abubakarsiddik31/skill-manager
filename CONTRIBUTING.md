@@ -74,3 +74,10 @@ Requires the [Rust toolchain](https://www.rust-lang.org/tools/install)
 Run `npx tsc --noEmit` and `cargo check` (from `src-tauri/`) before opening a
 PR — both must pass clean. If you touched `src-tauri/src/skills/`, also run
 `cargo test` from `src-tauri/`.
+
+## Notes
+
+docs: refresh demo GIF to reflect the v0.3.1 UI
+
+## Summary
+
