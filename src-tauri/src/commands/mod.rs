@@ -15,14 +15,12 @@ mod skills;
 // `generate_handler![commands::X]` in `lib.rs` looks them up under the
 // `commands::` path, so they are re-exported together with the fns.
 pub use collections::{
-    __cmd__add_collection, __cmd__browse_collection, __cmd__fetch_skill_manifest,
-    __cmd__install_skill, __cmd__list_collections, __cmd__refresh_collection,
-    __cmd__remove_collection, __tauri_command_name_add_collection,
-    __tauri_command_name_browse_collection, __tauri_command_name_fetch_skill_manifest,
-    __tauri_command_name_install_skill, __tauri_command_name_list_collections,
-    __tauri_command_name_refresh_collection, __tauri_command_name_remove_collection,
-    add_collection, browse_collection, fetch_skill_manifest, install_skill, list_collections,
-    refresh_collection, remove_collection,
+    __cmd__add_collection, __cmd__browse_collection, __cmd__install_skill, __cmd__list_collections,
+    __cmd__refresh_collection, __cmd__remove_collection, __tauri_command_name_add_collection,
+    __tauri_command_name_browse_collection, __tauri_command_name_install_skill,
+    __tauri_command_name_list_collections, __tauri_command_name_refresh_collection,
+    __tauri_command_name_remove_collection, add_collection, browse_collection, install_skill,
+    list_collections, refresh_collection, remove_collection,
 };
 pub(crate) use create_skill::validate_skill_folder_name;
 pub use create_skill::{__cmd__create_skill, __tauri_command_name_create_skill, create_skill};

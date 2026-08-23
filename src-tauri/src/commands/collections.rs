@@ -1,8 +1,8 @@
 use super::{find_skill_by_manifest, resolve_target_root, skills_roots};
 use crate::collections::github::{GithubHttp, UreqGithubHttp};
 use crate::collections::{
-    self, CachedSkillManifest, CatalogSource, CollectionInfo, CollectionsCache, ManifestCollection,
-    Provenance, RemoteSkill,
+    self, CatalogSource, CollectionInfo, CollectionsCache, ManifestCollection, Provenance,
+    RemoteSkill,
 };
 use crate::projects;
 use crate::skills::{self, Skill};
@@ -24,13 +24,6 @@ pub struct ListCollectionsResult {
 pub struct InstallResult {
     pub skill: Skill,
     pub skipped_links: u64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SkillManifest {
-    pub name: String,
-    pub description: Option<String>,
 }
 
 fn config_dir(app: &AppHandle) -> Result<PathBuf, String> {
@@ -108,6 +101,16 @@ pub fn list_collections(app: AppHandle) -> Result<ListCollectionsResult, String>
     let user = collections::load_user_collections(&dir);
     let mut merged = collections::merge_collections(&manifest, &user);
     for collection in &mut merged {
+        // Counts come offline first — the bundled index covers the
+        // built-ins; only user-added repos lean on the tree cache.
+        if let Some(count) = collections::bundled_skill_count(
+            &collection.owner,
+            &collection.repo,
+            collection.subpath.as_deref(),
+        ) {
+            collection.skill_count = Some(count);
+            continue;
+        }
         let key = format!("{}/{}", collection.owner, collection.repo);
         if let Some(hit) = cache.repos.get(&key) {
             let skills = collections::skills_from_tree(
@@ -130,14 +133,29 @@ fn browse(app: AppHandle, id: String, force: bool) -> Result<Vec<RemoteSkill>, S
     let dir = config_dir(&app)?;
     let mut cache = collections::load_cache(&dir);
     let info = find_collection(&app, &mut cache, &id)?;
+    // Collections covered by the bundled index browse completely
+    // offline — the 60 req/h unauthenticated GitHub limit is reserved
+    // for installs and explicit refreshes. `force` (the refresh
+    // button) deliberately bypasses this for a live re-enumeration.
+    if !force {
+        if let Some(skills) =
+            collections::bundled_skills(&info.owner, &info.repo, info.subpath.as_deref())
+        {
+            return Ok(skills);
+        }
+    }
     let (branch, tree, _) = repo_tree(&app, &mut cache, &info.owner, &info.repo, force)?;
-    Ok(collections::skills_from_tree(
+    let mut skills = collections::skills_from_tree(
         &info.owner,
         &info.repo,
         &branch,
         &tree,
         info.subpath.as_deref(),
-    ))
+    );
+    // A live enumeration carries no descriptions; graft the bundled
+    // ones on by path so refreshes don't blank out the grid.
+    collections::enrich_descriptions(&info.owner, &info.repo, &mut skills);
+    Ok(skills)
 }
 
 #[tauri::command]
@@ -257,52 +275,4 @@ pub fn install_skill(
         skill: installed,
         skipped_links: skipped_links as u64,
     })
-}
-
-/// The SKILL.md frontmatter for one remote skill, cached by blob SHA
-/// in `CollectionsCache` so descriptions survive modal closes and app
-/// restarts without refetching.
-#[tauri::command]
-pub fn fetch_skill_manifest(app: AppHandle, skill: RemoteSkill) -> Result<SkillManifest, String> {
-    let dir = config_dir(&app)?;
-    let mut cache = collections::load_cache(&dir);
-    let (_, tree, _) = repo_tree(&app, &mut cache, &skill.owner, &skill.repo, false)?;
-    let manifest_path = if skill.path.is_empty() {
-        "SKILL.md".to_string()
-    } else {
-        format!("{}/SKILL.md", skill.path)
-    };
-    let Some(entry) = tree.tree.iter().find(|e| e.path == manifest_path) else {
-        return Err(format!("no SKILL.md found at '{manifest_path}'"));
-    };
-    if let Some(hit) = cache.manifests.get(&entry.sha) {
-        return Ok(SkillManifest {
-            name: hit.name.clone(),
-            description: hit.description.clone(),
-        });
-    }
-    let bytes = HTTP.fetch_blob(&skill.owner, &skill.repo, &entry.sha)?;
-    let text = String::from_utf8(bytes).map_err(|_| "SKILL.md is not valid UTF-8".to_string())?;
-    let (name, description) = skills::parse_frontmatter(&text);
-    let manifest = SkillManifest {
-        name: if name.is_empty() {
-            skill.name.clone()
-        } else {
-            name
-        },
-        description: if description.is_empty() {
-            None
-        } else {
-            Some(description)
-        },
-    };
-    cache.manifests.insert(
-        entry.sha.clone(),
-        CachedSkillManifest {
-            name: manifest.name.clone(),
-            description: manifest.description.clone(),
-        },
-    );
-    let _ = collections::save_cache(&dir, &cache);
-    Ok(manifest)
 }

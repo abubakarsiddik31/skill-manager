@@ -40,22 +40,11 @@ pub struct ManifestCache {
     pub raw: String,
 }
 
-/// SKILL.md frontmatter cached by blob SHA, so description fills
-/// survive modal closes and app restarts without refetching.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CachedSkillManifest {
-    pub name: String,
-    pub description: Option<String>,
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct CollectionsCache {
     pub manifest: Option<ManifestCache>,
     pub repos: HashMap<String, RepoCache>,
-    #[serde(default)]
-    pub manifests: HashMap<String, CachedSkillManifest>,
 }
 
 pub fn now_secs() -> u64 {

@@ -23,7 +23,6 @@ pub fn run() {
             commands::add_collection,
             commands::remove_collection,
             commands::install_skill,
-            commands::fetch_skill_manifest,
             commands::list_detected_projects,
             commands::refresh_detected_projects,
             commands::list_project_skill_counts,
