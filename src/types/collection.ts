@@ -4,7 +4,8 @@ import type { AgentTool } from "./tool";
 /** One installable skill in a remote GitHub collection. */
 export interface RemoteSkill {
   name: string;
-  /** Filled lazily from the remote SKILL.md via fetchSkillManifest. */
+  /** From the app's bundled index; null when only a live tree
+   *  enumeration knows the skill (user-added repos). */
   description: string | null;
   owner: string;
   repo: string;
@@ -29,12 +30,6 @@ export type CatalogSource = "manifest" | "cached" | "bundled";
 export interface ListCollectionsResult {
   collections: CollectionInfo[];
   source: CatalogSource;
-}
-
-/** Frontmatter read from a remote SKILL.md. */
-export interface SkillManifest {
-  name: string;
-  description: string | null;
 }
 
 export interface InstallResult {

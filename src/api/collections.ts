@@ -5,7 +5,6 @@ import type {
   InstallResult,
   ListCollectionsResult,
   RemoteSkill,
-  SkillManifest,
 } from "../types";
 
 /** Invoke wrappers over the collection commands in
@@ -35,8 +34,5 @@ export const collectionsApi = {
       collectionId: input.collectionId,
       overwrite: input.overwrite ?? null,
     });
-  },
-  fetchSkillManifest(skill: RemoteSkill): Promise<SkillManifest> {
-    return invoke("fetch_skill_manifest", { skill });
   },
 };

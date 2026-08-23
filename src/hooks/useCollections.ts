@@ -1,15 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../api";
-import type {
-  CatalogSource,
-  CollectionInfo,
-  RemoteSkill,
-  SkillManifest,
-} from "../types";
+import type { CatalogSource, CollectionInfo, RemoteSkill } from "../types";
 
-/** Collection browsing state: the catalog list, the skills of the
- *  active collection, and lazy SKILL.md metadata with in-memory
- *  caching (one fetch per skill per session, deduped in-flight). */
+/** Collection browsing state: the catalog list and the skills of the
+ *  active collection. Built-ins are served from the bundled index —
+ *  descriptions arrive with the listing and no per-skill fetching
+ *  happens here (the GitHub API is only spent on install/refresh). */
 export function useCollections() {
   const [collections, setCollections] = useState<CollectionInfo[]>([]);
   const [source, setSource] = useState<CatalogSource>("bundled");
@@ -18,8 +14,6 @@ export function useCollections() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const latestRequest = useRef(0);
-  const manifests = useRef(new Map<string, SkillManifest>());
-  const inFlight = useRef(new Set<string>());
 
   const loadCollections = useCallback(async () => {
     try {
@@ -86,45 +80,6 @@ export function useCollections() {
     [activeId, loadCollections],
   );
 
-  /** Patch the description onto the matching skill in state — matched by
-   *  reference OR by the owner/repo/path key, so fresh objects from a
-   *  re-browse get patched just like the object that triggered the fetch. */
-  const patchDescription = useCallback((skill: RemoteSkill, description: string | null) => {
-    setSkills((current) =>
-      current.map((s) =>
-        s === skill || (s.owner === skill.owner && s.repo === skill.repo && s.path === skill.path)
-          ? { ...s, description }
-          : s,
-      ),
-    );
-  }, []);
-
-  /** Lazily fill one skill's description; resolves null while loading
-   *  or on failure (the card keeps its name-only rendering). */
-  const describe = useCallback(
-    async (skill: RemoteSkill): Promise<SkillManifest | null> => {
-      const key = `${skill.owner}/${skill.repo}/${skill.path}`;
-      const cached = manifests.current.get(key);
-      if (cached) {
-        patchDescription(skill, cached.description);
-        return cached;
-      }
-      if (inFlight.current.has(key)) return null;
-      inFlight.current.add(key);
-      try {
-        const manifest = await api.fetchSkillManifest(skill);
-        manifests.current.set(key, manifest);
-        patchDescription(skill, manifest.description);
-        return manifest;
-      } catch {
-        return null;
-      } finally {
-        inFlight.current.delete(key);
-      }
-    },
-    [patchDescription],
-  );
-
   return {
     collections,
     source,
@@ -136,6 +91,5 @@ export function useCollections() {
     refreshActive,
     add,
     remove,
-    describe,
   };
 }

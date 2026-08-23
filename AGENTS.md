@@ -12,8 +12,9 @@ src/
   components/
     layout/             app chrome (Sidebar, Topbar)
     skills/             skill grid (SkillList, SkillCard, SortToggle)
-    modals/             the five dialogs (Editor, CreateSkill, AddProject,
-                        Projects, Browse)
+    browse/             the full-window collections browser (BrowseView)
+    modals/             the four dialogs (Editor, CreateSkill,
+                        AddProject, Projects)
     ui/                 shared primitives (ModalShell, icons)
   hooks/                data + mutations (useGlobalSkills, useProjects, useProjectSkills)
   utils/                pure helpers + tests (filtering, sidebar lists, time, markdown)
@@ -24,7 +25,10 @@ src-tauri/src/
                         managed-path validation (see the security note below)
   collections/          GitHub collections: github.rs (HTTP + parsing), catalog.rs
                         (tree → skills), manifest.rs (public catalog +
-                        bundled fallback), install.rs (download into managed
+                        bundled fallback), index.rs + skills.json (bundled
+                        skill index — browsing built-ins costs no GitHub API
+                        calls; regenerate the index when seed repos change),
+                        install.rs (download into managed
                         roots + provenance), store.rs (user collections, cache)
   skills/               one adapter per skills folder (claude, agents, copilot, ...),
                         plus tools.rs — the tool→folder registry driving the sidebar
