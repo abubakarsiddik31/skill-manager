@@ -35,7 +35,6 @@ src-tauri/src/
   projects.rs           persisted list of tracked project folders
   detect.rs             project-folder discovery for the add-project picker
 docs/                   the landing page (GitHub Pages, docs/index.html)
-                        and specs/plans under docs/superpowers/
 ```
 
 Each skills folder implements the same `SkillAdapter` trait
