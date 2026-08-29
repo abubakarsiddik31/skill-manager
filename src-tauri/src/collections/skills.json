@@ -1,0 +1,370 @@
+{
+  "version": 1,
+  "repos": {
+    "anthropics/skills": {
+      "branch": "main",
+      "skills": [
+        {
+          "name": "academy-guide",
+          "description": "Stop and check this skill before finishing any reply to a question about how to use Claude or a Claude product — it recommends matching courses, tutorials, and use cases from Claude Academy (academy.claude.com), Anthropic's learning hub. Trigger on: \"how do I\", \"how can I\", \"getting started with\", \"what can Claude do\", \"teach me\", \"learn to use\"; questions about artifacts, projects, skills, plugins, connectors, MCP; requests about rolling Claude out to a team, class, or organization; and any ask for training materials, onboarding content, or learning resources. Use it when the user is learning how to use a feature or product — not when they are mid-task and just want the task done. This skill composes with other skills: after consulting product documentation to answer how a Claude feature works, also check here for a matching course or tutorial — a docs-grounded answer and an Academy recommendation belong together. Only recommend on a strong match; never invent Academy content.",
+          "path": "skills/academy-guide"
+        },
+        {
+          "name": "algorithmic-art",
+          "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.",
+          "path": "skills/algorithmic-art"
+        },
+        {
+          "name": "brand-guidelines",
+          "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.",
+          "path": "skills/brand-guidelines"
+        },
+        {
+          "name": "canvas-design",
+          "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.",
+          "path": "skills/canvas-design"
+        },
+        {
+          "name": "claude-api",
+          "description": "Reference for the Claude API / Anthropic SDK — model ids, pricing, params, streaming, tool use, MCP, agents, caching, token counting, model migration. TRIGGER — read BEFORE opening the target file; don't skip because it \"looks like a one-liner\" — whenever: the prompt names Claude/Anthropic in any form (Claude, Anthropic, Fable, Opus, Sonnet, Haiku, `anthropic`, `@anthropic-ai`, `claude-*`, `us.anthropic.*`, `[1m]`); the user asks about an LLM (pricing/model choice/limits/caching) — never answer from memory; OR the task is LLM-shaped with provider unstated (agent/MCP/tool-definition/multi-agent/RAG/LLM-judge/computer-use; generate/summarize/extract/classify/rewrite/converse over NL; debugging refusals/cutoffs/streaming/tool-calls/tokens). SKIP only when another provider is being worked on (overrides all triggers): OpenAI/GPT/Gemini/Llama/Mistral/Cohere/Ollama named in the query; OR `grep -rE 'openai|langchain_openai|google.generativeai|genai|mistralai|cohere|ollama'` over the project hits (run this grep FIRST if no provider named — don't Read the file).",
+          "path": "skills/claude-api"
+        },
+        {
+          "name": "discernment-nudge",
+          "description": "After you give a substantive answer or draft that the user may act on — advice or recommendations, drafted artifacts such as goals, plans, pitches, proposals, or emails, estimates or projections, analysis or interpretation of data, factual claims they may rely on, or a multi-step argument — invoke this skill BEFORE finalizing your reply and then, if it applies, append 2-3 short follow-up questions, each tied to something specific in what you just produced, that help the user check key facts, probe the reasoning or assumptions, and notice missing context. Do this at most once per conversation. Skip it when the user asked a trivial how-to or simple lookup, wants a purely educational explanation, asked you only to format, convert, or assemble a file from content they provided, is writing code they will run, is doing creative writing or casual chat, or already asked you to double-check, cite, or review — the skill file explains these boundaries and the exact output format.",
+          "path": "skills/discernment-nudge"
+        },
+        {
+          "name": "doc-coauthoring",
+          "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.",
+          "path": "skills/doc-coauthoring"
+        },
+        {
+          "name": "docx",
+          "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
+          "path": "skills/docx"
+        },
+        {
+          "name": "frontend-design",
+          "description": "Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.",
+          "path": "skills/frontend-design"
+        },
+        {
+          "name": "internal-comms",
+          "description": "A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status reports, leadership updates, 3P updates, company newsletters, FAQs, incident reports, project updates, etc.).",
+          "path": "skills/internal-comms"
+        },
+        {
+          "name": "mcp-builder",
+          "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
+          "path": "skills/mcp-builder"
+        },
+        {
+          "name": "pdf",
+          "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+          "path": "skills/pdf"
+        },
+        {
+          "name": "pptx",
+          "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \\\"deck,\\\" \\\"slides,\\\" \\\"presentation,\\\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
+          "path": "skills/pptx"
+        },
+        {
+          "name": "skill-creator",
+          "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
+          "path": "skills/skill-creator"
+        },
+        {
+          "name": "slack-gif-creator",
+          "description": "Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like \"make me a GIF of X doing Y for Slack.\"",
+          "path": "skills/slack-gif-creator"
+        },
+        {
+          "name": "template",
+          "description": "Replace with description of the skill and when Claude should use it.",
+          "path": "template"
+        },
+        {
+          "name": "theme-factory",
+          "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.",
+          "path": "skills/theme-factory"
+        },
+        {
+          "name": "web-artifacts-builder",
+          "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
+          "path": "skills/web-artifacts-builder"
+        },
+        {
+          "name": "webapp-testing",
+          "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
+          "path": "skills/webapp-testing"
+        },
+        {
+          "name": "xlsx",
+          "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \\\"the xlsx in my downloads\\\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
+          "path": "skills/xlsx"
+        }
+      ]
+    },
+    "obra/superpowers": {
+      "branch": "main",
+      "skills": [
+        {
+          "name": "brainstorming",
+          "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+          "path": "skills/brainstorming"
+        },
+        {
+          "name": "dispatching-parallel-agents",
+          "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
+          "path": "skills/dispatching-parallel-agents"
+        },
+        {
+          "name": "executing-plans",
+          "description": "Use when you have a written implementation plan to execute in a separate session with review checkpoints",
+          "path": "skills/executing-plans"
+        },
+        {
+          "name": "finishing-a-development-branch",
+          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
+          "path": "skills/finishing-a-development-branch"
+        },
+        {
+          "name": "receiving-code-review",
+          "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
+          "path": "skills/receiving-code-review"
+        },
+        {
+          "name": "requesting-code-review",
+          "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+          "path": "skills/requesting-code-review"
+        },
+        {
+          "name": "subagent-driven-development",
+          "description": "Use when executing implementation plans with independent tasks in the current session",
+          "path": "skills/subagent-driven-development"
+        },
+        {
+          "name": "systematic-debugging",
+          "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+          "path": "skills/systematic-debugging"
+        },
+        {
+          "name": "test-driven-development",
+          "description": "Use when implementing any feature or bugfix, before writing implementation code",
+          "path": "skills/test-driven-development"
+        },
+        {
+          "name": "using-git-worktrees",
+          "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback",
+          "path": "skills/using-git-worktrees"
+        },
+        {
+          "name": "using-superpowers",
+          "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
+          "path": "skills/using-superpowers"
+        },
+        {
+          "name": "verification-before-completion",
+          "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+          "path": "skills/verification-before-completion"
+        },
+        {
+          "name": "writing-plans",
+          "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+          "path": "skills/writing-plans"
+        },
+        {
+          "name": "writing-skills",
+          "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
+          "path": "skills/writing-skills"
+        }
+      ]
+    },
+    "mattpocock/skills": {
+      "branch": "main",
+      "skills": [
+        {
+          "name": "ask-matt",
+          "description": "Ask which skill or flow fits your situation. A router over the skills in this repo.",
+          "path": "skills/engineering/ask-matt"
+        },
+        {
+          "name": "claude-handoff",
+          "description": "Hand the current conversation off to a fresh background agent that picks up the work immediately.",
+          "path": "skills/in-progress/claude-handoff"
+        },
+        {
+          "name": "code-review",
+          "description": "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \\\"review since X\\\".",
+          "path": "skills/engineering/code-review"
+        },
+        {
+          "name": "codebase-design",
+          "description": "Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary.",
+          "path": "skills/engineering/codebase-design"
+        },
+        {
+          "name": "diagnosing-bugs",
+          "description": "Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow.",
+          "path": "skills/engineering/diagnosing-bugs"
+        },
+        {
+          "name": "domain-modeling",
+          "description": "Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.",
+          "path": "skills/engineering/domain-modeling"
+        },
+        {
+          "name": "git-guardrails-claude-code",
+          "description": "Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.",
+          "path": "skills/misc/git-guardrails-claude-code"
+        },
+        {
+          "name": "grill-me",
+          "description": "A relentless interview to sharpen a plan or design.",
+          "path": "skills/productivity/grill-me"
+        },
+        {
+          "name": "grill-with-docs",
+          "description": "A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.",
+          "path": "skills/engineering/grill-with-docs"
+        },
+        {
+          "name": "grilling",
+          "description": "Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.",
+          "path": "skills/productivity/grilling"
+        },
+        {
+          "name": "handoff",
+          "description": "Compact the current conversation into a handoff document for another agent to pick up.",
+          "path": "skills/productivity/handoff"
+        },
+        {
+          "name": "implement",
+          "description": "Implement a piece of work based on a spec or set of tickets.",
+          "path": "skills/engineering/implement"
+        },
+        {
+          "name": "implement-spec",
+          "description": "Implement a specification in code.",
+          "path": "skills/in-progress/implement-spec"
+        },
+        {
+          "name": "improve-codebase-architecture",
+          "description": "Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.",
+          "path": "skills/engineering/improve-codebase-architecture"
+        },
+        {
+          "name": "loop-me",
+          "description": "Grill me about specs for the workflows I want to build, within this workspace.",
+          "path": "skills/in-progress/loop-me"
+        },
+        {
+          "name": "migrate-to-shoehorn",
+          "description": "Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data.",
+          "path": "skills/misc/migrate-to-shoehorn"
+        },
+        {
+          "name": "prototype",
+          "description": "Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.",
+          "path": "skills/engineering/prototype"
+        },
+        {
+          "name": "research",
+          "description": "Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.",
+          "path": "skills/engineering/research"
+        },
+        {
+          "name": "resolving-merge-conflicts",
+          "description": "Use when you need to resolve an in-progress git merge/rebase conflict.",
+          "path": "skills/engineering/resolving-merge-conflicts"
+        },
+        {
+          "name": "scaffold-exercises",
+          "description": "Create exercise directory structures with sections, problems, solutions, and explainers that pass linting. Use when user wants to scaffold exercises, create exercise stubs, or set up a new course section.",
+          "path": "skills/misc/scaffold-exercises"
+        },
+        {
+          "name": "setup-matt-pocock-skills",
+          "description": "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.",
+          "path": "skills/engineering/setup-matt-pocock-skills"
+        },
+        {
+          "name": "setup-pre-commit",
+          "description": "Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current repo. Use when user wants to add pre-commit hooks, set up Husky, configure lint-staged, or add commit-time formatting/typechecking/testing.",
+          "path": "skills/misc/setup-pre-commit"
+        },
+        {
+          "name": "setup-ts-deep-modules",
+          "description": "Wire dependency-cruiser into a TypeScript repo so each package is a deep module, with implementation hidden in subfolders and reachable only through its entry-point files. User-invoked.",
+          "path": "skills/in-progress/setup-ts-deep-modules"
+        },
+        {
+          "name": "tdd",
+          "description": "Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests.",
+          "path": "skills/engineering/tdd"
+        },
+        {
+          "name": "teach",
+          "description": "Teach the user a new skill or concept, within this workspace.",
+          "path": "skills/productivity/teach"
+        },
+        {
+          "name": "to-questionnaire",
+          "description": "Turn a decision you can't fully answer into a questionnaire for someone else to fill in.",
+          "path": "skills/productivity/to-questionnaire"
+        },
+        {
+          "name": "to-spec",
+          "description": "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed.",
+          "path": "skills/engineering/to-spec"
+        },
+        {
+          "name": "to-tickets",
+          "description": "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker (edges as text in one file per ticket locally, or native blocking links on a real tracker).",
+          "path": "skills/engineering/to-tickets"
+        },
+        {
+          "name": "triage",
+          "description": "Move issues and external PRs through a state machine of triage roles, categorise, verify, grill if needed, and write agent-ready briefs.",
+          "path": "skills/engineering/triage"
+        },
+        {
+          "name": "wait-what",
+          "description": "Stop. That last message did not land: re-pitch it.",
+          "path": "skills/productivity/wait-what"
+        },
+        {
+          "name": "wayfinder",
+          "description": "Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.",
+          "path": "skills/engineering/wayfinder"
+        },
+        {
+          "name": "wizard",
+          "description": "Generate an interactive bash wizard that walks a human through steps only they can perform. Use when provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover. Don't invoke this for steps the agent can perform itself.",
+          "path": "skills/engineering/wizard"
+        },
+        {
+          "name": "writing-beats",
+          "description": "Writing, exploit; assemble raw material into a journey of beats, grounding each term before a beat leans on it.",
+          "path": "skills/in-progress/writing-beats"
+        },
+        {
+          "name": "writing-for-agents",
+          "description": "Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md.",
+          "path": "skills/productivity/writing-for-agents"
+        },
+        {
+          "name": "writing-fragments",
+          "description": "Writing, explore: mine raw fragments, no structure yet.",
+          "path": "skills/in-progress/writing-fragments"
+        },
+        {
+          "name": "writing-shape",
+          "description": "Writing, exploit: shape raw material into an article, paragraph by paragraph.",
+          "path": "skills/in-progress/writing-shape"
+        }
+      ]
+    }
+  }
+}

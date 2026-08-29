@@ -35,6 +35,8 @@ interface SidebarProps {
   onSelectTool: (toolId: string) => void;
   onOpenProject: (project: ProjectInfo) => void;
   onAddProject: () => void;
+  /** Opens the collections browser as the main-window view. */
+  onBrowse: () => void;
 }
 
 export function Sidebar({
@@ -53,6 +55,7 @@ export function Sidebar({
   onSelectTool,
   onOpenProject,
   onAddProject,
+  onBrowse,
 }: SidebarProps) {
   const [version, setVersion] = useState("");
   const [toolsExpanded, setToolsExpanded] = useState(false);
@@ -86,6 +89,15 @@ export function Sidebar({
       >
         <span>all skills</span>
         <span className="count">{totalSkillCount}</span>
+      </div>
+
+      <div
+        className={`nav-item ${view.kind === "browse" ? "active" : ""}`}
+        onClick={onBrowse}
+        title="browse and install skills from GitHub collections"
+      >
+        <span>browse collections</span>
+        <span className="count">↗</span>
       </div>
 
       {visibleTools.map((entry) => {

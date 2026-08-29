@@ -1,3 +1,4 @@
+mod collections;
 mod commands;
 mod detect;
 mod projects;
@@ -16,6 +17,12 @@ pub fn run() {
             commands::read_skill_content,
             commands::write_skill_content,
             commands::create_skill,
+            commands::list_collections,
+            commands::browse_collection,
+            commands::refresh_collection,
+            commands::add_collection,
+            commands::remove_collection,
+            commands::install_skill,
             commands::list_detected_projects,
             commands::refresh_detected_projects,
             commands::list_project_skill_counts,

@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 .claude/
 .mimosa/
+
+# Local development working notes (superpowers plans/specs, SDD ledger)
+docs/superpowers/
+.superpowers/

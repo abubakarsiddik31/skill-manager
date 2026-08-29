@@ -147,28 +147,45 @@ fn scan_dir(tool: AgentTool, dir: &Path, scope: SkillScope, enabled: bool) -> Ve
 
 /// Minimal YAML frontmatter reader for the two fields Skill Manager cares
 /// about (`name`, `description`). Intentionally not a full YAML parser —
-/// SKILL.md frontmatter is a flat key: value list.
+/// SKILL.md frontmatter is a flat key: value list, except block scalars
+/// (`description: >`), which are folded onto one line instead of
+/// surfacing as a bare `>`.
 fn parse_frontmatter(raw: &str) -> (String, String) {
     let mut name = String::new();
     let mut description = String::new();
 
-    let mut lines = raw.lines();
-    if lines.next() != Some("---") {
+    let lines: Vec<&str> = raw.lines().collect();
+    if lines.first() != Some(&"---") {
         return (name, description);
     }
-    for line in lines {
+    let mut i = 1;
+    while i < lines.len() {
+        let line = lines[i];
+        i += 1;
         if line.trim() == "---" {
             break;
         }
         let Some((key, value)) = line.split_once(':') else {
             continue;
         };
-        let value = value
-            .trim()
-            .trim_matches('"')
-            .trim_matches('\'')
-            .to_string();
-        match key.trim() {
+        let key = key.trim();
+        let mut value = value.trim().to_string();
+        if matches!(value.as_str(), ">" | ">-" | "|" | "|-") {
+            let mut body: Vec<&str> = Vec::new();
+            while i < lines.len() {
+                let next = lines[i];
+                if next.trim().is_empty() || next.starts_with([' ', '\t']) {
+                    body.push(next.trim());
+                    i += 1;
+                } else {
+                    break;
+                }
+            }
+            value = body.join(" ").trim().to_string();
+        } else {
+            value = value.trim_matches('"').trim_matches('\'').to_string();
+        }
+        match key {
             "name" => name = value,
             "description" => description = value,
             _ => {}
@@ -305,6 +322,34 @@ mod tests {
         )
         .unwrap();
         dir
+    }
+
+    #[test]
+    fn frontmatter_reads_flat_keys_and_strips_quotes() {
+        let raw = "---\nname: \"demo\"\ndescription: 'a skill'\nlicense: mit\n---\nbody";
+        let (name, description) = parse_frontmatter(raw);
+        assert_eq!(name, "demo");
+        assert_eq!(description, "a skill");
+    }
+
+    #[test]
+    fn frontmatter_folds_block_scalars_onto_one_line() {
+        let folded = "---\nname: demo\ndescription: >-\n  first line\n  second line\n---\n";
+        let (name, description) = parse_frontmatter(folded);
+        assert_eq!(name, "demo");
+        assert_eq!(description, "first line second line");
+
+        let literal = "---\ndescription: |\n  alpha\n  beta\nname: after\n---\n";
+        let (name, description) = parse_frontmatter(literal);
+        assert_eq!(description, "alpha beta");
+        assert_eq!(name, "after", "keys after a block must still be read");
+    }
+
+    #[test]
+    fn frontmatter_without_a_fence_reads_nothing() {
+        let (name, description) = parse_frontmatter("name: demo\n");
+        assert!(name.is_empty());
+        assert!(description.is_empty());
     }
 
     #[test]

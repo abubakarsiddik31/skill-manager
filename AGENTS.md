@@ -7,25 +7,35 @@ frontend, built with Vite.
 
 ```
 src/
-  api/                  the invoke client over Rust commands (skills.ts, projects.ts)
+  api/                  the invoke client over Rust commands (skills.ts,
+                        projects.ts, collections.ts)
   components/
     layout/             app chrome (Sidebar, Topbar)
     skills/             skill grid (SkillList, SkillCard, SortToggle)
-    modals/             the four dialogs (Editor, CreateSkill, AddProject, Projects)
+    browse/             the full-window collections browser (BrowseView)
+    modals/             the four dialogs (Editor, CreateSkill,
+                        AddProject, Projects)
     ui/                 shared primitives (ModalShell, icons)
   hooks/                data + mutations (useGlobalSkills, useProjects, useProjectSkills)
-  utils/                pure helpers + tests (filtering, sidebar lists, time, markdown)
+  utils/                pure helpers + tests (filtering, sidebar lists, time, markdown,
+                        collection search)
   types/                shared frontend types split by domain, barrel at types/index.ts
 src-tauri/src/
   commands/             tauri commands split by domain — skills.rs, create_skill.rs,
-                        projects.rs; mod.rs holds the shared managed-path validation
-                        (see the security note below)
+                        projects.rs, collections.rs; mod.rs holds the shared
+                        managed-path validation (see the security note below)
+  collections/          GitHub collections: github.rs (HTTP + parsing), catalog.rs
+                        (tree → skills), manifest.rs (public catalog +
+                        bundled fallback), index.rs + skills.json (bundled
+                        skill index — browsing built-ins costs no GitHub API
+                        calls; regenerate the index when seed repos change),
+                        install.rs (download into managed
+                        roots + provenance), store.rs (user collections, cache)
   skills/               one adapter per skills folder (claude, agents, copilot, ...),
                         plus tools.rs — the tool→folder registry driving the sidebar
   projects.rs           persisted list of tracked project folders
   detect.rs             project-folder discovery for the add-project picker
 docs/                   the landing page (GitHub Pages, docs/index.html)
-                        and specs/plans under docs/superpowers/
 ```
 
 Each skills folder implements the same `SkillAdapter` trait

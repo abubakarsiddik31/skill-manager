@@ -8,11 +8,13 @@ interface TopbarProps {
   query: string;
   onQueryChange: (query: string) => void;
   onForgetProject?: () => void;
+  /** Opens the collections browse flow. */
+  onBrowse?: () => void;
   /** Opens the new-skill flow. */
   onNewSkill?: () => void;
 }
 
-export function Topbar({ title, subtitle, folders, query, onQueryChange, onForgetProject, onNewSkill }: TopbarProps) {
+export function Topbar({ title, subtitle, folders, query, onQueryChange, onForgetProject, onBrowse, onNewSkill }: TopbarProps) {
   return (
     <div className="topbar">
       <div className="topbar-title">
@@ -33,6 +35,11 @@ export function Topbar({ title, subtitle, folders, query, onQueryChange, onForge
         )}
       </div>
       <div className="topbar-actions">
+        {onBrowse && (
+          <button className="btn" onClick={onBrowse} title="browse and install skills from GitHub collections">
+            browse
+          </button>
+        )}
         {onNewSkill && (
           <button className="btn" onClick={onNewSkill} title="create a new skill from a minimal template">
             new skill
