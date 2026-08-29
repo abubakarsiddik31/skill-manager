@@ -6,7 +6,7 @@
 
 ### One dashboard to manage every AI coding agent skill you've installed.
 
-Discover, enable, disable, edit, and delete [Agent Skills](#what-is-a-skill)
+Discover, install, enable, disable, edit, and delete [Agent Skills](#what-is-a-skill)
 across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Crush, Roo Code,
 Kiro, Junie, Factory Droid, OpenCode — and every tool that reads the
 shared `~/.agents/skills` folder (Goose, Amp, …) — without hand-editing
@@ -85,6 +85,7 @@ what you don't need for the current project is how you climb back out.
 | **Keep triggering accurate** | Every installed skill competes for a match, even ones irrelevant to this project | Disable the noise, leave only what's relevant enabled |
 | **Know what's wired into a project** | Global and project-level skills look identical until something breaks | Per-project breakdown, separate from global |
 | **Edit a `SKILL.md`** | Open a text editor, hunt down the path | Rendered markdown with one-click raw edit |
+| **Find new skills** | Hunt through GitHub repos and copy folders by hand | Browse curated collections in-app, install in one click |
 
 **Skill Manager fixes all of it.** One dashboard, every tool.
 
@@ -97,6 +98,14 @@ ecosystem (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and others).
 
 ## Features
 
+- 📥 **Browse & install from GitHub collections** — curated skill
+  collections (Anthropic's skills, Superpowers, Matt's skills) ship
+  inside the app: browse and search them offline, then install into any
+  tool's user or project folder in one click. Add any `owner/repo`
+  collection of your own, too — every install records where it came
+  from.
+- ✨ **Create skills** — start a new skill from a minimal template in
+  any tool's folder and write its instructions in the built-in editor.
 - 🗂️ **Unified view** across every tool's skills directory — no more digging
   through a dozen different config folders by hand.
 - 🔀 **Enable / disable** any skill without deleting it (skills move to a
@@ -198,14 +207,17 @@ npm run tauri build
 
 ```
 src/
-  components/           presentational react components (Sidebar, SkillCard, EditorModal, ...)
+  components/           react components grouped by role (layout, skills,
+                        browse, modals, ui)
   hooks/                data + mutations (useGlobalSkills, useProjects, useProjectSkills)
-  lib/                  api client, markdown rendering, filtering helpers
-  types.ts              shared frontend types
+  api/                  the invoke client over the Rust commands
+  utils/                pure helpers + tests
+  types/                shared frontend types split by domain
 src-tauri/src/
   skills/               one adapter per tool, all implementing SkillAdapter
+  collections/          GitHub collections: catalog, bundled index, install
+  commands/             tauri commands exposed to the frontend
   projects.rs           persisted list of tracked project folders
-  commands.rs           tauri commands exposed to the frontend
 docs/                   the landing page (GitHub Pages)
 ```
 
@@ -215,8 +227,8 @@ new module pointing at its skills directory.
 
 ## Roadmap
 
-- [ ] Skill browser & install — browse community skills and install them
-  into any tool's skills folder in one click
+- [ ] Update support for installed collection skills (in-app update
+  checks against the repo they came from)
 - [ ] Auto-update support (in-app update checks, no manual reinstall)
 - [ ] Code-signed builds (no more Gatekeeper/SmartScreen warnings)
 - [ ] Keep adding agents as they adopt `SKILL.md` — Windsurf and Trae are on
@@ -249,8 +261,10 @@ Yes — disabling moves the skill folder to `.disabled/` next to it. Re-enabling
 moves it back. Nothing is deleted until you explicitly delete it.
 
 **Does it phone home or collect telemetry?**
-No. Skill Manager is a local desktop app — it only reads and writes the skill
-directories already on your machine.
+No accounts, no analytics, no telemetry. The app reaches the network
+only to fetch the public collections catalog and to download a skill
+when you explicitly click install — everything else stays on your
+machine.
 
 **Why isn't `<my tool>` supported?**
 Open an issue with a link to that tool's own skills documentation and we'll

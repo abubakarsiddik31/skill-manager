@@ -8,11 +8,11 @@
     </title>
     <meta
       name="description"
-      content="Skill Manager is a free, open-source desktop app to discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode. Available for macOS, Windows, and Linux."
+      content="Skill Manager is a free, open-source desktop app to discover, install, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode — and to browse curated GitHub skill collections. Available for macOS, Windows, and Linux."
     />
     <meta
       name="keywords"
-      content="skill manager, claude code skills, agent skills, claude skills manager, codex skills, cursor skills, gemini cli skills, opencode skills, ai coding agent, developer tools, tauri desktop app, skill hell"
+      content="skill manager, claude code skills, agent skills, claude skills manager, codex skills, cursor skills, gemini cli skills, opencode skills, skill collections, install agent skills, ai coding agent, developer tools, tauri desktop app, skill hell"
     />
     <meta name="author" content="Skill Manager contributors" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -30,7 +30,7 @@
     />
     <meta
       property="og:description"
-      content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode — from one desktop app."
+      content="Discover, install, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode — and browse curated GitHub skill collections — from one desktop app."
     />
     <meta
       property="og:url"
@@ -53,7 +53,7 @@
     />
     <meta
       name="twitter:description"
-      content="Discover, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode."
+      content="Discover, install, enable, disable, edit, and delete AI agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode."
     />
     <meta
       name="twitter:image"
@@ -70,7 +70,7 @@
         "name": "Skill Manager",
         "operatingSystem": "macOS, Windows, Linux",
         "applicationCategory": "DeveloperApplication",
-        "description": "One dashboard to discover, enable, disable, edit, and delete AI coding agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode.",
+        "description": "One dashboard to discover, install, enable, disable, edit, and delete AI coding agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode — plus a built-in browser for curated GitHub skill collections.",
         "url": "https://abubakarsiddik31.github.io/skill-manager/",
         "image": "https://abubakarsiddik31.github.io/skill-manager/assets/social-card.png",
         "downloadUrl": "https://github.com/abubakarsiddik31/skill-manager/releases/latest",
@@ -109,7 +109,7 @@
             "name": "Does Skill Manager phone home or collect telemetry?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "No. Skill Manager is a local desktop app — it only reads and writes the skill directories already on your machine."
+              "text": "No accounts, no analytics, no telemetry. The app reaches the network only to fetch the public collections catalog and to download a skill when you explicitly click install — everything else stays on your machine."
             }
           },
           {
@@ -763,10 +763,12 @@
         </div>
         <h1>One dashboard for<br />every agent skill.</h1>
         <p class="tagline">
-          Discover, enable, disable, edit, and delete AI coding agent skills
-          across Claude Code, Codex, Cursor, Gemini CLI, VS Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode — instead
-          of digging through a dozen different config folders by hand, and letting
-          every skill you've ever installed sit there active.
+          Discover, install, enable, disable, edit, and delete AI coding
+          agent skills across Claude Code, Codex, Cursor, Gemini CLI, VS
+          Code, Roo Code, Kiro, Junie, Crush, Factory Droid, and OpenCode —
+          instead of digging through a dozen different config folders by
+          hand, and letting every skill you've ever installed sit there
+          active.
         </p>
 
         <div class="downloads" id="downloads">
@@ -931,6 +933,15 @@
               <td class="without">Open a text editor, hunt down the path</td>
               <td class="with">Rendered markdown, one-click raw edit</td>
             </tr>
+            <tr>
+              <td>Find new skills</td>
+              <td class="without">
+                Hunt through GitHub repos and copy folders by hand
+              </td>
+              <td class="with">
+                Browse curated collections in-app, install in one click
+              </td>
+            </tr>
           </tbody>
         </table>
       </section>
@@ -939,6 +950,15 @@
         <div class="kicker">features</div>
         <h2>Everything the config folders won't show you.</h2>
         <div class="features">
+          <div class="feature">
+            <h3>Browse &amp; install</h3>
+            <p>
+              Curated GitHub collections — Anthropic's skills, Superpowers,
+              and more — are built in. Browse and search them offline, then
+              install into any tool's user or project folder in one click.
+              Add any <code>owner/repo</code> of your own, too.
+            </p>
+          </div>
           <div class="feature">
             <h3>Unified view</h3>
             <p>
@@ -966,6 +986,13 @@
             <p>
               A skill's <code>SKILL.md</code> renders as formatted markdown by
               default, with a one-click switch to raw edit.
+            </p>
+          </div>
+          <div class="feature">
+            <h3>Create from scratch</h3>
+            <p>
+              Start a new skill from a minimal template in any tool's folder
+              and write its instructions in the built-in editor.
             </p>
           </div>
           <div class="feature">
@@ -1099,8 +1126,8 @@
         </p>
         <ul class="roadmap">
           <li>
-            Skill browser &amp; install — browse community skills and install
-            them into any tool's skills folder in one click
+            Update support for installed collection skills (in-app update
+            checks against the repo they came from)
           </li>
           <li>
             Auto-update support (in-app update checks, no manual reinstall)
@@ -1133,8 +1160,10 @@
           <details>
             <summary>Does it phone home or collect telemetry?</summary>
             <p>
-              No. Skill Manager is a local desktop app — it only reads and
-              writes the skill directories already on your machine.
+              No accounts, no analytics, no telemetry. The app reaches the
+              network only to fetch the public collections catalog and to
+              download a skill when you explicitly click install — everything
+              else stays on your machine.
             </p>
           </details>
           <details>
