@@ -9,8 +9,8 @@ pub mod store;
 // private so anything unconsumed here would warn as an unused import.
 pub use catalog::{enumerate_repo_skills, skills_from_tree};
 pub use github::TreeResponse;
-pub use index::{bundled_skill_count, bundled_skills, enrich_descriptions};
-pub use install::{files_for_skill, install_skill_files, Provenance};
+pub use index::{bundled_branch, bundled_skill_count, bundled_skills, enrich_descriptions};
+pub use install::{files_from_tarball, install_skill_files, Provenance};
 pub use manifest::{load_catalog, merge_collections, CatalogSource, ManifestCollection};
 pub use store::{
     add_user_collection, cache_fresh, load_cache, load_user_collections, now_secs,

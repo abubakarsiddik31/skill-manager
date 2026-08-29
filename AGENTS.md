@@ -29,8 +29,9 @@ src-tauri/src/
                         bundled fallback), index.rs + skills.json (bundled
                         skill index — browsing built-ins costs no GitHub API
                         calls; regenerate the index when seed repos change),
-                        install.rs (download into managed
-                        roots + provenance), store.rs (user collections, cache)
+                        install.rs (codeload tarball download into managed
+                        roots + provenance — installs spend no GitHub API
+                        quota), store.rs (user collections, cache)
   skills/               one adapter per skills folder (claude, agents, copilot, ...),
                         plus tools.rs — the tool→folder registry driving the sidebar
   projects.rs           persisted list of tracked project folders
