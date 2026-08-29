@@ -28,7 +28,7 @@ a config file ever again.
 [**Support code signing**](https://github.com/sponsors/abubakarsiddik31)
 
 > [!IMPORTANT]
-> **Before downloading:** v0.3.1 is not code-signed or notarized by Apple, and
+> **Before downloading:** v0.4.0 is not code-signed or notarized by Apple, and
 > its Windows installer is not signed by a verified publisher. macOS Gatekeeper
 > and Windows SmartScreen may therefore warn on first launch.
 >
@@ -163,7 +163,7 @@ Grab a build from the [latest release](https://github.com/abubakarsiddik31/skill
 | Linux | `.deb`, `.rpm`, or `.AppImage` |
 
 > [!NOTE]
-> **v0.3.1 is not code-signed or notarized by Apple, and its Windows installer
+> **v0.4.0 is not code-signed or notarized by Apple, and its Windows installer
 > is not signed by a verified publisher.** We have not completed Apple or
 > Microsoft publisher verification. Only continue if you downloaded the
 > installer from this repository's GitHub Releases page. Code-signed releases
