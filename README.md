@@ -227,6 +227,8 @@ new module pointing at its skills directory.
 
 ## Roadmap
 
+- [x] Skill browser & install — browse curated community collections and
+  install them into any tool's skills folder in one click
 - [ ] Update support for installed collection skills (in-app update
   checks against the repo they came from)
 - [ ] Auto-update support (in-app update checks, no manual reinstall)
