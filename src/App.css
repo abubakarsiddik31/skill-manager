@@ -40,6 +40,7 @@ body,
 .app {
   display: flex;
   height: 100vh;
+  overflow: hidden;
   background: var(--bg);
 }
 
@@ -48,6 +49,8 @@ body,
 .sidebar {
   width: 220px;
   flex-shrink: 0;
+  min-height: 0;
+  overflow-y: auto;
   background: var(--bg-elevated);
   border-right: 1px solid var(--border);
   display: flex;
@@ -222,6 +225,7 @@ body,
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
 .topbar {
