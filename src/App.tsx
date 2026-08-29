@@ -123,6 +123,13 @@ function App() {
     [projectView.skills, query],
   );
 
+  // What the browse view checks installed badges against — the union of
+  // everything the app manages, so badges reflect reality, not memory.
+  const managedSkills = useMemo(
+    () => [...global.skills, ...projectView.skills],
+    [global.skills, projectView.skills],
+  );
+
   const countForEntry = (entry: ToolEntry) =>
     global.skills.filter((s) => entry.folders.some((f) => f.tool === s.tool)).length;
 
@@ -160,6 +167,7 @@ function App() {
           <BrowseView
             toolEntries={global.toolEntries}
             projects={projects.projects}
+            installedSkills={managedSkills}
             defaultTool={browseDefaults.tool}
             defaultProject={browseDefaults.project}
             onBack={closeBrowse}

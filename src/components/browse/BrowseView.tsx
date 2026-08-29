@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { api } from "../../api";
 import { searchRemoteSkills } from "../../utils/collectionSearch";
+import { installedSkillKeys, isRemoteSkillInstalled } from "../../utils/installedSkills";
 import { CloseIcon } from "../ui/icons";
 import { useCollections } from "../../hooks/useCollections";
 import type {
@@ -15,6 +16,9 @@ import type {
 interface BrowseViewProps {
   toolEntries: ToolEntry[];
   projects: ProjectInfo[];
+  /** Skills the app currently manages — the installed badge is derived
+   *  from this, so it survives leaving the view and restarting. */
+  installedSkills: Skill[];
   /** Tool/scope preselected from where the browser was opened. */
   defaultTool?: AgentTool;
   defaultProject: ProjectInfo | null;
@@ -38,6 +42,7 @@ const SOURCE_LABELS: Record<CatalogSource, string> = {
 export function BrowseView({
   toolEntries,
   projects,
+  installedSkills,
   defaultTool,
   defaultProject,
   onBack,
@@ -56,16 +61,20 @@ export function BrowseView({
     defaultProject?.path ?? projects[0]?.path ?? "",
   );
   const [installError, setInstallError] = useState<string | null>(null);
-  const [installedKeys, setInstalledKeys] = useState<string[]>([]);
+  // Names installed this session — covers installs into projects whose
+  // skill list isn't loaded until the derived keys catch up on refresh.
+  const [sessionInstalled, setSessionInstalled] = useState<string[]>([]);
 
   const filtered = useMemo(
     () => searchRemoteSkills(browseState.skills, query),
     [browseState.skills, query],
   );
 
-  // Installed state is keyed by the skill's full coordinates — a
-  // same-named skill in another collection is a different install.
-  const skillKey = (skill: RemoteSkill) => `${skill.owner}/${skill.repo}/${skill.path}`;
+  const installedKeys = useMemo(() => installedSkillKeys(installedSkills), [installedSkills]);
+  const isInstalled = (skill: RemoteSkill) =>
+    isRemoteSkillInstalled(skill, installedKeys) ||
+    sessionInstalled.includes(skill.name.trim().toLowerCase());
+  const installedCount = browseState.skills.filter((s) => isInstalled(s)).length;
 
   const countedSkills = browseState.collections.reduce(
     (sum, c) => sum + (c.skillCount ?? 0),
@@ -99,7 +108,7 @@ export function BrowseView({
         collectionId: browseState.activeId,
         overwrite,
       });
-      setInstalledKeys((keys) => [...keys, skillKey(skill)]);
+      setSessionInstalled((names) => [...names, skill.name.trim().toLowerCase()]);
       closePicker();
       onInstalled(result.skill);
     } catch (e) {
@@ -202,6 +211,7 @@ export function BrowseView({
             <span className="browse-count">
               {activeCollection ? `${activeCollection.title} — ` : ""}
               {filtered.length} of {browseState.skills.length}
+              {installedCount > 0 && ` · ${installedCount} installed`}
             </span>
             <button
               className="btn"
@@ -222,7 +232,7 @@ export function BrowseView({
 
           <div className="skill-grid">
             {filtered.map((skill) => {
-              const installed = installedKeys.includes(skillKey(skill));
+              const installed = isInstalled(skill);
               const isTarget = installing?.name === skill.name && installing.path === skill.path;
               return (
                 <article
@@ -305,13 +315,10 @@ export function BrowseView({
                     )
                   ) : (
                     <div className="remote-skill-footer">
-                      {installed ? (
-                        <span className="installed-badge">installed ✓</span>
-                      ) : (
-                        <button className="btn grow" onClick={() => openPicker(skill)}>
-                          install
-                        </button>
-                      )}
+                      {installed && <span className="installed-badge">installed ✓</span>}
+                      <button className="btn grow" onClick={() => openPicker(skill)}>
+                        {installed ? "reinstall" : "install"}
+                      </button>
                     </div>
                   )}
 
