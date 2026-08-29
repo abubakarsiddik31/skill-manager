@@ -32,6 +32,13 @@ export interface ListCollectionsResult {
   source: CatalogSource;
 }
 
+/** The listing for one collection. `stale` means a live fetch failed
+ *  and a cached enumeration was served — surfaced as a UI badge. */
+export interface BrowseResult {
+  skills: RemoteSkill[];
+  stale: boolean;
+}
+
 export interface InstallResult {
   skill: Skill;
   skippedLinks: number;

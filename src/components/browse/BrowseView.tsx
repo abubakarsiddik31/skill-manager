@@ -56,17 +56,22 @@ export function BrowseView({
     defaultProject?.path ?? projects[0]?.path ?? "",
   );
   const [installError, setInstallError] = useState<string | null>(null);
-  const [installedNames, setInstalledNames] = useState<string[]>([]);
+  const [installedKeys, setInstalledKeys] = useState<string[]>([]);
 
   const filtered = useMemo(
     () => searchRemoteSkills(browseState.skills, query),
     [browseState.skills, query],
   );
 
-  const totalSkills = browseState.collections.reduce(
+  // Installed state is keyed by the skill's full coordinates — a
+  // same-named skill in another collection is a different install.
+  const skillKey = (skill: RemoteSkill) => `${skill.owner}/${skill.repo}/${skill.path}`;
+
+  const countedSkills = browseState.collections.reduce(
     (sum, c) => sum + (c.skillCount ?? 0),
     0,
   );
+  const unknownCounts = browseState.collections.some((c) => c.skillCount === null);
 
   function openPicker(skill: RemoteSkill) {
     setInstallError(null);
@@ -94,7 +99,7 @@ export function BrowseView({
         collectionId: browseState.activeId,
         overwrite,
       });
-      setInstalledNames((names) => [...names, skill.name]);
+      setInstalledKeys((keys) => [...keys, skillKey(skill)]);
       closePicker();
       onInstalled(result.skill);
     } catch (e) {
@@ -135,7 +140,8 @@ export function BrowseView({
         <div className="topbar-title">
           <h1>browse collections</h1>
           <span className="subtitle">
-            {browseState.collections.length} collections · {totalSkills} skills ready to install
+            {browseState.collections.length} collections ·{" "}
+            {unknownCounts ? `${countedSkills}+` : countedSkills} skills ready to install
           </span>
         </div>
         <span className="source-pill" title="where the collection list comes from">
@@ -205,13 +211,18 @@ export function BrowseView({
             >
               {browseState.loading ? "refreshing…" : "refresh"}
             </button>
+            {browseState.stale && (
+              <span className="source-pill stale" title="the live fetch failed; a cached listing is shown">
+                couldn't reach GitHub — cached list
+              </span>
+            )}
           </div>
 
           {browseState.error && <div className="create-error browse-error">{browseState.error}</div>}
 
           <div className="skill-grid">
             {filtered.map((skill) => {
-              const installed = installedNames.includes(skill.name);
+              const installed = installedKeys.includes(skillKey(skill));
               const isTarget = installing?.name === skill.name && installing.path === skill.path;
               return (
                 <article

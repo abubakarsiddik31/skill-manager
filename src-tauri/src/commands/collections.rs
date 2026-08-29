@@ -53,10 +53,10 @@ fn find_collection(
         .ok_or_else(|| format!("no collection named '{id}'"))
 }
 
-/// One repo's `(branch, tree, from_cache)` with cache-first semantics;
-/// `force` bypasses freshness for the refresh button. When the network
-/// fails but a stale cache entry exists, the stale tree is served —
-/// browsing degrades instead of erroring (the spec's fallback chain).
+/// One repo's `(branch, tree, stale)` with cache-first semantics; `force`
+/// bypasses freshness for the refresh button. `stale` is true only when
+/// the network failed and a cached tree was served instead — the spec
+/// requires that to be visible in the UI, not silent.
 fn repo_tree(
     app: &AppHandle,
     cache: &mut CollectionsCache,
@@ -68,7 +68,7 @@ fn repo_tree(
     if !force {
         if let Some(hit) = cache.repos.get(&key) {
             if collections::cache_fresh(hit.fetched_at, collections::now_secs()) {
-                return Ok((hit.branch.clone(), hit.tree.clone(), true));
+                return Ok((hit.branch.clone(), hit.tree.clone(), false));
             }
         }
     }
@@ -129,7 +129,16 @@ pub fn list_collections(app: AppHandle) -> Result<ListCollectionsResult, String>
     })
 }
 
-fn browse(app: AppHandle, id: String, force: bool) -> Result<Vec<RemoteSkill>, String> {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BrowseResult {
+    pub skills: Vec<RemoteSkill>,
+    /// True when a live fetch failed and a cached listing was served
+    /// instead — the UI must show this, not pretend the data is fresh.
+    pub stale: bool,
+}
+
+fn browse(app: AppHandle, id: String, force: bool) -> Result<BrowseResult, String> {
     let dir = config_dir(&app)?;
     let mut cache = collections::load_cache(&dir);
     let info = find_collection(&app, &mut cache, &id)?;
@@ -141,10 +150,13 @@ fn browse(app: AppHandle, id: String, force: bool) -> Result<Vec<RemoteSkill>, S
         if let Some(skills) =
             collections::bundled_skills(&info.owner, &info.repo, info.subpath.as_deref())
         {
-            return Ok(skills);
+            return Ok(BrowseResult {
+                skills,
+                stale: false,
+            });
         }
     }
-    let (branch, tree, _) = repo_tree(&app, &mut cache, &info.owner, &info.repo, force)?;
+    let (branch, tree, stale) = repo_tree(&app, &mut cache, &info.owner, &info.repo, force)?;
     let mut skills = collections::skills_from_tree(
         &info.owner,
         &info.repo,
@@ -155,16 +167,16 @@ fn browse(app: AppHandle, id: String, force: bool) -> Result<Vec<RemoteSkill>, S
     // A live enumeration carries no descriptions; graft the bundled
     // ones on by path so refreshes don't blank out the grid.
     collections::enrich_descriptions(&info.owner, &info.repo, &mut skills);
-    Ok(skills)
+    Ok(BrowseResult { skills, stale })
 }
 
 #[tauri::command]
-pub fn browse_collection(app: AppHandle, id: String) -> Result<Vec<RemoteSkill>, String> {
+pub fn browse_collection(app: AppHandle, id: String) -> Result<BrowseResult, String> {
     browse(app, id, false)
 }
 
 #[tauri::command]
-pub fn refresh_collection(app: AppHandle, id: String) -> Result<Vec<RemoteSkill>, String> {
+pub fn refresh_collection(app: AppHandle, id: String) -> Result<BrowseResult, String> {
     browse(app, id, true)
 }
 
@@ -216,6 +228,10 @@ pub fn remove_collection(app: AppHandle, id: String) -> Result<(), String> {
     if info.builtin {
         return Err("built-in collections cannot be removed".into());
     }
+    // Drop the repo's tree cache with the entry — a removed collection
+    // must not leave its enumeration in collections-cache.json forever.
+    cache.repos.remove(&format!("{}/{}", info.owner, info.repo));
+    let _ = collections::save_cache(&dir, &cache);
     collections::remove_user_collection(&dir, &id)
 }
 

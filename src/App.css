@@ -1022,6 +1022,16 @@ body,
   white-space: nowrap;
 }
 
+/* the toolbar variant sits inline, not pushed to the far right */
+.browse-toolbar .source-pill {
+  margin-left: 0;
+}
+
+.source-pill.stale {
+  color: var(--danger-bright);
+  border-color: var(--danger);
+}
+
 .browse-body {
   flex: 1;
   min-height: 0;

@@ -11,6 +11,7 @@ export function useCollections() {
   const [source, setSource] = useState<CatalogSource>("bundled");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [skills, setSkills] = useState<RemoteSkill[]>([]);
+  const [stale, setStale] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const latestRequest = useRef(0);
@@ -33,7 +34,8 @@ export function useCollections() {
     try {
       const result = force ? await api.refreshCollection(id) : await api.browseCollection(id);
       if (request !== latestRequest.current) return;
-      setSkills(result);
+      setSkills(result.skills);
+      setStale(result.stale);
     } catch (e) {
       if (request === latestRequest.current) setError(String(e));
     } finally {
@@ -75,7 +77,6 @@ export function useCollections() {
         setActiveId(null);
       }
       await loadCollections();
-      setActiveId((current) => current ?? null);
     },
     [activeId, loadCollections],
   );
@@ -85,6 +86,7 @@ export function useCollections() {
     source,
     activeId,
     skills,
+    stale,
     loading,
     error,
     select,

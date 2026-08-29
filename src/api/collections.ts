@@ -1,10 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import type {
+  BrowseResult,
   CollectionInfo,
   InstallSkillInput,
   InstallResult,
   ListCollectionsResult,
-  RemoteSkill,
 } from "../types";
 
 /** Invoke wrappers over the collection commands in
@@ -13,10 +13,10 @@ export const collectionsApi = {
   listCollections(): Promise<ListCollectionsResult> {
     return invoke("list_collections");
   },
-  browseCollection(id: string): Promise<RemoteSkill[]> {
+  browseCollection(id: string): Promise<BrowseResult> {
     return invoke("browse_collection", { id });
   },
-  refreshCollection(id: string): Promise<RemoteSkill[]> {
+  refreshCollection(id: string): Promise<BrowseResult> {
     return invoke("refresh_collection", { id });
   },
   addCollection(repo: string, title?: string): Promise<CollectionInfo> {

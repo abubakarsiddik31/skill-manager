@@ -17,7 +17,8 @@ src/
                         AddProject, Projects)
     ui/                 shared primitives (ModalShell, icons)
   hooks/                data + mutations (useGlobalSkills, useProjects, useProjectSkills)
-  utils/                pure helpers + tests (filtering, sidebar lists, time, markdown)
+  utils/                pure helpers + tests (filtering, sidebar lists, time, markdown,
+                        collection search)
   types/                shared frontend types split by domain, barrel at types/index.ts
 src-tauri/src/
   commands/             tauri commands split by domain — skills.rs, create_skill.rs,
