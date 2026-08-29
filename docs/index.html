@@ -344,6 +344,12 @@
       .dl-btn.primary:hover {
         background: #e5e5e5;
       }
+      /* the platform picker hides these via JS; the explicit rule is
+         needed because .dl-btn's display:flex would override the
+         user-agent's [hidden] display:none */
+      .dl-btn[hidden] {
+        display: none;
+      }
 
       .dl-note {
         font-family: var(--mono);
@@ -1264,19 +1270,49 @@
     <script>
       (function () {
         var ua = navigator.userAgent;
-        var os = /Mac/.test(ua)
-          ? "mac"
-          : /Win/.test(ua)
-            ? "win"
-            : /Linux/.test(ua)
-              ? "linux"
-              : null;
+        // phones can't run any of the installers — keep the full row
+        // for them instead of guessing a desktop platform
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+        var os = isMobile
+          ? null
+          : /Mac/.test(ua)
+            ? "mac"
+            : /Win/.test(ua)
+              ? "win"
+              : /Linux|X11/.test(ua)
+                ? "linux"
+                : null;
+        // unknown platform or no JS: every button stays visible
         if (!os) return;
+        var labels = { mac: "macOS", win: "Windows", linux: "Linux" };
+        var note = document.querySelector(".dl-note");
+        var others = [];
         document
           .querySelectorAll("#downloads .dl-btn[data-os]")
           .forEach(function (btn) {
-            if (btn.dataset.os === os) btn.classList.add("primary");
+            if (btn.dataset.os === os) {
+              btn.classList.add("primary");
+              btn.textContent = "Download for " + labels[os];
+            } else {
+              btn.hidden = true;
+              others.push({ os: btn.dataset.os, href: btn.href });
+            }
           });
+        if (!others.length || !note) return;
+        // the big button covers the visitor's platform, so the generic
+        // "all downloads" link makes way for direct links to the rest
+        var also = document.createElement("span");
+        also.textContent = "also available for ";
+        others.forEach(function (other, i) {
+          if (i > 0) also.appendChild(document.createTextNode(" and "));
+          var link = document.createElement("a");
+          link.href = other.href;
+          link.textContent = labels[other.os];
+          also.appendChild(link);
+        });
+        var allLink = note.querySelector("a");
+        if (allLink) note.replaceChild(also, allLink);
+        else note.appendChild(also);
       })();
     </script>
   </body>
