@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { orderToolsByPin, selectVisibleProjects } from "../../utils/sidebarLists";
+import {
+  orderToolsByPin,
+  selectVisibleProjects,
+} from "../../utils/sidebarLists";
 import { PinIcon } from "../ui/icons";
 import type { ProjectInfo, ToolEntry, View } from "../../types";
 
@@ -65,14 +68,13 @@ export function Sidebar({
   }, []);
 
   const sortedTools = orderToolsByPin(toolEntries, pinnedTools);
-  const visibleTools = toolsExpanded ? sortedTools : sortedTools.slice(0, PREVIEW_COUNT);
+  const visibleTools = toolsExpanded
+    ? sortedTools
+    : sortedTools.slice(0, PREVIEW_COUNT);
   const hiddenTools = sortedTools.length - visibleTools.length;
 
-  const { visible: visibleProjects, hiddenCount: hiddenProjects } = selectVisibleProjects(
-    projects,
-    MOST_USED_COUNT,
-    MIN_PROJECT_ROWS,
-  );
+  const { visible: visibleProjects, hiddenCount: hiddenProjects } =
+    selectVisibleProjects(projects, MOST_USED_COUNT, MIN_PROJECT_ROWS);
 
   return (
     <aside className="sidebar">
@@ -83,98 +85,108 @@ export function Sidebar({
         </span>
       </div>
 
-      <div
-        className={`nav-item ${view.kind === "global" && activeToolId === ALL ? "active" : ""}`}
-        onClick={onSelectAll}
-      >
-        <span>all skills</span>
-        <span className="count">{totalSkillCount}</span>
-      </div>
+      <nav className="sidebar-nav" aria-label="skill manager navigation">
+        <div
+          className={`nav-item ${view.kind === "global" && activeToolId === ALL ? "active" : ""}`}
+          onClick={onSelectAll}
+        >
+          <span>all skills</span>
+          <span className="count">{totalSkillCount}</span>
+        </div>
 
-      <div
-        className={`nav-item ${view.kind === "browse" ? "active" : ""}`}
-        onClick={onBrowse}
-        title="browse and install skills from GitHub collections"
-      >
-        <span>browse collections</span>
-        <span className="count">↗</span>
-      </div>
+        <div
+          className={`nav-item ${view.kind === "browse" ? "active" : ""}`}
+          onClick={onBrowse}
+          title="browse and install skills from GitHub collections"
+        >
+          <span>browse collections</span>
+          <span className="count">↗</span>
+        </div>
 
-      {visibleTools.map((entry) => {
-        const anyDirExists = entry.folders.some((f) => f.dirExists);
-        return (
+        {visibleTools.map((entry) => {
+          const anyDirExists = entry.folders.some((f) => f.dirExists);
+          return (
+            <div
+              key={entry.id}
+              className={`nav-item ${view.kind === "global" && activeToolId === entry.id ? "active" : ""}`}
+              onClick={() => onSelectTool(entry.id)}
+              title={entry.folders.map((f) => f.dir).join("\n")}
+            >
+              <span className={anyDirExists ? "" : "dir-missing"}>
+                {entry.label}
+              </span>
+              <span className="nav-right">
+                <button
+                  className={`pin-btn ${pinnedTools.has(entry.id) ? "pinned" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTogglePinTool(entry.id);
+                  }}
+                  title={pinnedTools.has(entry.id) ? "unpin" : "pin"}
+                >
+                  <PinIcon />
+                </button>
+                <span className="count">{countForEntry(entry)}</span>
+              </span>
+            </div>
+          );
+        })}
+
+        {hiddenTools > 0 && (
           <div
-            key={entry.id}
-            className={`nav-item ${view.kind === "global" && activeToolId === entry.id ? "active" : ""}`}
-            onClick={() => onSelectTool(entry.id)}
-            title={entry.folders.map((f) => f.dir).join("\n")}
+            className="nav-item expand"
+            onClick={() => setToolsExpanded(true)}
           >
-            <span className={anyDirExists ? "" : "dir-missing"}>{entry.label}</span>
+            <span>+ {hiddenTools} more</span>
+          </div>
+        )}
+        {toolsExpanded && sortedTools.length > PREVIEW_COUNT && (
+          <div
+            className="nav-item expand"
+            onClick={() => setToolsExpanded(false)}
+          >
+            <span>show less</span>
+          </div>
+        )}
+
+        <div className="nav-section-label">projects</div>
+
+        {visibleProjects.map((p) => (
+          <div
+            key={p.path}
+            className={`nav-item ${view.kind === "project" && view.project.path === p.path ? "active" : ""}`}
+            onClick={() => onOpenProject(p)}
+            title={p.path}
+          >
+            <span>{p.name}</span>
             <span className="nav-right">
+              {skillCounts[p.path] !== undefined && (
+                <span className="count">{skillCounts[p.path]}</span>
+              )}
               <button
-                className={`pin-btn ${pinnedTools.has(entry.id) ? "pinned" : ""}`}
+                className={`pin-btn ${p.pinned ? "pinned" : ""}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onTogglePinTool(entry.id);
+                  onTogglePinProject(p);
                 }}
-                title={pinnedTools.has(entry.id) ? "unpin" : "pin"}
+                title={p.pinned ? "unpin" : "pin"}
               >
                 <PinIcon />
               </button>
-              <span className="count">{countForEntry(entry)}</span>
             </span>
           </div>
-        );
-      })}
+        ))}
 
-      {hiddenTools > 0 && (
-        <div className="nav-item expand" onClick={() => setToolsExpanded(true)}>
-          <span>+ {hiddenTools} more</span>
+        {hiddenProjects > 0 && (
+          <div className="nav-item expand" onClick={onShowAllProjects}>
+            <span>+ {hiddenProjects} more</span>
+          </div>
+        )}
+
+        <div className="nav-item add-project" onClick={onAddProject}>
+          <span>+ add project</span>
         </div>
-      )}
-      {toolsExpanded && sortedTools.length > PREVIEW_COUNT && (
-        <div className="nav-item expand" onClick={() => setToolsExpanded(false)}>
-          <span>show less</span>
-        </div>
-      )}
-
-      <div className="nav-section-label">projects</div>
-
-      {visibleProjects.map((p) => (
-        <div
-          key={p.path}
-          className={`nav-item ${view.kind === "project" && view.project.path === p.path ? "active" : ""}`}
-          onClick={() => onOpenProject(p)}
-          title={p.path}
-        >
-          <span>{p.name}</span>
-          <span className="nav-right">
-            {skillCounts[p.path] !== undefined && (
-              <span className="count">{skillCounts[p.path]}</span>
-            )}
-            <button
-              className={`pin-btn ${p.pinned ? "pinned" : ""}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onTogglePinProject(p);
-              }}
-              title={p.pinned ? "unpin" : "pin"}
-            >
-              <PinIcon />
-            </button>
-          </span>
-        </div>
-      ))}
-
-      {hiddenProjects > 0 && (
-        <div className="nav-item expand" onClick={onShowAllProjects}>
-          <span>+ {hiddenProjects} more</span>
-        </div>
-      )}
-
-      <div className="nav-item add-project" onClick={onAddProject}>
-        <span>+ add project</span>
-      </div>
+      </nav>
 
       <div className="sidebar-footer">
         <div className="footer-row">
@@ -195,7 +207,9 @@ export function Sidebar({
         <div className="footer-links">
           <a onClick={link(REPO_URL)}>github</a>
           <span className="sep">·</span>
-          <a onClick={link(`${REPO_URL}/issues/new?template=bug_report.yml`)}>report a bug</a>
+          <a onClick={link(`${REPO_URL}/issues/new?template=bug_report.yml`)}>
+            report a bug
+          </a>
           <span className="sep">·</span>
           <a onClick={link(`${REPO_URL}/blob/main/LICENSE`)}>mit</a>
         </div>

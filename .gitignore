@@ -28,3 +28,4 @@ dist-ssr
 # Local development working notes (superpowers plans/specs, SDD ledger)
 docs/superpowers/
 .superpowers/
+.gstack/
