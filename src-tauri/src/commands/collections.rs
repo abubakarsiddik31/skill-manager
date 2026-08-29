@@ -260,20 +260,42 @@ pub fn install_skill(
             skill.owner, skill.repo
         ));
     }
-    let (branch, tree, _) = repo_tree(&app, &mut cache, &skill.owner, &skill.repo, false)?;
-
-    let (files, skipped_links) = collections::files_for_skill(&tree, &skill.path)?;
+    // Installs download one tarball from codeload — outside the REST
+    // API and its 60 req/h unauthenticated quota — instead of one blob
+    // request per file. The ref needs no network round trip: the
+    // bundled index knows built-ins' branches, the tree cache knows
+    // user-added ones, and HEAD always serves the current default
+    // branch. `skill.branch` is webview input and deliberately ignored.
+    let reference = collections::bundled_branch(&info.owner, &info.repo)
+        .or_else(|| {
+            cache
+                .repos
+                .get(&format!("{}/{}", info.owner, info.repo))
+                .map(|hit| hit.branch.clone())
+        })
+        .unwrap_or_else(|| "HEAD".to_string());
+    let tarball = HTTP
+        .fetch_tarball(&info.owner, &info.repo, &reference)
+        .map_err(|e| {
+            if e.starts_with("not found:") {
+                format!(
+                    "'{}/{}' cannot be downloaded — the repository or its '{reference}' ref may have been removed",
+                    info.owner, info.repo
+                )
+            } else {
+                e
+            }
+        })?;
+    let (files, skipped_links) = collections::files_from_tarball(&tarball, &skill.path)?;
     let provenance = Provenance {
         owner: skill.owner.clone(),
         repo: skill.repo.clone(),
         path: skill.path.clone(),
-        branch,
-        tree_sha: tree.sha.clone(),
+        branch: reference,
         installed_at: collections::now_secs(),
         collection_id,
     };
     let manifest = collections::install_skill_files(
-        &HTTP,
         &roots,
         &root,
         &skill.name,

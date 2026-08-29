@@ -7,9 +7,10 @@ use super::RemoteSkill;
 
 /// The skill index compiled into the binary: names, descriptions, and
 /// paths for every built-in collection, generated from each repo's git
-/// tree. Browsing serves this file and touches no GitHub API — the
-/// unauthenticated rate limit (60 req/h) is only spent on installs and
-/// explicit refreshes.
+/// tree. Browsing serves this file and touches no GitHub API, and the
+/// unauthenticated rate limit (60 req/h) is spent only on explicit
+/// refreshes and first-time enumerations of user-added repos — installs
+/// download a codeload tarball, which is outside that quota.
 pub const BUNDLED_INDEX: &str = include_str!("skills.json");
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -100,6 +101,15 @@ pub fn bundled_skill_count(owner: &str, repo: &str, subpath: Option<&str>) -> Op
     bundled_skills(owner, repo, subpath).map(|s| s.len() as u64)
 }
 
+/// The branch the bundled index recorded for a repo, so installs can
+/// download a tarball without spending a REST API call on resolving
+/// the default branch.
+pub fn bundled_branch(owner: &str, repo: &str) -> Option<String> {
+    index()?
+        .get(&format!("{owner}/{repo}"))
+        .map(|indexed| indexed.branch.clone())
+}
+
 /// Fill missing descriptions on freshly enumerated skills from the
 /// bundled index, matched by path — a refresh keeps the UI readable
 /// without spending a blob fetch per skill.
@@ -155,6 +165,13 @@ mod tests {
     fn unknown_repos_have_no_bundled_skills() {
         assert!(bundled_skills("someone", "unknown", None).is_none());
         assert!(bundled_skill_count("someone", "unknown", None).is_none());
+        assert!(bundled_branch("someone", "unknown").is_none());
+    }
+
+    #[test]
+    fn bundled_branch_serves_the_recorded_branch_offline() {
+        let branch = bundled_branch("anthropics", "skills").unwrap();
+        assert!(!branch.is_empty());
     }
 
     #[test]

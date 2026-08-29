@@ -1,10 +1,14 @@
-use base64::engine::general_purpose::STANDARD as BASE64;
-use base64::Engine;
 use serde::{Deserialize, Serialize};
+use std::io::Read;
 use std::time::Duration;
 
 /// GitHub requires a User-Agent on every request; identify the app.
 pub const USER_AGENT: &str = "skill-manager (https://github.com/abubakarsiddik31/skill-manager)";
+
+/// Hard cap on any single response. Repo tarballs run a few MB; a
+/// misbehaving or hostile server must not be able to stream unbounded
+/// data into memory.
+const MAX_DOWNLOAD_BYTES: u64 = 64 * 1024 * 1024;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TreeEntry {
@@ -29,31 +33,15 @@ pub fn api_url(path: &str) -> String {
     format!("https://api.github.com{path}")
 }
 
-pub fn parse_tree(json: &str) -> Result<TreeResponse, String> {
-    serde_json::from_str(json).map_err(|e| format!("cannot parse tree response: {e}"))
+/// codeload serves repo archives outside the REST API — and therefore
+/// outside its 60 req/h unauthenticated quota. `reference` may be a
+/// branch, tag, commit sha, or `HEAD` for the current default branch.
+pub fn tarball_url(owner: &str, repo: &str, reference: &str) -> String {
+    format!("https://codeload.github.com/{owner}/{repo}/tar.gz/{reference}")
 }
 
-/// Blob responses carry base64 content wrapped at 60 columns — strip the
-/// newlines before decoding, and refuse any non-base64 encoding.
-pub fn parse_blob(json: &str) -> Result<Vec<u8>, String> {
-    #[derive(Deserialize)]
-    struct Raw {
-        content: String,
-        encoding: String,
-    }
-    let raw: Raw =
-        serde_json::from_str(json).map_err(|e| format!("cannot parse blob response: {e}"))?;
-    if raw.encoding != "base64" {
-        return Err(format!("unsupported blob encoding '{}'", raw.encoding));
-    }
-    let compact: String = raw
-        .content
-        .chars()
-        .filter(|c| *c != '\n' && *c != '\r')
-        .collect();
-    BASE64
-        .decode(compact.as_bytes())
-        .map_err(|e| format!("cannot decode blob content: {e}"))
+pub fn parse_tree(json: &str) -> Result<TreeResponse, String> {
+    serde_json::from_str(json).map_err(|e| format!("cannot parse tree response: {e}"))
 }
 
 pub fn parse_default_branch(json: &str) -> Result<String, String> {
@@ -72,7 +60,12 @@ pub fn parse_default_branch(json: &str) -> Result<String, String> {
 /// The one seam every GitHub call goes through. Tests provide fixture
 /// implementations; production uses `UreqGithubHttp`.
 pub trait GithubHttp: Send + Sync {
-    fn get_text(&self, url: &str) -> Result<String, String>;
+    fn get_bytes(&self, url: &str) -> Result<Vec<u8>, String>;
+
+    fn get_text(&self, url: &str) -> Result<String, String> {
+        self.get_bytes(url)
+            .map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
+    }
 
     fn fetch_tree(&self, owner: &str, repo: &str, reference: &str) -> Result<TreeResponse, String> {
         let url = api_url(&format!(
@@ -81,29 +74,46 @@ pub trait GithubHttp: Send + Sync {
         self.get_text(&url).and_then(|t| parse_tree(&t))
     }
 
-    fn fetch_blob(&self, owner: &str, repo: &str, sha: &str) -> Result<Vec<u8>, String> {
-        let url = api_url(&format!("/repos/{owner}/{repo}/git/blobs/{sha}"));
-        self.get_text(&url).and_then(|t| parse_blob(&t))
-    }
-
     fn fetch_default_branch(&self, owner: &str, repo: &str) -> Result<String, String> {
         let url = api_url(&format!("/repos/{owner}/{repo}"));
         self.get_text(&url).and_then(|t| parse_default_branch(&t))
+    }
+
+    /// Download one repo's tarball — a single request that spends none
+    /// of the REST API quota, unlike fetching every skill file as its
+    /// own blob.
+    fn fetch_tarball(&self, owner: &str, repo: &str, reference: &str) -> Result<Vec<u8>, String> {
+        self.get_bytes(&tarball_url(owner, repo, reference))
     }
 }
 
 pub struct UreqGithubHttp;
 
+impl UreqGithubHttp {
+    fn read_capped(response: ureq::Response) -> Result<Vec<u8>, String> {
+        let mut bytes = Vec::new();
+        let mut reader = response.into_reader().take(MAX_DOWNLOAD_BYTES + 1);
+        reader
+            .read_to_end(&mut bytes)
+            .map_err(|e| format!("cannot read response: {e}"))?;
+        if bytes.len() as u64 > MAX_DOWNLOAD_BYTES {
+            return Err(format!(
+                "response exceeds the {} MiB download cap",
+                MAX_DOWNLOAD_BYTES / (1024 * 1024)
+            ));
+        }
+        Ok(bytes)
+    }
+}
+
 impl GithubHttp for UreqGithubHttp {
-    fn get_text(&self, url: &str) -> Result<String, String> {
+    fn get_bytes(&self, url: &str) -> Result<Vec<u8>, String> {
         match ureq::get(url)
             .set("User-Agent", USER_AGENT)
-            .timeout(Duration::from_secs(30))
+            .timeout(Duration::from_secs(60))
             .call()
         {
-            Ok(response) => response
-                .into_string()
-                .map_err(|e| format!("cannot read response: {e}")),
+            Ok(response) => Self::read_capped(response),
             Err(ureq::Error::Status(404, _)) => Err(format!("not found: {url}")),
             Err(ureq::Error::Status(403, _)) | Err(ureq::Error::Status(429, _)) => {
                 Err("GitHub rate limit reached — wait a few minutes and refresh".into())
@@ -121,7 +131,7 @@ pub(crate) mod testutil {
     use std::collections::HashMap;
 
     pub struct FakeGithubHttp {
-        pub bodies: HashMap<String, String>,
+        pub bodies: HashMap<String, Vec<u8>>,
     }
 
     impl FakeGithubHttp {
@@ -132,7 +142,8 @@ pub(crate) mod testutil {
         }
 
         pub fn mount(&mut self, url_suffix: &str, body: &str) {
-            self.bodies.insert(url_suffix.to_string(), body.to_string());
+            self.bodies
+                .insert(url_suffix.to_string(), body.as_bytes().to_vec());
         }
     }
 
@@ -143,7 +154,7 @@ pub(crate) mod testutil {
     }
 
     impl GithubHttp for FakeGithubHttp {
-        fn get_text(&self, url: &str) -> Result<String, String> {
+        fn get_bytes(&self, url: &str) -> Result<Vec<u8>, String> {
             self.bodies
                 .iter()
                 .find(|(suffix, _)| url.ends_with(suffix.as_str()))
@@ -191,20 +202,16 @@ mod tests {
     }
 
     #[test]
-    fn parse_blob_decodes_base64_with_newlines() {
-        // GitHub wraps blob content at 60 columns with literal newlines.
-        let json = r#"{"content": "aGVs\nbG8=\n", "encoding": "base64"}"#;
-        assert_eq!(parse_blob(json).unwrap(), b"hello");
-    }
-
-    #[test]
-    fn parse_blob_rejects_unknown_encoding() {
-        assert!(parse_blob(r#"{"content": "x", "encoding": "utf-16"}"#).is_err());
-    }
-
-    #[test]
     fn parse_default_branch_reads_field() {
         let json = r#"{"default_branch": "main", "full_name": "a/b"}"#;
         assert_eq!(parse_default_branch(json).unwrap(), "main");
+    }
+
+    #[test]
+    fn tarball_url_targets_codeload_not_the_api() {
+        assert_eq!(
+            tarball_url("anthropics", "skills", "HEAD"),
+            "https://codeload.github.com/anthropics/skills/tar.gz/HEAD"
+        );
     }
 }
