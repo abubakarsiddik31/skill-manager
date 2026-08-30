@@ -29,3 +29,6 @@ dist-ssr
 docs/superpowers/
 .superpowers/
 .gstack/
+
+# Uncompressed demo master (keep local only)
+skill-manager-demo-v0.4.2-original.gif

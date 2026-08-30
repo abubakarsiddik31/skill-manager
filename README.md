@@ -44,7 +44,7 @@ a config file ever again.
 
 <br />
 
-<img src="docs/assets/demo.gif" width="760" alt="Skill Manager demo: browsing, filtering, searching, and viewing a skill across Claude Code, Codex, Cursor, Gemini CLI, and OpenCode" />
+<img src="docs/assets/skill-manager-demo-v0.4.2.gif" width="760" alt="Skill Manager demo: every installed skill in one list across all tools, browsing collections and installing a skill into the tool and scope of your choice, and creating a new skill in a project" />
 
 </div>
 

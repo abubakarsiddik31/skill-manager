@@ -394,7 +394,8 @@
           0 30px 80px -30px rgba(255, 255, 255, 0.08);
         background: var(--surface);
       }
-      .demo-frame img {
+      .demo-frame img,
+      .demo-frame video {
         display: block;
         width: 100%;
         height: auto;
@@ -832,17 +833,20 @@
 
       <section id="demo" style="border-top: none; padding-top: 0">
         <div class="demo-frame">
-          <img
-            src="./assets/demo.gif"
+          <video
+            src="./assets/skill-manager-demo-v0.4.2.mp4"
             width="760"
-            height="506"
-            loading="eager"
-            alt="Skill Manager: browsing all installed skills, filtering by tool, searching, and opening a skill's SKILL.md in the view/edit modal"
-          />
+            height="555"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-label="Skill Manager demo: every installed skill in one list across all tools, browsing collections and installing a skill, and creating a new skill in a project"
+          ></video>
         </div>
         <p class="demo-caption">
-          actual screen capture — not a mockup · <b>74 skills</b> across four
-          tools, one list
+          actual screen capture — not a mockup · <b>140+ skills</b> across
+          every tool, one list
         </p>
       </section>
 
